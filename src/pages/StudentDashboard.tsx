@@ -46,6 +46,8 @@ export default function StudentDashboard() {
   const [triggerAnswers, setTriggerAnswers] = useState<TriggerAnswer[]>([]);
   const [loading, setLoading] = useState(true);
   const [fullName, setFullName] = useState('');
+  const [nis, setNis] = useState('');
+  const [kelas, setKelas] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -57,15 +59,17 @@ export default function StudentDashboard() {
     if (!user) return;
     setLoading(true);
 
-    // Fetch profile
+    // Fetch profile with NIS and kelas
     const { data: profileData } = await supabase
       .from('profiles')
-      .select('full_name')
+      .select('full_name, nis, kelas')
       .eq('id', user.id)
       .maybeSingle();
     
     if (profileData) {
       setFullName(profileData.full_name || 'Siswa');
+      setNis(profileData.nis || '-');
+      setKelas(profileData.kelas || '-');
     }
 
     // Fetch quiz answers
@@ -176,7 +180,15 @@ export default function StudentDashboard() {
           {/* Page Header */}
           <motion.div variants={itemVariants}>
             <h1 className="text-3xl font-display font-bold mb-2">Halo, {fullName}! 👋</h1>
-            <p className="text-muted-foreground">Lihat progress dan hasil belajarmu di sini</p>
+            <div className="flex flex-wrap items-center gap-3 text-muted-foreground">
+              <span>Lihat progress dan hasil belajarmu</span>
+              {nis !== '-' && (
+                <Badge variant="outline" className="font-mono">NIS: {nis}</Badge>
+              )}
+              {kelas !== '-' && (
+                <Badge variant="secondary">Kelas {kelas}</Badge>
+              )}
+            </div>
           </motion.div>
 
           {/* Stats */}

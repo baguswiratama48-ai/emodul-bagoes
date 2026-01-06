@@ -57,18 +57,24 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          kelas: string | null
+          nis: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           full_name?: string | null
           id: string
+          kelas?: string | null
+          nis?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           full_name?: string | null
           id?: string
+          kelas?: string | null
+          nis?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -110,6 +116,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      teacher_feedback: {
+        Row: {
+          answer_id: string
+          answer_type: string
+          created_at: string
+          feedback: string
+          id: string
+          student_id: string
+          teacher_id: string
+          updated_at: string
+        }
+        Insert: {
+          answer_id: string
+          answer_type: string
+          created_at?: string
+          feedback: string
+          id?: string
+          student_id: string
+          teacher_id: string
+          updated_at?: string
+        }
+        Update: {
+          answer_id?: string
+          answer_type?: string
+          created_at?: string
+          feedback?: string
+          id?: string
+          student_id?: string
+          teacher_id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       trigger_answers: {
         Row: {
