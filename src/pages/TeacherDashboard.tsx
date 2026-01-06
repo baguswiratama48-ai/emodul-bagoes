@@ -66,16 +66,21 @@ export default function TeacherDashboard() {
 
   const fetchStudentData = async () => {
     setLoading(true);
+
+    // First fetch all profiles for lookup
+    const { data: profilesData } = await supabase
+      .from('profiles')
+      .select('id, full_name');
     
-    // Fetch quiz answers with profiles
+    const profilesMap: Record<string, string> = {};
+    profilesData?.forEach((p) => {
+      profilesMap[p.id] = p.full_name || 'Unknown';
+    });
+    
+    // Fetch quiz answers
     const { data: quizData } = await supabase
       .from('quiz_answers')
-      .select(`
-        user_id,
-        question_id,
-        is_correct,
-        profiles!inner(full_name)
-      `);
+      .select('user_id, question_id, is_correct');
 
     if (quizData) {
       const userScores: Record<string, StudentQuizResult> = {};
@@ -83,7 +88,7 @@ export default function TeacherDashboard() {
         if (!userScores[answer.user_id]) {
           userScores[answer.user_id] = {
             user_id: answer.user_id,
-            full_name: answer.profiles?.full_name || 'Unknown',
+            full_name: profilesMap[answer.user_id] || 'Unknown',
             total_questions: 0,
             correct_answers: 0,
             score: 0
@@ -102,70 +107,50 @@ export default function TeacherDashboard() {
       setQuizResults(Object.values(userScores));
     }
 
-    // Fetch LKPD answers with profiles
+    // Fetch LKPD answers
     const { data: lkpdData } = await supabase
       .from('lkpd_answers')
-      .select(`
-        user_id,
-        problem_id,
-        answer,
-        submitted_at,
-        profiles!inner(full_name)
-      `)
+      .select('user_id, problem_id, answer, submitted_at')
       .order('submitted_at', { ascending: false });
 
     if (lkpdData) {
       setLkpdAnswers(lkpdData.map((item: any) => ({
         user_id: item.user_id,
-        full_name: item.profiles?.full_name || 'Unknown',
+        full_name: profilesMap[item.user_id] || 'Unknown',
         problem_id: item.problem_id,
         answer: item.answer,
         submitted_at: item.submitted_at
       })));
     }
 
-    // Fetch trigger answers with profiles (only pemantik, not refleksi)
+    // Fetch trigger answers (only pemantik, not refleksi)
     const { data: triggerData } = await supabase
       .from('trigger_answers')
-      .select(`
-        user_id,
-        module_id,
-        question_id,
-        answer,
-        submitted_at,
-        profiles!inner(full_name)
-      `)
+      .select('user_id, module_id, question_id, answer, submitted_at')
       .not('module_id', 'like', '%-refleksi')
       .order('submitted_at', { ascending: false });
 
     if (triggerData) {
       setTriggerAnswers(triggerData.map((item: any) => ({
         user_id: item.user_id,
-        full_name: item.profiles?.full_name || 'Unknown',
+        full_name: profilesMap[item.user_id] || 'Unknown',
         question_id: item.question_id,
         answer: item.answer,
         submitted_at: item.submitted_at
       })));
     }
 
-    // Fetch reflection answers with profiles
+    // Fetch reflection answers
     const { data: reflectionData } = await supabase
       .from('trigger_answers')
-      .select(`
-        user_id,
-        module_id,
-        question_id,
-        answer,
-        submitted_at,
-        profiles!inner(full_name)
-      `)
+      .select('user_id, module_id, question_id, answer, submitted_at')
       .like('module_id', '%-refleksi')
       .order('submitted_at', { ascending: false });
 
     if (reflectionData) {
       setReflectionAnswers(reflectionData.map((item: any) => ({
         user_id: item.user_id,
-        full_name: item.profiles?.full_name || 'Unknown',
+        full_name: profilesMap[item.user_id] || 'Unknown',
         question_id: item.question_id,
         answer: item.answer,
         submitted_at: item.submitted_at
