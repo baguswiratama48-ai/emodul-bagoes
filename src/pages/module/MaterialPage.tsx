@@ -16,7 +16,6 @@ import { ModuleLayout } from '@/components/layout/ModuleLayout';
 import { useProgress } from '@/hooks/useProgress';
 import { demandModule } from '@/data/moduleContent';
 import { DemandCurveChart } from '@/components/interactive/DemandCurveChart';
-import { DemandCalculator } from '@/components/interactive/DemandCalculator';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -151,12 +150,6 @@ export default function MaterialPage() {
                       </div>
                     )}
 
-                    {section.id === 'fungsi-permintaan' && (
-                      <div className="mt-8">
-                        <h3 className="text-lg font-semibold mb-4">🧮 Kalkulator Fungsi Permintaan</h3>
-                        <DemandCalculator />
-                      </div>
-                    )}
                   </CardContent>
                 </Card>
 
