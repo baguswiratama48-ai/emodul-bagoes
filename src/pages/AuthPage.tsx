@@ -42,10 +42,16 @@ export default function AuthPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Auto-format: if input looks like NISN (numbers only), append @siswa.local
+    let emailToUse = loginEmail.trim();
+    if (/^\d+$/.test(emailToUse)) {
+      emailToUse = `${emailToUse}@siswa.local`;
+    }
+    
     // Validate
-    const emailResult = emailSchema.safeParse(loginEmail);
+    const emailResult = emailSchema.safeParse(emailToUse);
     if (!emailResult.success) {
-      toast({ title: 'Error', description: emailResult.error.errors[0].message, variant: 'destructive' });
+      toast({ title: 'Error', description: 'NISN atau email tidak valid', variant: 'destructive' });
       return;
     }
     
@@ -57,12 +63,12 @@ export default function AuthPage() {
     
     setIsSubmitting(true);
     
-    const { error } = await signIn(loginEmail, loginPassword);
+    const { error } = await signIn(emailToUse, loginPassword);
     
     if (error) {
       let message = 'Terjadi kesalahan saat login';
       if (error.message.includes('Invalid login credentials')) {
-        message = 'Email atau password salah';
+        message = 'NISN/Email atau password salah';
       }
       toast({ title: 'Login Gagal', description: message, variant: 'destructive' });
     } else {
@@ -150,19 +156,19 @@ export default function AuthPage() {
               <CardHeader>
                 <CardTitle>Masuk ke Akun</CardTitle>
                 <CardDescription>
-                  Siswa: gunakan NISN sebagai email (contoh: 0099891698@siswa.local) dan NIS sebagai password
+                  Siswa: masukkan NISN dan NIS sebagai password
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
+                    <Label htmlFor="login-email">NISN / Email</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
                         id="login-email"
-                        type="email"
-                        placeholder="nama@email.com"
+                        type="text"
+                        placeholder="Masukkan NISN atau email"
                         className="pl-10"
                         value={loginEmail}
                         onChange={(e) => setLoginEmail(e.target.value)}
