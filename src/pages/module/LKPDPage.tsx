@@ -7,51 +7,70 @@ import {
   ArrowLeft,
   FileText,
   CheckCircle2,
-  HelpCircle
+  HelpCircle,
+  Calculator
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ModuleLayout } from '@/components/layout/ModuleLayout';
 import { useProgress } from '@/hooks/useProgress';
 import { demandModule } from '@/data/moduleContent';
 
-const demandScheduleData = [
-  { price: 8000, quantity: 30 },
-  { price: 7000, quantity: 50 },
-  { price: 6000, quantity: 70 },
-  { price: 5000, quantity: 100 },
-  { price: 4000, quantity: 140 },
-];
-
-const lkpdQuestions = [
+const lkpdProblems = [
   {
     id: 1,
-    question: "Berdasarkan tabel di atas, bagaimana hubungan antara harga dan jumlah permintaan minuman dingin?",
-    type: "textarea",
+    title: "Soal 1: Penjualan Es Teh di Kantin",
+    story: "Bu Siti menjual es teh di kantin sekolah. Ketika harga es teh Rp5.000 per gelas, ia berhasil menjual 100 gelas per hari. Setelah menurunkan harga menjadi Rp3.000 per gelas, penjualannya meningkat menjadi 160 gelas per hari.",
+    question: "Tentukan fungsi permintaan es teh di kantin Bu Siti!",
+    hint: "Gunakan rumus: a = ΔQ/ΔP, lalu substitusi ke persamaan garis",
+    data: {
+      p1: "5.000",
+      q1: "100",
+      p2: "3.000", 
+      q2: "160"
+    }
   },
   {
     id: 2,
-    question: "Apakah data tersebut sesuai dengan hukum permintaan? Jelaskan alasanmu!",
-    type: "textarea",
+    title: "Soal 2: Penjualan Pulpen di Koperasi",
+    story: "Koperasi sekolah menjual pulpen. Saat harga pulpen Rp4.000 per buah, terjual 50 buah per minggu. Ketika harga dinaikkan menjadi Rp6.000 per buah, jumlah yang terjual menurun menjadi 30 buah per minggu.",
+    question: "Tentukan fungsi permintaan pulpen di koperasi sekolah!",
+    hint: "Perhatikan: harga naik, permintaan turun (sesuai hukum permintaan)",
+    data: {
+      p1: "4.000",
+      q1: "50",
+      p2: "6.000",
+      q2: "30"
+    }
   },
   {
     id: 3,
-    question: "Hitunglah fungsi permintaan berdasarkan data titik (Rp8.000, 30 gelas) dan (Rp4.000, 140 gelas)!",
-    type: "textarea",
+    title: "Soal 3: Penjualan Bakso di Stadion",
+    story: "Pak Joko berjualan bakso di stadion. Pada saat pertandingan biasa, dengan harga Rp15.000 per mangkok, ia menjual 80 mangkok. Saat ia memberikan diskon menjadi Rp12.000 per mangkok, penjualan meningkat menjadi 110 mangkok.",
+    question: "Tentukan fungsi permintaan bakso Pak Joko dan hitung berapa mangkok yang akan terjual jika harga diturunkan lagi menjadi Rp10.000!",
+    hint: "Setelah menemukan fungsi, substitusikan P = 10.000 untuk mencari Q",
+    data: {
+      p1: "15.000",
+      q1: "80",
+      p2: "12.000",
+      q2: "110"
+    }
   },
   {
     id: 4,
-    question: "Jika harga diturunkan menjadi Rp3.000, berapakah perkiraan jumlah permintaan? (Gunakan fungsi yang sudah kamu hitung)",
-    type: "input",
-  },
-  {
-    id: 5,
-    question: "Faktor apa saja yang mungkin mempengaruhi permintaan minuman dingin di kantin selain harga? Sebutkan minimal 3 faktor!",
-    type: "textarea",
+    title: "Soal 4: Analisis Kasus",
+    story: "Toko buku menjual novel dengan harga Rp75.000 dan terjual 40 eksemplar per bulan. Setelah ada diskon 20%, penjualan meningkat menjadi 60 eksemplar per bulan.",
+    question: "a) Tentukan fungsi permintaan novel tersebut!\nb) Jika toko ingin menjual 80 eksemplar per bulan, berapa harga yang harus ditetapkan?",
+    hint: "Harga setelah diskon 20% = 75.000 - (20% × 75.000) = 60.000. Untuk bagian b, substitusi Q = 80 lalu cari P",
+    data: {
+      p1: "75.000",
+      q1: "40",
+      p2: "60.000 (setelah diskon)",
+      q2: "60"
+    }
   },
 ];
 
@@ -61,9 +80,14 @@ export default function LKPDPage() {
   const module = demandModule;
   
   const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [showHints, setShowHints] = useState<Record<number, boolean>>({});
 
   const handleAnswerChange = (id: number, value: string) => {
     setAnswers(prev => ({ ...prev, [id]: value }));
+  };
+
+  const toggleHint = (id: number) => {
+    setShowHints(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
   const handleComplete = () => {
@@ -103,7 +127,7 @@ export default function LKPDPage() {
             Lembar Kerja Peserta Didik
           </h1>
           <p className="text-muted-foreground">
-            Analisis studi kasus permintaan minuman dingin di kantin sekolah.
+            Latihan menentukan fungsi permintaan dari soal cerita
           </p>
         </motion.div>
 
@@ -113,88 +137,121 @@ export default function LKPDPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-primary" />
+                  <Calculator className="h-5 w-5 text-primary" />
                   <span className="text-foreground font-medium">Progress LKPD</span>
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  {answeredCount} dari {lkpdQuestions.length} pertanyaan terjawab
+                  {answeredCount} dari {lkpdProblems.length} soal terjawab
                 </span>
               </div>
             </CardContent>
           </Card>
         </motion.div>
 
-        {/* Case Study */}
+        {/* Rumus Pengingat */}
         <motion.div variants={itemVariants}>
           <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">📊</span>
-                Studi Kasus: Permintaan Minuman Dingin di Kantin
+                <span className="text-2xl">📐</span>
+                Rumus yang Digunakan
               </CardTitle>
-              <CardDescription>
-                Perhatikan data skedul permintaan berikut dengan seksama, kemudian jawab pertanyaan-pertanyaan di bawahnya.
-              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-foreground mb-4">
-                Berikut adalah data permintaan minuman dingin di kantin SMA Harapan Bangsa selama satu minggu:
-              </p>
-              
-              <div className="bg-card rounded-lg border overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-center">No</TableHead>
-                      <TableHead className="text-center">Harga per Gelas (Rp)</TableHead>
-                      <TableHead className="text-center">Jumlah Diminta (gelas/hari)</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {demandScheduleData.map((row, index) => (
-                      <TableRow key={index}>
-                        <TableCell className="text-center font-medium">{index + 1}</TableCell>
-                        <TableCell className="text-center">Rp{row.price.toLocaleString()}</TableCell>
-                        <TableCell className="text-center">{row.quantity}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="p-4 bg-card rounded-lg border">
+                  <p className="font-medium text-foreground mb-2">Rumus Slope:</p>
+                  <p className="font-mono text-lg text-primary">a = (Q₂ - Q₁) / (P₂ - P₁)</p>
+                </div>
+                <div className="p-4 bg-card rounded-lg border">
+                  <p className="font-medium text-foreground mb-2">Bentuk Fungsi Permintaan:</p>
+                  <p className="font-mono text-lg text-primary">Qd = aP + b</p>
+                </div>
+              </div>
+              <div className="p-4 bg-card rounded-lg border">
+                <p className="font-medium text-foreground mb-2">Persamaan Garis Melalui Dua Titik:</p>
+                <p className="font-mono text-primary">(Q - Q₁) / (Q₂ - Q₁) = (P - P₁) / (P₂ - P₁)</p>
               </div>
             </CardContent>
           </Card>
         </motion.div>
 
-        {/* Questions */}
-        {lkpdQuestions.map((q, index) => (
-          <motion.div key={q.id} variants={itemVariants}>
+        {/* Problems */}
+        {lkpdProblems.map((problem, index) => (
+          <motion.div key={problem.id} variants={itemVariants}>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-start gap-3 text-lg">
                   <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold flex items-center justify-center">
                     {index + 1}
                   </span>
-                  <span className="text-foreground">{q.question}</span>
+                  <span className="text-foreground">{problem.title}</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                {q.type === 'textarea' ? (
-                  <Textarea
-                    placeholder="Tuliskan jawabanmu di sini..."
-                    className="min-h-[120px] resize-none"
-                    value={answers[q.id] || ''}
-                    onChange={(e) => handleAnswerChange(q.id, e.target.value)}
-                  />
-                ) : (
-                  <Input
-                    placeholder="Jawaban..."
-                    value={answers[q.id] || ''}
-                    onChange={(e) => handleAnswerChange(q.id, e.target.value)}
-                  />
+              <CardContent className="space-y-4">
+                {/* Story */}
+                <div className="p-4 bg-muted/50 rounded-lg border-l-4 border-primary">
+                  <p className="text-foreground leading-relaxed">{problem.story}</p>
+                </div>
+
+                {/* Data Points */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="p-3 bg-card rounded-lg border text-center">
+                    <p className="text-xs text-muted-foreground">P₁</p>
+                    <p className="font-mono font-medium text-foreground">Rp{problem.data.p1}</p>
+                  </div>
+                  <div className="p-3 bg-card rounded-lg border text-center">
+                    <p className="text-xs text-muted-foreground">Q₁</p>
+                    <p className="font-mono font-medium text-foreground">{problem.data.q1}</p>
+                  </div>
+                  <div className="p-3 bg-card rounded-lg border text-center">
+                    <p className="text-xs text-muted-foreground">P₂</p>
+                    <p className="font-mono font-medium text-foreground">Rp{problem.data.p2}</p>
+                  </div>
+                  <div className="p-3 bg-card rounded-lg border text-center">
+                    <p className="text-xs text-muted-foreground">Q₂</p>
+                    <p className="font-mono font-medium text-foreground">{problem.data.q2}</p>
+                  </div>
+                </div>
+
+                {/* Question */}
+                <div className="p-3 bg-accent/50 rounded-lg">
+                  <p className="font-medium text-foreground">{problem.question}</p>
+                </div>
+
+                {/* Hint Toggle */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => toggleHint(problem.id)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <HelpCircle className="h-4 w-4 mr-2" />
+                  {showHints[problem.id] ? 'Sembunyikan Petunjuk' : 'Tampilkan Petunjuk'}
+                </Button>
+
+                {showHints[problem.id] && (
+                  <div className="p-3 bg-warning/10 border border-warning/30 rounded-lg">
+                    <p className="text-sm text-foreground">
+                      <strong>💡 Petunjuk:</strong> {problem.hint}
+                    </p>
+                  </div>
                 )}
+
+                {/* Answer Area */}
+                <div className="space-y-2">
+                  <Label htmlFor={`answer-${problem.id}`}>Jawaban:</Label>
+                  <Textarea
+                    id={`answer-${problem.id}`}
+                    placeholder="Tuliskan langkah-langkah penyelesaian dan jawabanmu di sini..."
+                    className="min-h-[150px] font-mono text-sm"
+                    value={answers[problem.id] || ''}
+                    onChange={(e) => handleAnswerChange(problem.id, e.target.value)}
+                  />
+                </div>
                 
-                {answers[q.id]?.trim() && (
-                  <div className="flex items-center gap-2 mt-3 text-success text-sm">
+                {answers[problem.id]?.trim() && (
+                  <div className="flex items-center gap-2 text-success text-sm">
                     <CheckCircle2 className="h-4 w-4" />
                     <span>Jawaban tersimpan</span>
                   </div>
@@ -209,15 +266,17 @@ export default function LKPDPage() {
           <Card className="bg-accent/50 border-accent">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
-                <HelpCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                <FileText className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm text-foreground font-medium mb-2">Petunjuk Pengerjaan:</p>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Jawablah setiap pertanyaan dengan jelas dan lengkap</li>
-                    <li>• Gunakan rumus dan konsep yang sudah dipelajari</li>
-                    <li>• Untuk menghitung fungsi permintaan, gunakan rumus: (Q - Q₁)/(Q₂ - Q₁) = (P - P₁)/(P₂ - P₁)</li>
-                    <li>• Jawabanmu akan tersimpan secara otomatis di browser</li>
-                  </ul>
+                  <p className="text-sm text-foreground font-medium mb-2">Langkah-langkah Pengerjaan:</p>
+                  <ol className="text-sm text-muted-foreground space-y-1 list-decimal pl-4">
+                    <li>Identifikasi data titik A (P₁, Q₁) dan titik B (P₂, Q₂) dari soal cerita</li>
+                    <li>Hitung ΔQ = Q₂ - Q₁ dan ΔP = P₂ - P₁</li>
+                    <li>Hitung slope: a = ΔQ / ΔP</li>
+                    <li>Substitusi ke persamaan: Q - Q₁ = a(P - P₁)</li>
+                    <li>Sederhanakan menjadi bentuk Qd = aP + b</li>
+                    <li>Verifikasi dengan memasukkan nilai P₁ dan P₂</li>
+                  </ol>
                 </div>
               </div>
             </CardContent>
