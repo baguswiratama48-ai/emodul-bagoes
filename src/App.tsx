@@ -19,6 +19,7 @@ import ReflectionPage from "./pages/module/ReflectionPage";
 import SummaryPage from "./pages/module/SummaryPage";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
+import ManageStudents from "./pages/ManageStudents";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/siswa" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
             <Route path="/guru" element={<ProtectedRoute requiredRole="guru"><TeacherDashboard /></ProtectedRoute>} />
+            <Route path="/guru/kelola-siswa" element={<ProtectedRoute requiredRole="guru"><ManageStudents /></ProtectedRoute>} />
             <Route path="/modul/:moduleId" element={<ProtectedRoute><ModuleInfo /></ProtectedRoute>} />
             <Route path="/modul/:moduleId/pemantik" element={<ProtectedRoute><TriggerQuestions /></ProtectedRoute>} />
             <Route path="/modul/:moduleId/materi" element={<ProtectedRoute><MaterialPage /></ProtectedRoute>} />

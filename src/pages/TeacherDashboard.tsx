@@ -13,40 +13,62 @@ import {
   CheckCircle2,
   XCircle,
   MessageCircle,
-  Lightbulb
+  Lightbulb,
+  Filter
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { lkpdAnswerKeys } from '@/data/answerKeys';
 import { demandModule } from '@/data/moduleContent';
+import { FeedbackForm } from '@/components/teacher/FeedbackForm';
+
+interface StudentProfile {
+  id: string;
+  full_name: string;
+  nis: string | null;
+  kelas: string | null;
+}
 
 interface StudentQuizResult {
   user_id: string;
   full_name: string;
+  nis: string;
+  kelas: string;
   total_questions: number;
   correct_answers: number;
   score: number;
 }
 
 interface StudentLkpdAnswer {
+  id: string;
   user_id: string;
   full_name: string;
+  kelas: string;
   problem_id: number;
   answer: string;
   submitted_at: string;
+  feedback?: string;
 }
 
 interface StudentTriggerAnswer {
+  id: string;
   user_id: string;
   full_name: string;
+  kelas: string;
   question_id: number;
   answer: string;
   submitted_at: string;
+  feedback?: string;
+}
+
+interface FeedbackMap {
+  [key: string]: string;
 }
 
 export default function TeacherDashboard() {
@@ -57,6 +79,9 @@ export default function TeacherDashboard() {
   const [reflectionAnswers, setReflectionAnswers] = useState<StudentTriggerAnswer[]>([]);
   const [expandedAnswerKey, setExpandedAnswerKey] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedKelas, setSelectedKelas] = useState<string>('all');
+  const [availableKelas, setAvailableKelas] = useState<string[]>([]);
+  const [feedbackMap, setFeedbackMap] = useState<FeedbackMap>({});
 
   useEffect(() => {
     if (isGuru) {
@@ -67,15 +92,38 @@ export default function TeacherDashboard() {
   const fetchStudentData = async () => {
     setLoading(true);
 
-    // First fetch all profiles for lookup
+    // Fetch all profiles with NIS and kelas
     const { data: profilesData } = await supabase
       .from('profiles')
-      .select('id, full_name');
+      .select('id, full_name, nis, kelas');
     
-    const profilesMap: Record<string, string> = {};
+    const profilesMap: Record<string, StudentProfile> = {};
+    const kelasSet = new Set<string>();
+    
     profilesData?.forEach((p) => {
-      profilesMap[p.id] = p.full_name || 'Unknown';
+      profilesMap[p.id] = {
+        id: p.id,
+        full_name: p.full_name || 'Unknown',
+        nis: p.nis,
+        kelas: p.kelas
+      };
+      if (p.kelas) {
+        kelasSet.add(p.kelas);
+      }
     });
+    
+    setAvailableKelas(Array.from(kelasSet).sort());
+
+    // Fetch all teacher feedback
+    const { data: feedbackData } = await supabase
+      .from('teacher_feedback')
+      .select('answer_id, answer_type, feedback');
+    
+    const fbMap: FeedbackMap = {};
+    feedbackData?.forEach((fb: any) => {
+      fbMap[`${fb.answer_type}-${fb.answer_id}`] = fb.feedback;
+    });
+    setFeedbackMap(fbMap);
     
     // Fetch quiz answers
     const { data: quizData } = await supabase
@@ -85,10 +133,13 @@ export default function TeacherDashboard() {
     if (quizData) {
       const userScores: Record<string, StudentQuizResult> = {};
       quizData.forEach((answer: any) => {
+        const profile = profilesMap[answer.user_id];
         if (!userScores[answer.user_id]) {
           userScores[answer.user_id] = {
             user_id: answer.user_id,
-            full_name: profilesMap[answer.user_id] || 'Unknown',
+            full_name: profile?.full_name || 'Unknown',
+            nis: profile?.nis || '-',
+            kelas: profile?.kelas || '-',
             total_questions: 0,
             correct_answers: 0,
             score: 0
@@ -110,55 +161,90 @@ export default function TeacherDashboard() {
     // Fetch LKPD answers
     const { data: lkpdData } = await supabase
       .from('lkpd_answers')
-      .select('user_id, problem_id, answer, submitted_at')
+      .select('id, user_id, problem_id, answer, submitted_at')
       .order('submitted_at', { ascending: false });
 
     if (lkpdData) {
-      setLkpdAnswers(lkpdData.map((item: any) => ({
-        user_id: item.user_id,
-        full_name: profilesMap[item.user_id] || 'Unknown',
-        problem_id: item.problem_id,
-        answer: item.answer,
-        submitted_at: item.submitted_at
-      })));
+      setLkpdAnswers(lkpdData.map((item: any) => {
+        const profile = profilesMap[item.user_id];
+        return {
+          id: item.id,
+          user_id: item.user_id,
+          full_name: profile?.full_name || 'Unknown',
+          kelas: profile?.kelas || '-',
+          problem_id: item.problem_id,
+          answer: item.answer,
+          submitted_at: item.submitted_at,
+          feedback: fbMap[`lkpd-${item.id}`]
+        };
+      }));
     }
 
     // Fetch trigger answers (only pemantik, not refleksi)
     const { data: triggerData } = await supabase
       .from('trigger_answers')
-      .select('user_id, module_id, question_id, answer, submitted_at')
+      .select('id, user_id, module_id, question_id, answer, submitted_at')
       .not('module_id', 'like', '%-refleksi')
       .order('submitted_at', { ascending: false });
 
     if (triggerData) {
-      setTriggerAnswers(triggerData.map((item: any) => ({
-        user_id: item.user_id,
-        full_name: profilesMap[item.user_id] || 'Unknown',
-        question_id: item.question_id,
-        answer: item.answer,
-        submitted_at: item.submitted_at
-      })));
+      setTriggerAnswers(triggerData.map((item: any) => {
+        const profile = profilesMap[item.user_id];
+        return {
+          id: item.id,
+          user_id: item.user_id,
+          full_name: profile?.full_name || 'Unknown',
+          kelas: profile?.kelas || '-',
+          question_id: item.question_id,
+          answer: item.answer,
+          submitted_at: item.submitted_at,
+          feedback: fbMap[`trigger-${item.id}`]
+        };
+      }));
     }
 
     // Fetch reflection answers
     const { data: reflectionData } = await supabase
       .from('trigger_answers')
-      .select('user_id, module_id, question_id, answer, submitted_at')
+      .select('id, user_id, module_id, question_id, answer, submitted_at')
       .like('module_id', '%-refleksi')
       .order('submitted_at', { ascending: false });
 
     if (reflectionData) {
-      setReflectionAnswers(reflectionData.map((item: any) => ({
-        user_id: item.user_id,
-        full_name: profilesMap[item.user_id] || 'Unknown',
-        question_id: item.question_id,
-        answer: item.answer,
-        submitted_at: item.submitted_at
-      })));
+      setReflectionAnswers(reflectionData.map((item: any) => {
+        const profile = profilesMap[item.user_id];
+        return {
+          id: item.id,
+          user_id: item.user_id,
+          full_name: profile?.full_name || 'Unknown',
+          kelas: profile?.kelas || '-',
+          question_id: item.question_id,
+          answer: item.answer,
+          submitted_at: item.submitted_at,
+          feedback: fbMap[`reflection-${item.id}`]
+        };
+      }));
     }
 
     setLoading(false);
   };
+
+  // Filter functions
+  const filteredQuizResults = selectedKelas === 'all' 
+    ? quizResults 
+    : quizResults.filter(r => r.kelas === selectedKelas);
+  
+  const filteredLkpdAnswers = selectedKelas === 'all'
+    ? lkpdAnswers
+    : lkpdAnswers.filter(a => a.kelas === selectedKelas);
+  
+  const filteredTriggerAnswers = selectedKelas === 'all'
+    ? triggerAnswers
+    : triggerAnswers.filter(a => a.kelas === selectedKelas);
+  
+  const filteredReflectionAnswers = selectedKelas === 'all'
+    ? reflectionAnswers
+    : reflectionAnswers.filter(a => a.kelas === selectedKelas);
 
   const triggerQuestions = [
     { id: 1, question: "Pernahkah kamu memperhatikan saat ada diskon besar-besaran, mengapa orang jadi lebih banyak membeli?" },
@@ -186,6 +272,23 @@ export default function TeacherDashboard() {
     hidden: { y: 20, opacity: 0 },
     visible: { y: 0, opacity: 1 },
   };
+
+  const KelasFilter = () => (
+    <div className="flex items-center gap-2">
+      <Filter className="h-4 w-4 text-muted-foreground" />
+      <Select value={selectedKelas} onValueChange={setSelectedKelas}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Filter Kelas" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">Semua Kelas</SelectItem>
+          {availableKelas.map(kelas => (
+            <SelectItem key={kelas} value={kelas}>Kelas {kelas}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -224,9 +327,12 @@ export default function TeacherDashboard() {
           className="space-y-8"
         >
           {/* Page Header */}
-          <motion.div variants={itemVariants}>
-            <h1 className="text-3xl font-display font-bold mb-2">Dashboard Guru</h1>
-            <p className="text-muted-foreground">Kelola modul, lihat hasil siswa, dan akses kunci jawaban</p>
+          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-display font-bold mb-2">Dashboard Guru</h1>
+              <p className="text-muted-foreground">Kelola modul, lihat hasil siswa, dan berikan feedback</p>
+            </div>
+            <KelasFilter />
           </motion.div>
 
           {/* Stats */}
@@ -238,7 +344,7 @@ export default function TeacherDashboard() {
                     <Users className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{quizResults.length}</p>
+                    <p className="text-2xl font-bold">{filteredQuizResults.length}</p>
                     <p className="text-sm text-muted-foreground">Mengerjakan Kuis</p>
                   </div>
                 </div>
@@ -251,7 +357,7 @@ export default function TeacherDashboard() {
                     <ClipboardList className="h-6 w-6 text-secondary" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{new Set(lkpdAnswers.map(a => a.user_id)).size}</p>
+                    <p className="text-2xl font-bold">{new Set(filteredLkpdAnswers.map(a => a.user_id)).size}</p>
                     <p className="text-sm text-muted-foreground">Mengerjakan LKPD</p>
                   </div>
                 </div>
@@ -264,7 +370,7 @@ export default function TeacherDashboard() {
                     <MessageCircle className="h-6 w-6 text-warning" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{new Set(triggerAnswers.map(a => a.user_id)).size}</p>
+                    <p className="text-2xl font-bold">{new Set(filteredTriggerAnswers.map(a => a.user_id)).size}</p>
                     <p className="text-sm text-muted-foreground">Menjawab Pemantik</p>
                   </div>
                 </div>
@@ -277,7 +383,7 @@ export default function TeacherDashboard() {
                     <Lightbulb className="h-6 w-6 text-amber-500" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{new Set(reflectionAnswers.map(a => a.user_id)).size}</p>
+                    <p className="text-2xl font-bold">{new Set(filteredReflectionAnswers.map(a => a.user_id)).size}</p>
                     <p className="text-sm text-muted-foreground">Mengisi Refleksi</p>
                   </div>
                 </div>
@@ -291,8 +397,8 @@ export default function TeacherDashboard() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">
-                      {quizResults.length > 0 
-                        ? Math.round(quizResults.reduce((acc, r) => acc + r.score, 0) / quizResults.length) 
+                      {filteredQuizResults.length > 0 
+                        ? Math.round(filteredQuizResults.reduce((acc, r) => acc + r.score, 0) / filteredQuizResults.length) 
                         : 0}%
                     </p>
                     <p className="text-sm text-muted-foreground">Rata-rata Kuis</p>
@@ -340,7 +446,7 @@ export default function TeacherDashboard() {
                       <div className="text-center py-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                       </div>
-                    ) : triggerAnswers.length === 0 ? (
+                    ) : filteredTriggerAnswers.length === 0 ? (
                       <div className="text-center py-8 text-muted-foreground">
                         <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
                         <p>Belum ada siswa yang menjawab pertanyaan pemantik</p>
@@ -348,7 +454,7 @@ export default function TeacherDashboard() {
                     ) : (
                       <div className="space-y-4">
                         {triggerQuestions.map((q) => {
-                          const answersForQuestion = triggerAnswers.filter(a => a.question_id === q.id);
+                          const answersForQuestion = filteredTriggerAnswers.filter(a => a.question_id === q.id);
                           return (
                             <div key={q.id} className="border rounded-lg overflow-hidden">
                               <div className="p-4 bg-muted/50">
@@ -363,7 +469,12 @@ export default function TeacherDashboard() {
                                   {answersForQuestion.map((answer, index) => (
                                     <div key={`${answer.user_id}-${index}`} className="p-4">
                                       <div className="flex items-center justify-between mb-2">
-                                        <span className="font-medium">{answer.full_name}</span>
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-medium">{answer.full_name}</span>
+                                          {answer.kelas !== '-' && (
+                                            <Badge variant="outline" className="text-xs">Kelas {answer.kelas}</Badge>
+                                          )}
+                                        </div>
                                         <span className="text-xs text-muted-foreground">
                                           {new Date(answer.submitted_at).toLocaleDateString('id-ID', {
                                             day: 'numeric',
@@ -374,7 +485,14 @@ export default function TeacherDashboard() {
                                           })}
                                         </span>
                                       </div>
-                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{answer.answer}</p>
+                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap mb-2">{answer.answer}</p>
+                                      <FeedbackForm
+                                        studentId={answer.user_id}
+                                        answerId={answer.id}
+                                        answerType="trigger"
+                                        existingFeedback={answer.feedback}
+                                        onFeedbackSaved={fetchStudentData}
+                                      />
                                     </div>
                                   ))}
                                 </div>
@@ -400,7 +518,7 @@ export default function TeacherDashboard() {
                       <div className="text-center py-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                       </div>
-                    ) : reflectionAnswers.length === 0 ? (
+                    ) : filteredReflectionAnswers.length === 0 ? (
                       <div className="text-center py-8 text-muted-foreground">
                         <Lightbulb className="h-12 w-12 mx-auto mb-4 opacity-50" />
                         <p>Belum ada siswa yang mengisi refleksi</p>
@@ -408,7 +526,7 @@ export default function TeacherDashboard() {
                     ) : (
                       <div className="space-y-4">
                         {reflectionQuestions.map((q) => {
-                          const answersForQuestion = reflectionAnswers.filter(a => a.question_id === q.id);
+                          const answersForQuestion = filteredReflectionAnswers.filter(a => a.question_id === q.id);
                           return (
                             <div key={q.id} className="border rounded-lg overflow-hidden">
                               <div className="p-4 bg-amber-50 dark:bg-amber-900/20">
@@ -423,7 +541,12 @@ export default function TeacherDashboard() {
                                   {answersForQuestion.map((answer, index) => (
                                     <div key={`${answer.user_id}-${index}`} className="p-4">
                                       <div className="flex items-center justify-between mb-2">
-                                        <span className="font-medium">{answer.full_name}</span>
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-medium">{answer.full_name}</span>
+                                          {answer.kelas !== '-' && (
+                                            <Badge variant="outline" className="text-xs">Kelas {answer.kelas}</Badge>
+                                          )}
+                                        </div>
                                         <span className="text-xs text-muted-foreground">
                                           {new Date(answer.submitted_at).toLocaleDateString('id-ID', {
                                             day: 'numeric',
@@ -434,7 +557,14 @@ export default function TeacherDashboard() {
                                           })}
                                         </span>
                                       </div>
-                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{answer.answer}</p>
+                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap mb-2">{answer.answer}</p>
+                                      <FeedbackForm
+                                        studentId={answer.user_id}
+                                        answerId={answer.id}
+                                        answerType="reflection"
+                                        existingFeedback={answer.feedback}
+                                        onFeedbackSaved={fetchStudentData}
+                                      />
                                     </div>
                                   ))}
                                 </div>
@@ -460,19 +590,22 @@ export default function TeacherDashboard() {
                       <div className="text-center py-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                       </div>
-                    ) : lkpdAnswers.length === 0 ? (
+                    ) : filteredLkpdAnswers.length === 0 ? (
                       <div className="text-center py-8 text-muted-foreground">
                         <ClipboardList className="h-12 w-12 mx-auto mb-4 opacity-50" />
                         <p>Belum ada siswa yang mengerjakan LKPD</p>
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {lkpdAnswers.map((answer, index) => (
+                        {filteredLkpdAnswers.map((answer, index) => (
                           <div key={`${answer.user_id}-${answer.problem_id}-${index}`} className="p-4 border rounded-lg">
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-2">
                                 <Badge variant="outline">Soal {answer.problem_id}</Badge>
                                 <span className="font-medium">{answer.full_name}</span>
+                                {answer.kelas !== '-' && (
+                                  <Badge variant="secondary" className="text-xs">Kelas {answer.kelas}</Badge>
+                                )}
                               </div>
                               <span className="text-xs text-muted-foreground">
                                 {new Date(answer.submitted_at).toLocaleDateString('id-ID', {
@@ -484,7 +617,14 @@ export default function TeacherDashboard() {
                                 })}
                               </span>
                             </div>
-                            <p className="text-sm font-mono bg-muted/50 p-3 rounded whitespace-pre-wrap">{answer.answer}</p>
+                            <p className="text-sm font-mono bg-muted/50 p-3 rounded whitespace-pre-wrap mb-2">{answer.answer}</p>
+                            <FeedbackForm
+                              studentId={answer.user_id}
+                              answerId={answer.id}
+                              answerType="lkpd"
+                              existingFeedback={answer.feedback}
+                              onFeedbackSaved={fetchStudentData}
+                            />
                           </div>
                         ))}
                       </div>
@@ -505,7 +645,7 @@ export default function TeacherDashboard() {
                       <div className="text-center py-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                       </div>
-                    ) : quizResults.length === 0 ? (
+                    ) : filteredQuizResults.length === 0 ? (
                       <div className="text-center py-8 text-muted-foreground">
                         <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
                         <p>Belum ada siswa yang mengerjakan kuis</p>
@@ -516,16 +656,24 @@ export default function TeacherDashboard() {
                           <TableRow>
                             <TableHead>No</TableHead>
                             <TableHead>Nama Siswa</TableHead>
+                            <TableHead>NIS</TableHead>
+                            <TableHead>Kelas</TableHead>
                             <TableHead className="text-center">Soal Dijawab</TableHead>
                             <TableHead className="text-center">Benar</TableHead>
                             <TableHead className="text-center">Nilai</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {quizResults.map((result, index) => (
+                          {filteredQuizResults.map((result, index) => (
                             <TableRow key={result.user_id}>
                               <TableCell>{index + 1}</TableCell>
                               <TableCell className="font-medium">{result.full_name}</TableCell>
+                              <TableCell className="font-mono text-sm">{result.nis}</TableCell>
+                              <TableCell>
+                                {result.kelas !== '-' && (
+                                  <Badge variant="outline">Kelas {result.kelas}</Badge>
+                                )}
+                              </TableCell>
                               <TableCell className="text-center">{result.total_questions}</TableCell>
                               <TableCell className="text-center">{result.correct_answers}</TableCell>
                               <TableCell className="text-center">
