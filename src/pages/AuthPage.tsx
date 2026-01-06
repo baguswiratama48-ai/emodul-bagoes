@@ -143,156 +143,53 @@ export default function AuthPage() {
         </div>
 
         <Card>
-          <Tabs defaultValue="login">
-            <TabsList className="w-full grid grid-cols-2">
-              <TabsTrigger value="login">Masuk</TabsTrigger>
-              <TabsTrigger value="signup">Daftar</TabsTrigger>
-            </TabsList>
-
-            {/* Login Tab */}
-            <TabsContent value="login">
-              <CardHeader>
-                <CardTitle>Masuk ke Akun</CardTitle>
-                <CardDescription>
-                  Siswa: masukkan NISN dan NIS sebagai password
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email">NISN / Email</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="login-email"
-                        type="text"
-                        placeholder="Masukkan NISN atau email"
-                        className="pl-10"
-                        value={loginEmail}
-                        onChange={(e) => setLoginEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="login-password">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="login-password"
-                        type="password"
-                        placeholder="••••••••"
-                        className="pl-10"
-                        value={loginPassword}
-                        onChange={(e) => setLoginPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-primary"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? 'Memproses...' : 'Masuk'}
-                  </Button>
-                </form>
-              </CardContent>
-            </TabsContent>
-
-            {/* Signup Tab */}
-            <TabsContent value="signup">
-              <CardHeader>
-                <CardTitle>Buat Akun Baru</CardTitle>
-                <CardDescription>Daftar sebagai siswa atau guru</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSignup} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-name">Nama Lengkap</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="signup-name"
-                        type="text"
-                        placeholder="Nama lengkap"
-                        className="pl-10"
-                        value={signupName}
-                        onChange={(e) => setSignupName(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="signup-email"
-                        type="email"
-                        placeholder="nama@email.com"
-                        className="pl-10"
-                        value={signupEmail}
-                        onChange={(e) => setSignupEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="signup-password"
-                        type="password"
-                        placeholder="Minimal 6 karakter"
-                        className="pl-10"
-                        value={signupPassword}
-                        onChange={(e) => setSignupPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <Label>Daftar Sebagai</Label>
-                    <RadioGroup 
-                      value={signupRole} 
-                      onValueChange={(v) => setSignupRole(v as 'siswa' | 'guru')}
-                      className="grid grid-cols-2 gap-4"
-                    >
-                      <div>
-                        <RadioGroupItem value="siswa" id="siswa" className="peer sr-only" />
-                        <Label
-                          htmlFor="siswa"
-                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
-                        >
-                          <GraduationCap className="mb-2 h-6 w-6" />
-                          <span className="font-medium">Siswa</span>
-                        </Label>
-                      </div>
-                      <div>
-                        <RadioGroupItem value="guru" id="guru" className="peer sr-only" />
-                        <Label
-                          htmlFor="guru"
-                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
-                        >
-                          <Users className="mb-2 h-6 w-6" />
-                          <span className="font-medium">Guru</span>
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-primary"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? 'Memproses...' : 'Daftar'}
-                  </Button>
-                </form>
-              </CardContent>
-            </TabsContent>
-          </Tabs>
+          <CardHeader>
+            <CardTitle>Masuk ke Akun</CardTitle>
+            <CardDescription>
+              Siswa: masukkan NISN dan NIS sebagai password
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="login-email">NISN / Email</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="login-email"
+                    type="text"
+                    placeholder="Masukkan NISN atau email"
+                    className="pl-10"
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="login-password">NIS / Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="login-password"
+                    type="password"
+                    placeholder="Masukkan NIS atau password"
+                    className="pl-10"
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-primary"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Memproses...' : 'Masuk'}
+              </Button>
+            </form>
+          </CardContent>
         </Card>
       </motion.div>
     </div>
