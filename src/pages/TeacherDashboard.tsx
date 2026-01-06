@@ -16,7 +16,8 @@ import {
   Lightbulb,
   Filter,
   Recycle,
-  TrendingUp
+  TrendingUp,
+  RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,12 +25,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { lkpdAnswerKeys, lkpdAnswerKeysPKWU, quizAnswerKeysEkonomi, quizAnswerKeysPKWU } from '@/data/answerKeys';
 import { demandModule } from '@/data/moduleContent';
 import { pkwuModule } from '@/data/pkwuModuleContent';
 import { FeedbackForm } from '@/components/teacher/FeedbackForm';
+import { ResetStudentWork } from '@/components/teacher/ResetStudentWork';
 
 interface StudentProfile {
   id: string;
@@ -87,6 +90,7 @@ export default function TeacherDashboard() {
   const [lkpdAnswers, setLkpdAnswers] = useState<StudentLkpdAnswer[]>([]);
   const [triggerAnswers, setTriggerAnswers] = useState<StudentTriggerAnswer[]>([]);
   const [reflectionAnswers, setReflectionAnswers] = useState<StudentTriggerAnswer[]>([]);
+  const [allStudents, setAllStudents] = useState<StudentProfile[]>([]);
   const [expandedAnswerKey, setExpandedAnswerKey] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedKelas, setSelectedKelas] = useState<string>('all');
@@ -138,6 +142,7 @@ export default function TeacherDashboard() {
       }
     });
     
+    setAllStudents(Object.values(profilesMap));
     setAvailableKelas(Array.from(kelasSet).sort());
 
     // Fetch all teacher feedback
@@ -320,7 +325,13 @@ export default function TeacherDashboard() {
 
   // Get current module and answer keys based on mapel
   const currentModule = selectedMapel === 'ekonomi' ? demandModule : pkwuModule;
+  const currentModuleId = selectedMapel === 'ekonomi' ? 'permintaan' : 'kerajinan-limbah';
   const currentLkpdAnswerKeys = selectedMapel === 'ekonomi' ? lkpdAnswerKeys : lkpdAnswerKeysPKWU;
+
+  // Filter students by mapel kelas
+  const filteredStudents = useMemo(() => {
+    return allStudents.filter(s => s.kelas && mapelKelas.includes(s.kelas));
+  }, [allStudents, mapelKelas]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -515,7 +526,7 @@ export default function TeacherDashboard() {
           {/* Main Content */}
           <motion.div variants={itemVariants}>
             <Tabs defaultValue="trigger-answers" className="w-full">
-              <TabsList className="w-full grid grid-cols-5">
+              <TabsList className="w-full grid grid-cols-6">
                 <TabsTrigger value="trigger-answers" className="gap-2">
                   <MessageCircle className="h-4 w-4" />
                   <span className="hidden sm:inline">Pemantik</span>
@@ -535,6 +546,10 @@ export default function TeacherDashboard() {
                 <TabsTrigger value="answer-keys" className="gap-2">
                   <FileText className="h-4 w-4" />
                   <span className="hidden sm:inline">Kunci</span>
+                </TabsTrigger>
+                <TabsTrigger value="reset" className="gap-2">
+                  <RefreshCw className="h-4 w-4" />
+                  <span className="hidden sm:inline">Reset</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -886,6 +901,15 @@ export default function TeacherDashboard() {
                     </div>
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              {/* Reset Tab */}
+              <TabsContent value="reset" className="mt-6">
+                <ResetStudentWork
+                  students={filteredStudents}
+                  moduleId={currentModuleId}
+                  onReset={fetchStudentData}
+                />
               </TabsContent>
             </Tabs>
           </motion.div>

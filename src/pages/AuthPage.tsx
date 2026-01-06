@@ -173,21 +173,6 @@ export default function AuthPage() {
               <CardContent>
                 <form onSubmit={handleSiswaLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="siswa-kelas">Kelas</Label>
-                    <Select value={selectedKelas} onValueChange={setSelectedKelas}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih Kelas" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {kelasOptions.map((kelas) => (
-                          <SelectItem key={kelas.value} value={kelas.value}>
-                            {kelas.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
                     <Label htmlFor="siswa-nisn">NISN</Label>
                     <div className="relative">
                       <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -216,6 +201,21 @@ export default function AuthPage() {
                         required
                       />
                     </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="siswa-kelas">Kelas</Label>
+                    <Select value={selectedKelas} onValueChange={setSelectedKelas}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih Kelas" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[200px] overflow-y-auto">
+                        {kelasOptions.map((kelas) => (
+                          <SelectItem key={kelas.value} value={kelas.value}>
+                            {kelas.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <Button 
                     type="submit" 

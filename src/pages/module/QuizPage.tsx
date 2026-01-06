@@ -39,11 +39,45 @@ export default function QuizPage() {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
   const [showResults, setShowResults] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [loadingCheck, setLoadingCheck] = useState(true);
 
   const questions = module.quizQuestions;
   const totalQuestions = questions.length;
 
+  // Check if already submitted
+  useEffect(() => {
+    if (user) {
+      checkSubmissionStatus();
+    } else {
+      setLoadingCheck(false);
+    }
+  }, [user]);
+
+  const checkSubmissionStatus = async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
+      .from('quiz_answers')
+      .select('question_id, selected_answer, is_correct')
+      .eq('user_id', user.id)
+      .eq('module_id', module.id);
+
+    if (data && data.length > 0) {
+      const loadedAnswers: Record<number, number> = {};
+      data.forEach((item, index) => {
+        const qIndex = questions.findIndex(q => q.id === item.question_id);
+        if (qIndex >= 0) loadedAnswers[qIndex] = item.selected_answer;
+      });
+      setSelectedAnswers(loadedAnswers);
+      setHasSubmitted(true);
+      setShowResults(true);
+    }
+    setLoadingCheck(false);
+  };
+
   const handleAnswerSelect = (questionIndex: number, answerIndex: number) => {
+    if (hasSubmitted) return; // Prevent changes if already submitted
     setSelectedAnswers(prev => ({ ...prev, [questionIndex]: answerIndex }));
     setShowExplanation(false);
   };
@@ -104,6 +138,10 @@ export default function QuizPage() {
   };
 
   const handleRetry = () => {
+    if (hasSubmitted) {
+      // Already submitted - cannot retry
+      return;
+    }
     setSelectedAnswers({});
     setCurrentQuestion(0);
     setShowResults(false);
