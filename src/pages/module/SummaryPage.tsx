@@ -14,10 +14,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { ModuleLayout } from '@/components/layout/ModuleLayout';
 import { useProgress } from '@/hooks/useProgress';
-import { demandModule } from '@/data/moduleContent';
+import { getModuleById, isPKWUModule } from '@/data/moduleUtils';
 import confetti from 'canvas-confetti';
 
-const summaryPoints = [
+// Summary for Ekonomi
+const ekonomiSummaryPoints = [
   {
     title: "Pengertian Permintaan",
     content: "Permintaan adalah jumlah barang/jasa yang ingin dan mampu dibeli konsumen pada berbagai tingkat harga dalam periode waktu tertentu."
@@ -44,6 +45,34 @@ const summaryPoints = [
   }
 ];
 
+// Summary for PKWU
+const pkwuSummaryPoints = [
+  {
+    title: "Pengertian Limbah Bangun Datar",
+    content: "Limbah bangun datar adalah bahan sisa yang memiliki bentuk dasar dua dimensi seperti kertas, kardus, plastik lembaran, dan kain perca."
+  },
+  {
+    title: "Konsep Upcycling",
+    content: "Proses mengubah limbah menjadi produk bernilai lebih tinggi dari bentuk aslinya, berbeda dengan recycling yang mengolah kembali menjadi bahan dasar."
+  },
+  {
+    title: "Sumber Ide Kreatif",
+    content: "Ide dapat berasal dari observasi lingkungan, tren pasar, kebutuhan konsumen, dan riset referensi."
+  },
+  {
+    title: "Analisis Peluang Usaha",
+    content: "Meliputi identifikasi produk, riset target pasar, analisis pesaing, dan penentuan USP (Unique Selling Point)."
+  },
+  {
+    title: "Proses Produksi",
+    content: "Tahapan: pengumpulan bahan → persiapan → desain → pengerjaan → quality control → packaging."
+  },
+  {
+    title: "Strategi Pemasaran",
+    content: "Memanfaatkan online marketplace, media sosial, storytelling, eco-branding, dan kolaborasi."
+  }
+];
+
 const reflectionQuestions = [
   "Apa hal paling menarik yang kamu pelajari dari materi permintaan ini?",
   "Bagaimana kamu akan menerapkan konsep permintaan dalam kehidupan sehari-hari?",
@@ -53,8 +82,15 @@ const reflectionQuestions = [
 export default function SummaryPage() {
   const { moduleId } = useParams();
   const { markSectionComplete, markModuleComplete, getModuleProgress } = useProgress();
-  const module = demandModule;
+  const module = getModuleById(moduleId);
+  
+  if (!module) {
+    return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
+  }
+  
   const progress = getModuleProgress(module.id);
+  const isPKWU = isPKWUModule(moduleId);
+  const summaryPoints = isPKWU ? pkwuSummaryPoints : ekonomiSummaryPoints;
   
   const [reflections, setReflections] = useState<Record<number, string>>({});
   const [isCompleted, setIsCompleted] = useState(progress.isCompleted);

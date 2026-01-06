@@ -25,6 +25,7 @@ import { ekonomiModules } from '@/data/moduleContent';
 import { pkwuModule } from '@/data/pkwuModuleContent';
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import logo from '@/assets/logo.png';
 
 const Index = () => {
   const { darkMode, toggleDarkMode, getModuleProgress, calculateProgress } = useProgress();
@@ -76,9 +77,7 @@ const Index = () => {
       <header className="sticky top-0 z-50 glass border-b border-border">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-md">
-              <span className="text-white font-bold text-lg">B</span>
-            </div>
+            <img src={logo} alt="E-Modul Bagoes" className="h-10 w-auto rounded-xl" />
             <div className="hidden sm:block">
               <h1 className="font-display font-bold text-foreground">E-Modul Bagoes</h1>
               <p className="text-xs text-muted-foreground">Belajar Jadi Lebih Bagoes</p>

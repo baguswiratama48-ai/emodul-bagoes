@@ -13,16 +13,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ModuleLayout } from '@/components/layout/ModuleLayout';
 import { useProgress } from '@/hooks/useProgress';
-import { demandModule } from '@/data/moduleContent';
+import { getModuleById, isPKWUModule } from '@/data/moduleUtils';
 
 export default function GlossaryPage() {
   const { moduleId } = useParams();
   const { markSectionComplete } = useProgress();
-  const module = demandModule;
+  const module = getModuleById(moduleId);
   
+  if (!module) {
+    return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
+  }
+  
+  const isPKWU = isPKWUModule(moduleId);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const glossaryEntries = Object.entries(module.glossary).sort((a, b) => 
+  const glossaryEntries = Object.entries(module.glossary || {}).sort((a, b) => 
     a[0].localeCompare(b[0])
   );
 
@@ -66,7 +71,7 @@ export default function GlossaryPage() {
             Daftar Istilah
           </h1>
           <p className="text-muted-foreground">
-            Kumpulan istilah penting yang perlu kamu pahami dalam materi permintaan.
+            Kumpulan istilah penting yang perlu kamu pahami dalam materi {isPKWU ? 'kerajinan limbah' : 'permintaan'}.
           </p>
         </motion.div>
 

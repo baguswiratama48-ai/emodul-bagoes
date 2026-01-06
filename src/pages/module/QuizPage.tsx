@@ -18,7 +18,7 @@ import { Progress } from '@/components/ui/progress';
 import { ModuleLayout } from '@/components/layout/ModuleLayout';
 import { useProgress } from '@/hooks/useProgress';
 import { useAuth } from '@/hooks/useAuth';
-import { demandModule } from '@/data/moduleContent';
+import { getModuleById, isPKWUModule } from '@/data/moduleUtils';
 import { supabase } from '@/integrations/supabase/client';
 import confetti from 'canvas-confetti';
 
@@ -26,8 +26,14 @@ export default function QuizPage() {
   const { moduleId } = useParams();
   const { markSectionComplete, saveQuizScore, getModuleProgress } = useProgress();
   const { user } = useAuth();
-  const module = demandModule;
+  const module = getModuleById(moduleId);
+  
+  if (!module) {
+    return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
+  }
+  
   const progress = getModuleProgress(module.id);
+  const isPKWU = isPKWUModule(moduleId);
   
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});

@@ -17,10 +17,11 @@ import { ModuleLayout } from '@/components/layout/ModuleLayout';
 import { useProgress } from '@/hooks/useProgress';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { demandModule } from '@/data/moduleContent';
+import { getModuleById, isPKWUModule } from '@/data/moduleUtils';
 import { supabase } from '@/integrations/supabase/client';
 
-const triggerQuestions = [
+// Trigger questions for Ekonomi
+const ekonomiTriggerQuestions = [
   {
     id: 1,
     question: "Pernahkah kamu memperhatikan saat ada diskon besar-besaran, mengapa orang jadi lebih banyak membeli?",
@@ -41,12 +42,41 @@ const triggerQuestions = [
   },
 ];
 
+// Trigger questions for PKWU
+const pkwuTriggerQuestions = [
+  {
+    id: 1,
+    question: "Pernahkah kamu melihat sampah plastik atau kardus di sekitarmu? Menurut kamu, bisakah sampah tersebut diubah menjadi sesuatu yang berguna?",
+    hint: "Pikirkan tentang kreativitas dan nilai tambah dari limbah.",
+    icon: "♻️",
+  },
+  {
+    id: 2,
+    question: "Jika kamu bisa membuat kerajinan dari bahan bekas, produk apa yang ingin kamu buat dan siapa yang akan membelinya?",
+    hint: "Pertimbangkan target pasar dan kebutuhan konsumen.",
+    icon: "🎨",
+  },
+  {
+    id: 3,
+    question: "Mengapa menurut kamu produk ramah lingkungan (eco-friendly) semakin diminati oleh masyarakat?",
+    hint: "Pikirkan tentang tren kesadaran lingkungan dan green economy.",
+    icon: "🌿",
+  },
+];
+
 export default function TriggerQuestions() {
   const { moduleId } = useParams();
   const { markSectionComplete } = useProgress();
   const { user } = useAuth();
   const { toast } = useToast();
-  const module = demandModule;
+  const module = getModuleById(moduleId);
+  
+  if (!module) {
+    return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
+  }
+  
+  const isPKWU = isPKWUModule(moduleId);
+  const triggerQuestions = isPKWU ? pkwuTriggerQuestions : ekonomiTriggerQuestions;
   
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [revealedHints, setRevealedHints] = useState<Set<number>>(new Set());

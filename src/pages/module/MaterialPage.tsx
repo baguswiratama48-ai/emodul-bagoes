@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ModuleLayout } from '@/components/layout/ModuleLayout';
 import { useProgress } from '@/hooks/useProgress';
-import { demandModule } from '@/data/moduleContent';
+import { getModuleById, isPKWUModule } from '@/data/moduleUtils';
 import { DemandCurveChart } from '@/components/interactive/DemandCurveChart';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -22,9 +22,14 @@ import remarkGfm from 'remark-gfm';
 export default function MaterialPage() {
   const { moduleId } = useParams();
   const { markSectionComplete } = useProgress();
-  const module = demandModule;
+  const module = getModuleById(moduleId);
+  
+  if (!module) {
+    return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
+  }
   
   const [activeSection, setActiveSection] = useState(module.sections[0].id);
+  const isPKWU = isPKWUModule(moduleId);
 
   const handleComplete = () => {
     markSectionComplete(module.id, 'materi');
