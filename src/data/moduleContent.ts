@@ -149,13 +149,13 @@ Permintaan yang dilakukan oleh **satu orang** konsumen terhadap suatu barang.
 
 ---
 
-## Tabel Perbandingan
+## Tabel Perbandingan Jenis Permintaan
 
-| Jenis | Keinginan | Kemampuan | Terwujud? |
-|-------|-----------|-----------|-----------|
-| Efektif | ✅ Ada | ✅ Ada | ✅ Ya |
-| Potensial | ❌ Belum | ✅ Ada | 🔄 Mungkin |
-| Absolut | ✅ Ada | ❌ Tidak | ❌ Tidak |
+| Jenis Permintaan | Keinginan | Kemampuan | Dapat Terwujud? |
+|------------------|-----------|-----------|-----------------|
+| Efektif | Ada ✅ | Ada ✅ | Ya ✅ |
+| Potensial | Belum ❌ | Ada ✅ | Mungkin 🔄 |
+| Absolut | Ada ✅ | Tidak ❌ | Tidak ❌ |
       `,
     },
     {
@@ -192,17 +192,17 @@ Mengapa penting? Karena permintaan dipengaruhi banyak faktor. Untuk melihat hubu
 
 ## 📊 Contoh Penerapan Hukum Permintaan
 
-### Kasus: Harga Pulsa Internet
+### Kasus: Harga Paket Data Internet
 
-| Harga/GB | Permintaan (Juta pengguna) |
-|----------|---------------------------|
-| Rp25.000 | 80 juta |
-| Rp20.000 | 100 juta |
-| Rp15.000 | 130 juta |
-| Rp10.000 | 170 juta |
-| Rp5.000  | 220 juta |
+| Harga per GB | Jumlah Pengguna |
+|--------------|-----------------|
+| Rp25.000 | 80 juta orang |
+| Rp20.000 | 100 juta orang |
+| Rp15.000 | 130 juta orang |
+| Rp10.000 | 170 juta orang |
+| Rp5.000 | 220 juta orang |
 
-**Analisis**: Semakin murah harga pulsa internet per GB, semakin banyak orang yang menggunakannya. Ini sesuai dengan hukum permintaan!
+**Analisis**: Semakin murah harga paket data internet per GB, semakin banyak orang yang menggunakannya. Ini sesuai dengan hukum permintaan!
 
 ---
 
@@ -298,29 +298,32 @@ Kepuasan tambahan dari mengkonsumsi satu unit tambahan semakin menurun, sehingga
 Fungsi permintaan menunjukkan hubungan **matematis** antara harga (P) dan jumlah yang diminta (Qd).
 
 ### Rumus:
-$$Q_d = -aP + b$$
 
-atau
+**Qd = -aP + b**
 
-$$Q_d = b - aP$$
+atau bisa ditulis:
+
+**Qd = b - aP**
 
 **Keterangan:**
 - **Qd** = Jumlah barang yang diminta
 - **P** = Harga barang
-- **a** = Koefisien arah (slope) → selalu negatif
+- **a** = Koefisien arah (slope) → bernilai negatif
 - **b** = Konstanta (nilai Qd ketika P = 0)
 
 ---
 
 ## 📝 Cara Menentukan Fungsi Permintaan
 
-Jika diketahui **dua titik** pada kurva permintaan, gunakan rumus:
+Jika diketahui **dua titik** pada kurva permintaan, gunakan langkah berikut:
 
 ### Langkah 1: Hitung slope (gradien)
-$$a = \\frac{Q_2 - Q_1}{P_2 - P_1}$$
 
-### Langkah 2: Masukkan ke persamaan
-$$\\frac{Q - Q_1}{Q_2 - Q_1} = \\frac{P - P_1}{P_2 - P_1}$$
+**a = (Q₂ - Q₁) / (P₂ - P₁)**
+
+### Langkah 2: Masukkan ke persamaan titik
+
+**(Q - Q₁) / (Q₂ - Q₁) = (P - P₁) / (P₂ - P₁)**
 
 ---
 
@@ -335,31 +338,26 @@ $$\\frac{Q - Q_1}{Q_2 - Q_1} = \\frac{P - P_1}{P_2 - P_1}$$
 ### Penyelesaian:
 
 **Langkah 1:** Hitung perubahan
-- ΔQ = Q₂ - Q₁ = 40 - 20 = 20
-- ΔP = P₂ - P₁ = 8.000 - 10.000 = -2.000
+- ΔQ = Q₂ - Q₁ = 40 - 20 = **20**
+- ΔP = P₂ - P₁ = 8.000 - 10.000 = **-2.000**
 
 **Langkah 2:** Hitung slope
-- a = ΔQ/ΔP = 20/(-2.000) = -0,01
+- a = ΔQ / ΔP = 20 / (-2.000) = **-0,01**
 
 **Langkah 3:** Substitusi ke persamaan
-$$\\frac{Q - 20}{40 - 20} = \\frac{P - 10.000}{8.000 - 10.000}$$
 
-$$\\frac{Q - 20}{20} = \\frac{P - 10.000}{-2.000}$$
+(Q - 20) / (40 - 20) = (P - 10.000) / (8.000 - 10.000)
 
-$$Q - 20 = \\frac{20(P - 10.000)}{-2.000}$$
+(Q - 20) / 20 = (P - 10.000) / (-2.000)
 
-$$Q - 20 = -0,01P + 100$$
+Q - 20 = 20 × (P - 10.000) / (-2.000)
 
-$$Q = -0,01P + 120$$
+Q - 20 = -0,01P + 100
+
+**Q = -0,01P + 120**
 
 ### Jawaban:
 **Qd = -0,01P + 120** atau **Qd = 120 - 0,01P**
-
----
-
-## 🧮 Gunakan Kalkulator di Bawah!
-
-Masukkan dua titik data untuk menghitung fungsi permintaan secara otomatis!
       `,
     },
     {
