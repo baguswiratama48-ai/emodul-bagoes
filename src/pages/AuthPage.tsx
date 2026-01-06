@@ -149,7 +149,9 @@ export default function AuthPage() {
             <TabsContent value="login">
               <CardHeader>
                 <CardTitle>Masuk ke Akun</CardTitle>
-                <CardDescription>Masukkan email dan password Anda</CardDescription>
+                <CardDescription>
+                  Siswa: gunakan NISN sebagai email (contoh: 0099891698@siswa.local) dan NIS sebagai password
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleLogin} className="space-y-4">
