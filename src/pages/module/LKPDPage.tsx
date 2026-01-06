@@ -104,15 +104,19 @@ export default function LKPDPage() {
   const [showHints, setShowHints] = useState<Record<number, boolean>>({});
   const [saving, setSaving] = useState<Record<number, boolean>>({});
   const [savedAnswers, setSavedAnswers] = useState<Record<number, boolean>>({});
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [loadingCheck, setLoadingCheck] = useState(true);
 
-  // Load existing answers from database
+  // Check if already submitted and load existing answers
   useEffect(() => {
     if (user) {
-      loadExistingAnswers();
+      checkSubmissionStatus();
+    } else {
+      setLoadingCheck(false);
     }
   }, [user]);
 
-  const loadExistingAnswers = async () => {
+  const checkSubmissionStatus = async () => {
     if (!user) return;
     
     const { data } = await supabase
@@ -121,7 +125,7 @@ export default function LKPDPage() {
       .eq('user_id', user.id)
       .eq('module_id', module.id);
 
-    if (data) {
+    if (data && data.length > 0) {
       const loadedAnswers: Record<number, string> = {};
       const loadedSaved: Record<number, boolean> = {};
       data.forEach(item => {
@@ -130,7 +134,12 @@ export default function LKPDPage() {
       });
       setAnswers(loadedAnswers);
       setSavedAnswers(loadedSaved);
+      
+      // Check if all problems are answered (meaning submitted)
+      const allAnswered = lkpdProblems.every(p => loadedAnswers[p.id]?.trim());
+      setHasSubmitted(allAnswered);
     }
+    setLoadingCheck(false);
   };
 
   const handleAnswerChange = (id: number, value: string) => {
@@ -339,33 +348,44 @@ export default function LKPDPage() {
                 {/* Answer Area */}
                 <div className="space-y-2">
                   <Label htmlFor={`answer-${problem.id}`}>Jawaban:</Label>
-                  <Textarea
-                    id={`answer-${problem.id}`}
-                    placeholder="Tuliskan langkah-langkah penyelesaian dan jawabanmu di sini..."
-                    className="min-h-[150px] font-mono text-sm"
-                    value={answers[problem.id] || ''}
-                    onChange={(e) => handleAnswerChange(problem.id, e.target.value)}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    {savedAnswers[problem.id] && (
-                      <div className="flex items-center gap-2 text-success text-sm">
-                        <CheckCircle2 className="h-4 w-4" />
-                        <span>Tersimpan di database</span>
+                  {hasSubmitted ? (
+                    <div className="p-4 bg-muted/50 rounded-lg font-mono text-sm whitespace-pre-wrap">
+                      {answers[problem.id] || '(Tidak ada jawaban)'}
+                      <p className="text-xs text-muted-foreground mt-2 font-sans flex items-center gap-1">
+                        <CheckCircle2 className="h-3 w-3" />
+                        Sudah dikumpulkan
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <Textarea
+                        id={`answer-${problem.id}`}
+                        placeholder="Tuliskan langkah-langkah penyelesaian dan jawabanmu di sini..."
+                        className="min-h-[150px] font-mono text-sm"
+                        value={answers[problem.id] || ''}
+                        onChange={(e) => handleAnswerChange(problem.id, e.target.value)}
+                      />
+                      <div className="flex items-center justify-between">
+                        <div>
+                          {savedAnswers[problem.id] && (
+                            <div className="flex items-center gap-2 text-success text-sm">
+                              <CheckCircle2 className="h-4 w-4" />
+                              <span>Tersimpan di database</span>
+                            </div>
+                          )}
+                        </div>
+                        <Button
+                          size="sm"
+                          onClick={() => saveAnswer(problem.id)}
+                          disabled={!answers[problem.id]?.trim() || saving[problem.id]}
+                          className="gap-2"
+                        >
+                          <Save className="h-4 w-4" />
+                          {saving[problem.id] ? 'Menyimpan...' : 'Simpan Jawaban'}
+                        </Button>
                       </div>
-                    )}
-                  </div>
-                  <Button
-                    size="sm"
-                    onClick={() => saveAnswer(problem.id)}
-                    disabled={!answers[problem.id]?.trim() || saving[problem.id]}
-                    className="gap-2"
-                  >
-                    <Save className="h-4 w-4" />
-                    {saving[problem.id] ? 'Menyimpan...' : 'Simpan Jawaban'}
-                  </Button>
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>

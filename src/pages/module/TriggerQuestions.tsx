@@ -82,15 +82,19 @@ export default function TriggerQuestions() {
   const [revealedHints, setRevealedHints] = useState<Set<number>>(new Set());
   const [saving, setSaving] = useState<Record<number, boolean>>({});
   const [savedAnswers, setSavedAnswers] = useState<Record<number, boolean>>({});
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [loadingCheck, setLoadingCheck] = useState(true);
 
-  // Load existing answers from database
+  // Check if already submitted and load existing answers
   useEffect(() => {
     if (user) {
-      loadExistingAnswers();
+      checkSubmissionStatus();
+    } else {
+      setLoadingCheck(false);
     }
   }, [user]);
 
-  const loadExistingAnswers = async () => {
+  const checkSubmissionStatus = async () => {
     if (!user) return;
     
     const { data } = await supabase
@@ -99,7 +103,7 @@ export default function TriggerQuestions() {
       .eq('user_id', user.id)
       .eq('module_id', module.id);
 
-    if (data) {
+    if (data && data.length > 0) {
       const loadedAnswers: Record<number, string> = {};
       const loadedSaved: Record<number, boolean> = {};
       data.forEach(item => {
@@ -108,7 +112,12 @@ export default function TriggerQuestions() {
       });
       setAnswers(loadedAnswers);
       setSavedAnswers(loadedSaved);
+      
+      // Check if all questions are answered (meaning submitted)
+      const allAnswered = triggerQuestions.every(q => loadedAnswers[q.id]?.trim());
+      setHasSubmitted(allAnswered);
     }
+    setLoadingCheck(false);
   };
 
   const handleAnswerChange = (id: number, value: string) => {
@@ -238,55 +247,67 @@ export default function TriggerQuestions() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
-                <Textarea
-                  placeholder="Tuliskan jawabanmu di sini..."
-                  className="min-h-[100px] resize-none"
-                  value={answers[q.id] || ''}
-                  onChange={(e) => handleAnswerChange(q.id, e.target.value)}
-                />
-                
-                <div className="flex items-center justify-between">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => toggleHint(q.id)}
-                    className="text-muted-foreground hover:text-foreground gap-2"
-                  >
-                    <Lightbulb className="h-4 w-4" />
-                    {revealedHints.has(q.id) ? 'Sembunyikan Petunjuk' : 'Lihat Petunjuk'}
-                  </Button>
-                  
-                  <div className="flex items-center gap-2">
-                    {savedAnswers[q.id] && (
-                      <span className="flex items-center gap-1 text-success text-sm">
-                        <CheckCircle className="h-4 w-4" />
-                        Tersimpan
-                      </span>
-                    )}
-                    <Button
-                      size="sm"
-                      onClick={() => saveAnswer(q.id)}
-                      disabled={!answers[q.id]?.trim() || saving[q.id]}
-                      className="gap-2"
-                    >
-                      <Save className="h-4 w-4" />
-                      {saving[q.id] ? 'Menyimpan...' : 'Simpan'}
-                    </Button>
+                {hasSubmitted ? (
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <p className="text-foreground whitespace-pre-wrap">{answers[q.id]}</p>
+                    <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                      <CheckCircle className="h-3 w-3" />
+                      Sudah dikumpulkan
+                    </p>
                   </div>
-                </div>
-
-                {revealedHints.has(q.id) && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="p-4 rounded-lg bg-warning/10 border border-warning/20"
-                  >
-                    <div className="flex items-start gap-2">
-                      <Lightbulb className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
-                      <p className="text-sm text-foreground">{q.hint}</p>
+                ) : (
+                  <>
+                    <Textarea
+                      placeholder="Tuliskan jawabanmu di sini..."
+                      className="min-h-[100px] resize-none"
+                      value={answers[q.id] || ''}
+                      onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                    />
+                    
+                    <div className="flex items-center justify-between">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleHint(q.id)}
+                        className="text-muted-foreground hover:text-foreground gap-2"
+                      >
+                        <Lightbulb className="h-4 w-4" />
+                        {revealedHints.has(q.id) ? 'Sembunyikan Petunjuk' : 'Lihat Petunjuk'}
+                      </Button>
+                      
+                      <div className="flex items-center gap-2">
+                        {savedAnswers[q.id] && (
+                          <span className="flex items-center gap-1 text-success text-sm">
+                            <CheckCircle className="h-4 w-4" />
+                            Tersimpan
+                          </span>
+                        )}
+                        <Button
+                          size="sm"
+                          onClick={() => saveAnswer(q.id)}
+                          disabled={!answers[q.id]?.trim() || saving[q.id]}
+                          className="gap-2"
+                        >
+                          <Save className="h-4 w-4" />
+                          {saving[q.id] ? 'Menyimpan...' : 'Simpan'}
+                        </Button>
+                      </div>
                     </div>
-                  </motion.div>
+
+                    {revealedHints.has(q.id) && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="p-4 rounded-lg bg-warning/10 border border-warning/20"
+                      >
+                        <div className="flex items-start gap-2">
+                          <Lightbulb className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
+                          <p className="text-sm text-foreground">{q.hint}</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </>
                 )}
               </CardContent>
             </Card>
@@ -295,13 +316,20 @@ export default function TriggerQuestions() {
 
         {/* Info */}
         <motion.div variants={itemVariants}>
-          <Card className="bg-accent/50 border-accent">
+          <Card className={hasSubmitted ? 'bg-success/10 border-success/30' : 'bg-accent/50 border-accent'}>
             <CardContent className="pt-6">
-              <p className="text-sm text-foreground">
-                💡 <strong>Catatan:</strong> Tidak ada jawaban yang benar atau salah di sini. 
-                Pertanyaan-pertanyaan ini bertujuan untuk membantu kamu berpikir tentang konsep 
-                permintaan sebelum mempelajari materi secara mendalam.
-              </p>
+              {hasSubmitted ? (
+                <p className="text-sm text-foreground flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-success" />
+                  <strong>Pengerjaan sudah dikumpulkan.</strong> Jawaban tidak dapat diubah. Hubungi guru untuk reset jika diperlukan.
+                </p>
+              ) : (
+                <p className="text-sm text-foreground">
+                  💡 <strong>Catatan:</strong> Tidak ada jawaban yang benar atau salah di sini. 
+                  Pertanyaan-pertanyaan ini bertujuan untuk membantu kamu berpikir tentang konsep 
+                  permintaan sebelum mempelajari materi secara mendalam.
+                </p>
+              )}
             </CardContent>
           </Card>
         </motion.div>

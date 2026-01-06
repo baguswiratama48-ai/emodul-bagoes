@@ -55,6 +55,7 @@ export default function ReflectionPage() {
   const [savedAnswers, setSavedAnswers] = useState<Record<number, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   // Fetch existing answers
   useEffect(() => {
@@ -76,6 +77,10 @@ export default function ReflectionPage() {
         });
         setAnswers(answersMap);
         setSavedAnswers(answersMap);
+        
+        // Check if all questions are answered (meaning submitted)
+        const allAnswered = reflectionQuestions.every(q => answersMap[q.id]?.trim());
+        setHasSubmitted(allAnswered);
       } catch (error) {
         console.error('Error fetching reflection answers:', error);
       } finally {
@@ -197,18 +202,30 @@ export default function ReflectionPage() {
                 </p>
               </CardHeader>
               <CardContent>
-                <Textarea
-                  value={answers[item.id] || ''}
-                  onChange={(e) => handleAnswerChange(item.id, e.target.value)}
-                  placeholder="Tulis jawabanmu di sini..."
-                  className="min-h-[120px] resize-none"
-                  disabled={isLoading}
-                />
-                {savedAnswers[item.id] && answers[item.id] === savedAnswers[item.id] && (
-                  <div className="flex items-center gap-2 mt-2 text-sm text-success">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span>Tersimpan</span>
+                {hasSubmitted ? (
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <p className="whitespace-pre-wrap">{answers[item.id]}</p>
+                    <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3" />
+                      Sudah dikumpulkan
+                    </p>
                   </div>
+                ) : (
+                  <>
+                    <Textarea
+                      value={answers[item.id] || ''}
+                      onChange={(e) => handleAnswerChange(item.id, e.target.value)}
+                      placeholder="Tulis jawabanmu di sini..."
+                      className="min-h-[120px] resize-none"
+                      disabled={isLoading}
+                    />
+                    {savedAnswers[item.id] && answers[item.id] === savedAnswers[item.id] && (
+                      <div className="flex items-center gap-2 mt-2 text-sm text-success">
+                        <CheckCircle2 className="h-4 w-4" />
+                        <span>Tersimpan</span>
+                      </div>
+                    )}
+                  </>
                 )}
               </CardContent>
             </Card>
@@ -216,17 +233,19 @@ export default function ReflectionPage() {
         </motion.div>
 
         {/* Save Button */}
-        <motion.div variants={itemVariants} className="flex justify-center">
-          <Button
-            onClick={handleSave}
-            disabled={!hasChanges || isSaving}
-            size="lg"
-            className="gap-2"
-          >
-            <Save className="h-4 w-4" />
-            {isSaving ? 'Menyimpan...' : 'Simpan Refleksi'}
-          </Button>
-        </motion.div>
+        {!hasSubmitted && (
+          <motion.div variants={itemVariants} className="flex justify-center">
+            <Button
+              onClick={handleSave}
+              disabled={!hasChanges || isSaving}
+              size="lg"
+              className="gap-2"
+            >
+              <Save className="h-4 w-4" />
+              {isSaving ? 'Menyimpan...' : 'Simpan Refleksi'}
+            </Button>
+          </motion.div>
+        )}
 
         {/* Completion Message */}
         {allAnswered && !hasChanges && (
