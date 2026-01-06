@@ -25,13 +25,7 @@ const lkpdProblems = [
     title: "Soal 1: Penjualan Es Teh di Kantin",
     story: "Bu Siti menjual es teh di kantin sekolah. Ketika harga es teh Rp5.000 per gelas, ia berhasil menjual 100 gelas per hari. Setelah menurunkan harga menjadi Rp3.000 per gelas, penjualannya meningkat menjadi 160 gelas per hari.",
     question: "Tentukan fungsi permintaan es teh di kantin Bu Siti!",
-    hint: "Gunakan rumus: a = ΔQ/ΔP, lalu substitusi ke persamaan garis",
-    data: {
-      p1: "5.000",
-      q1: "100",
-      p2: "3.000", 
-      q2: "160"
-    }
+    hint: "Identifikasi dua titik dari cerita, lalu gunakan rumus: a = ΔQ/ΔP",
   },
   {
     id: 2,
@@ -39,12 +33,6 @@ const lkpdProblems = [
     story: "Koperasi sekolah menjual pulpen. Saat harga pulpen Rp4.000 per buah, terjual 50 buah per minggu. Ketika harga dinaikkan menjadi Rp6.000 per buah, jumlah yang terjual menurun menjadi 30 buah per minggu.",
     question: "Tentukan fungsi permintaan pulpen di koperasi sekolah!",
     hint: "Perhatikan: harga naik, permintaan turun (sesuai hukum permintaan)",
-    data: {
-      p1: "4.000",
-      q1: "50",
-      p2: "6.000",
-      q2: "30"
-    }
   },
   {
     id: 3,
@@ -52,25 +40,13 @@ const lkpdProblems = [
     story: "Pak Joko berjualan bakso di stadion. Pada saat pertandingan biasa, dengan harga Rp15.000 per mangkok, ia menjual 80 mangkok. Saat ia memberikan diskon menjadi Rp12.000 per mangkok, penjualan meningkat menjadi 110 mangkok.",
     question: "Tentukan fungsi permintaan bakso Pak Joko dan hitung berapa mangkok yang akan terjual jika harga diturunkan lagi menjadi Rp10.000!",
     hint: "Setelah menemukan fungsi, substitusikan P = 10.000 untuk mencari Q",
-    data: {
-      p1: "15.000",
-      q1: "80",
-      p2: "12.000",
-      q2: "110"
-    }
   },
   {
     id: 4,
     title: "Soal 4: Analisis Kasus",
     story: "Toko buku menjual novel dengan harga Rp75.000 dan terjual 40 eksemplar per bulan. Setelah ada diskon 20%, penjualan meningkat menjadi 60 eksemplar per bulan.",
     question: "a) Tentukan fungsi permintaan novel tersebut!\nb) Jika toko ingin menjual 80 eksemplar per bulan, berapa harga yang harus ditetapkan?",
-    hint: "Harga setelah diskon 20% = 75.000 - (20% × 75.000) = 60.000. Untuk bagian b, substitusi Q = 80 lalu cari P",
-    data: {
-      p1: "75.000",
-      q1: "40",
-      p2: "60.000 (setelah diskon)",
-      q2: "60"
-    }
+    hint: "Hitung dulu harga setelah diskon 20%. Untuk bagian b, substitusi Q = 80 lalu cari P",
   },
 ];
 
@@ -192,26 +168,6 @@ export default function LKPDPage() {
                 {/* Story */}
                 <div className="p-4 bg-muted/50 rounded-lg border-l-4 border-primary">
                   <p className="text-foreground leading-relaxed">{problem.story}</p>
-                </div>
-
-                {/* Data Points */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className="p-3 bg-card rounded-lg border text-center">
-                    <p className="text-xs text-muted-foreground">P₁</p>
-                    <p className="font-mono font-medium text-foreground">Rp{problem.data.p1}</p>
-                  </div>
-                  <div className="p-3 bg-card rounded-lg border text-center">
-                    <p className="text-xs text-muted-foreground">Q₁</p>
-                    <p className="font-mono font-medium text-foreground">{problem.data.q1}</p>
-                  </div>
-                  <div className="p-3 bg-card rounded-lg border text-center">
-                    <p className="text-xs text-muted-foreground">P₂</p>
-                    <p className="font-mono font-medium text-foreground">Rp{problem.data.p2}</p>
-                  </div>
-                  <div className="p-3 bg-card rounded-lg border text-center">
-                    <p className="text-xs text-muted-foreground">Q₂</p>
-                    <p className="font-mono font-medium text-foreground">{problem.data.q2}</p>
-                  </div>
                 </div>
 
                 {/* Question */}
