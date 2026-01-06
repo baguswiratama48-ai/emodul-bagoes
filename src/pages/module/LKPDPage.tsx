@@ -815,7 +815,7 @@ export default function LKPDPage() {
         <motion.div variants={itemVariants}>
           <div className="flex flex-col sm:flex-row gap-4 justify-between pt-4">
             <Button variant="outline" asChild className="gap-2">
-              <Link to={`/module/${module.id}/video`}>
+              <Link to={`/modul/${module.id}/video`}>
                 <ArrowLeft className="h-4 w-4" />
                 Video Pembelajaran
               </Link>
@@ -825,7 +825,7 @@ export default function LKPDPage() {
               onClick={handleComplete}
               className={`gap-2 ${isPKWU ? 'bg-green-600 hover:bg-green-700' : ''}`}
             >
-              <Link to={`/module/${module.id}/kuis`}>
+              <Link to={`/modul/${module.id}/kuis`}>
                 Lanjut ke Kuis
                 <ArrowRight className="h-4 w-4" />
               </Link>
