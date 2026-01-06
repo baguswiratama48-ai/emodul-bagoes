@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { BookOpen, Mail, Lock, User, GraduationCap, Users } from 'lucide-react';
+import { Mail, Lock, User, GraduationCap, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { z } from 'zod';
+import logo from '@/assets/logo.png';
 
 const emailSchema = z.string().email('Email tidak valid');
 const passwordSchema = z.string().min(6, 'Password minimal 6 karakter');
@@ -136,11 +137,8 @@ export default function AuthPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center">
-              <BookOpen className="h-6 w-6 text-white" />
-            </div>
+            <img src={logo} alt="E-Modul Bagoes" className="h-24 w-auto" />
           </div>
-          <h1 className="text-2xl font-display font-bold text-gradient">E-Modul Bagoes</h1>
           <p className="text-muted-foreground mt-2">Masuk untuk melanjutkan pembelajaran</p>
         </div>
 
