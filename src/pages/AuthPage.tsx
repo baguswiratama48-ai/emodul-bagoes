@@ -14,7 +14,7 @@ import { z } from 'zod';
 import logo from '@/assets/logo.png';
 
 const emailSchema = z.string().email('Email tidak valid');
-const passwordSchema = z.string().min(6, 'Password minimal 6 karakter');
+const passwordSchema = z.string().min(5, 'Password minimal 5 karakter');
 
 export default function AuthPage() {
   const navigate = useNavigate();
