@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -14,7 +14,9 @@ import {
   XCircle,
   MessageCircle,
   Lightbulb,
-  Filter
+  Filter,
+  Recycle,
+  TrendingUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,8 +26,9 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { lkpdAnswerKeys } from '@/data/answerKeys';
+import { lkpdAnswerKeys, lkpdAnswerKeysPKWU, quizAnswerKeysEkonomi, quizAnswerKeysPKWU } from '@/data/answerKeys';
 import { demandModule } from '@/data/moduleContent';
+import { pkwuModule } from '@/data/pkwuModuleContent';
 import { FeedbackForm } from '@/components/teacher/FeedbackForm';
 
 interface StudentProfile {
@@ -43,6 +46,7 @@ interface StudentQuizResult {
   total_questions: number;
   correct_answers: number;
   score: number;
+  module_id?: string;
 }
 
 interface StudentLkpdAnswer {
@@ -54,6 +58,7 @@ interface StudentLkpdAnswer {
   answer: string;
   submitted_at: string;
   feedback?: string;
+  module_id?: string;
 }
 
 interface StudentTriggerAnswer {
@@ -65,11 +70,16 @@ interface StudentTriggerAnswer {
   answer: string;
   submitted_at: string;
   feedback?: string;
+  module_id?: string;
 }
 
 interface FeedbackMap {
   [key: string]: string;
 }
+
+// Kelas untuk mapel Ekonomi dan PKWU
+const EKONOMI_KELAS = ['X.9', 'X.10', 'X.11'];
+const PKWU_KELAS = ['XI.3', 'XI.5', 'XI.6', 'XI.7', 'XI.8', 'XI.9', 'XI.10', 'XI.11'];
 
 export default function TeacherDashboard() {
   const { user, signOut, isGuru } = useAuth();
@@ -82,12 +92,28 @@ export default function TeacherDashboard() {
   const [selectedKelas, setSelectedKelas] = useState<string>('all');
   const [availableKelas, setAvailableKelas] = useState<string[]>([]);
   const [feedbackMap, setFeedbackMap] = useState<FeedbackMap>({});
+  const [selectedMapel, setSelectedMapel] = useState<'ekonomi' | 'pkwu'>('ekonomi');
+
+  // Determine which classes to show based on selected mapel
+  const mapelKelas = useMemo(() => {
+    return selectedMapel === 'ekonomi' ? EKONOMI_KELAS : PKWU_KELAS;
+  }, [selectedMapel]);
+
+  // Filter available kelas based on selected mapel
+  const filteredAvailableKelas = useMemo(() => {
+    return availableKelas.filter(k => mapelKelas.includes(k));
+  }, [availableKelas, mapelKelas]);
 
   useEffect(() => {
     if (isGuru) {
       fetchStudentData();
     }
   }, [isGuru]);
+
+  // Reset kelas filter when mapel changes
+  useEffect(() => {
+    setSelectedKelas('all');
+  }, [selectedMapel]);
 
   const fetchStudentData = async () => {
     setLoading(true);
@@ -125,29 +151,31 @@ export default function TeacherDashboard() {
     });
     setFeedbackMap(fbMap);
     
-    // Fetch quiz answers
+    // Fetch quiz answers with module_id
     const { data: quizData } = await supabase
       .from('quiz_answers')
-      .select('user_id, question_id, is_correct');
+      .select('user_id, question_id, is_correct, module_id');
 
     if (quizData) {
       const userScores: Record<string, StudentQuizResult> = {};
       quizData.forEach((answer: any) => {
         const profile = profilesMap[answer.user_id];
-        if (!userScores[answer.user_id]) {
-          userScores[answer.user_id] = {
+        const key = `${answer.user_id}-${answer.module_id || 'default'}`;
+        if (!userScores[key]) {
+          userScores[key] = {
             user_id: answer.user_id,
             full_name: profile?.full_name || 'Unknown',
             nis: profile?.nis || '-',
             kelas: profile?.kelas || '-',
             total_questions: 0,
             correct_answers: 0,
-            score: 0
+            score: 0,
+            module_id: answer.module_id
           };
         }
-        userScores[answer.user_id].total_questions++;
+        userScores[key].total_questions++;
         if (answer.is_correct) {
-          userScores[answer.user_id].correct_answers++;
+          userScores[key].correct_answers++;
         }
       });
 
@@ -158,10 +186,10 @@ export default function TeacherDashboard() {
       setQuizResults(Object.values(userScores));
     }
 
-    // Fetch LKPD answers
+    // Fetch LKPD answers with module_id
     const { data: lkpdData } = await supabase
       .from('lkpd_answers')
-      .select('id, user_id, problem_id, answer, submitted_at')
+      .select('id, user_id, problem_id, answer, submitted_at, module_id')
       .order('submitted_at', { ascending: false });
 
     if (lkpdData) {
@@ -175,7 +203,8 @@ export default function TeacherDashboard() {
           problem_id: item.problem_id,
           answer: item.answer,
           submitted_at: item.submitted_at,
-          feedback: fbMap[`lkpd-${item.id}`]
+          feedback: fbMap[`lkpd-${item.id}`],
+          module_id: item.module_id
         };
       }));
     }
@@ -198,7 +227,8 @@ export default function TeacherDashboard() {
           question_id: item.question_id,
           answer: item.answer,
           submitted_at: item.submitted_at,
-          feedback: fbMap[`trigger-${item.id}`]
+          feedback: fbMap[`trigger-${item.id}`],
+          module_id: item.module_id
         };
       }));
     }
@@ -221,7 +251,8 @@ export default function TeacherDashboard() {
           question_id: item.question_id,
           answer: item.answer,
           submitted_at: item.submitted_at,
-          feedback: fbMap[`reflection-${item.id}`]
+          feedback: fbMap[`reflection-${item.id}`],
+          module_id: item.module_id
         };
       }));
     }
@@ -229,27 +260,54 @@ export default function TeacherDashboard() {
     setLoading(false);
   };
 
-  // Filter functions
-  const filteredQuizResults = selectedKelas === 'all' 
-    ? quizResults 
-    : quizResults.filter(r => r.kelas === selectedKelas);
+  // Filter functions based on mapel and kelas
+  const filteredQuizResults = useMemo(() => {
+    let results = quizResults.filter(r => mapelKelas.includes(r.kelas));
+    if (selectedKelas !== 'all') {
+      results = results.filter(r => r.kelas === selectedKelas);
+    }
+    // Filter by module type
+    if (selectedMapel === 'pkwu') {
+      results = results.filter(r => r.module_id === 'kerajinan-limbah' || !r.module_id);
+    } else {
+      results = results.filter(r => r.module_id === 'permintaan' || !r.module_id);
+    }
+    return results;
+  }, [quizResults, mapelKelas, selectedKelas, selectedMapel]);
   
-  const filteredLkpdAnswers = selectedKelas === 'all'
-    ? lkpdAnswers
-    : lkpdAnswers.filter(a => a.kelas === selectedKelas);
+  const filteredLkpdAnswers = useMemo(() => {
+    let answers = lkpdAnswers.filter(a => mapelKelas.includes(a.kelas));
+    if (selectedKelas !== 'all') {
+      answers = answers.filter(a => a.kelas === selectedKelas);
+    }
+    return answers;
+  }, [lkpdAnswers, mapelKelas, selectedKelas]);
   
-  const filteredTriggerAnswers = selectedKelas === 'all'
-    ? triggerAnswers
-    : triggerAnswers.filter(a => a.kelas === selectedKelas);
+  const filteredTriggerAnswers = useMemo(() => {
+    let answers = triggerAnswers.filter(a => mapelKelas.includes(a.kelas));
+    if (selectedKelas !== 'all') {
+      answers = answers.filter(a => a.kelas === selectedKelas);
+    }
+    return answers;
+  }, [triggerAnswers, mapelKelas, selectedKelas]);
   
-  const filteredReflectionAnswers = selectedKelas === 'all'
-    ? reflectionAnswers
-    : reflectionAnswers.filter(a => a.kelas === selectedKelas);
+  const filteredReflectionAnswers = useMemo(() => {
+    let answers = reflectionAnswers.filter(a => mapelKelas.includes(a.kelas));
+    if (selectedKelas !== 'all') {
+      answers = answers.filter(a => a.kelas === selectedKelas);
+    }
+    return answers;
+  }, [reflectionAnswers, mapelKelas, selectedKelas]);
 
-  const triggerQuestions = [
+  // Questions based on mapel
+  const triggerQuestions = selectedMapel === 'ekonomi' ? [
     { id: 1, question: "Pernahkah kamu memperhatikan saat ada diskon besar-besaran, mengapa orang jadi lebih banyak membeli?" },
     { id: 2, question: "Jika uang sakumu naik 2x lipat, apakah kamu akan membeli lebih banyak jajanan? Mengapa?" },
     { id: 3, question: "Ketika harga pulsa mahal, apa yang biasanya kamu lakukan? Apakah mencari alternatif lain?" },
+  ] : [
+    { id: 1, question: "Pernahkah kamu melihat sampah plastik di sekitarmu? Menurutmu, apa yang bisa dilakukan agar sampah tersebut tidak mencemari lingkungan?" },
+    { id: 2, question: "Jika kamu memiliki banyak bungkus kopi sachet bekas, produk apa yang bisa kamu buat dari bahan tersebut?" },
+    { id: 3, question: "Mengapa menurut kamu produk kerajinan dari limbah bisa memiliki nilai jual tinggi?" },
   ];
 
   const reflectionQuestions = [
@@ -259,6 +317,10 @@ export default function TeacherDashboard() {
     { id: 4, question: "Apa yang perlu ditambahkan dari media pembelajaran e-modul ini?" },
     { id: 5, question: "Apa yang kamu sukai dari Bapak Bagus Panca Wiratama, S.Pd., M.Pd.? (Boleh Kritik dan Saran)" },
   ];
+
+  // Get current module and answer keys based on mapel
+  const currentModule = selectedMapel === 'ekonomi' ? demandModule : pkwuModule;
+  const currentLkpdAnswerKeys = selectedMapel === 'ekonomi' ? lkpdAnswerKeys : lkpdAnswerKeysPKWU;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -273,6 +335,29 @@ export default function TeacherDashboard() {
     visible: { y: 0, opacity: 1 },
   };
 
+  const MapelSelector = () => (
+    <div className="flex items-center gap-2 p-1 bg-muted rounded-lg">
+      <Button
+        variant={selectedMapel === 'ekonomi' ? 'default' : 'ghost'}
+        size="sm"
+        onClick={() => setSelectedMapel('ekonomi')}
+        className={`gap-2 ${selectedMapel === 'ekonomi' ? 'bg-gradient-to-r from-teal-500 to-cyan-500' : ''}`}
+      >
+        <TrendingUp className="h-4 w-4" />
+        Ekonomi
+      </Button>
+      <Button
+        variant={selectedMapel === 'pkwu' ? 'default' : 'ghost'}
+        size="sm"
+        onClick={() => setSelectedMapel('pkwu')}
+        className={`gap-2 ${selectedMapel === 'pkwu' ? 'bg-gradient-to-r from-green-500 to-emerald-500' : ''}`}
+      >
+        <Recycle className="h-4 w-4" />
+        PKWU
+      </Button>
+    </div>
+  );
+
   const KelasFilter = () => (
     <div className="flex items-center gap-2">
       <Filter className="h-4 w-4 text-muted-foreground" />
@@ -282,7 +367,7 @@ export default function TeacherDashboard() {
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Semua Kelas</SelectItem>
-          {availableKelas.map(kelas => (
+          {filteredAvailableKelas.map(kelas => (
             <SelectItem key={kelas} value={kelas}>Kelas {kelas}</SelectItem>
           ))}
         </SelectContent>
@@ -297,8 +382,8 @@ export default function TeacherDashboard() {
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center">
-                <BookOpen className="h-4 w-4 text-white" />
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${selectedMapel === 'ekonomi' ? 'bg-gradient-to-r from-teal-500 to-cyan-500' : 'bg-gradient-to-r from-green-500 to-emerald-500'}`}>
+                {selectedMapel === 'ekonomi' ? <TrendingUp className="h-4 w-4 text-white" /> : <Recycle className="h-4 w-4 text-white" />}
               </div>
               <span className="font-display font-bold text-gradient">E-Modul Bagoes</span>
             </Link>
@@ -326,30 +411,41 @@ export default function TeacherDashboard() {
           variants={containerVariants}
           className="space-y-8"
         >
-          {/* Page Header */}
-          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-display font-bold mb-2">Dashboard Guru</h1>
-              <p className="text-muted-foreground">Kelola modul, lihat hasil siswa, dan berikan feedback</p>
+          {/* Page Header with Mapel Selector */}
+          <motion.div variants={itemVariants} className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-display font-bold mb-2">
+                  Dashboard Guru - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}
+                </h1>
+                <p className="text-muted-foreground">
+                  {selectedMapel === 'ekonomi' 
+                    ? 'Kelola modul Ekonomi untuk Kelas X.9, X.10, X.11' 
+                    : 'Kelola modul PKWU untuk Kelas XI.3 - XI.11'}
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Link to="/guru/kelola-siswa">
+                  <Button variant="outline" className="gap-2">
+                    <Users className="h-4 w-4" />
+                    Kelola Siswa
+                  </Button>
+                </Link>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Link to="/guru/kelola-siswa">
-                <Button variant="outline" className="gap-2">
-                  <Users className="h-4 w-4" />
-                  Kelola Siswa
-                </Button>
-              </Link>
+            <div className="flex flex-wrap items-center gap-3">
+              <MapelSelector />
               <KelasFilter />
             </div>
           </motion.div>
 
           {/* Stats */}
           <motion.div variants={itemVariants} className="grid sm:grid-cols-5 gap-4">
-            <Card>
+            <Card className={selectedMapel === 'pkwu' ? 'border-green-200 dark:border-green-900' : ''}>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Users className="h-6 w-6 text-primary" />
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedMapel === 'ekonomi' ? 'bg-primary/10' : 'bg-green-500/10'}`}>
+                    <Users className={`h-6 w-6 ${selectedMapel === 'ekonomi' ? 'text-primary' : 'text-green-500'}`} />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{filteredQuizResults.length}</p>
@@ -358,11 +454,11 @@ export default function TeacherDashboard() {
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className={selectedMapel === 'pkwu' ? 'border-green-200 dark:border-green-900' : ''}>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center">
-                    <ClipboardList className="h-6 w-6 text-secondary" />
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedMapel === 'ekonomi' ? 'bg-secondary/20' : 'bg-emerald-500/10'}`}>
+                    <ClipboardList className={`h-6 w-6 ${selectedMapel === 'ekonomi' ? 'text-secondary' : 'text-emerald-500'}`} />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{new Set(filteredLkpdAnswers.map(a => a.user_id)).size}</p>
@@ -371,7 +467,7 @@ export default function TeacherDashboard() {
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className={selectedMapel === 'pkwu' ? 'border-green-200 dark:border-green-900' : ''}>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center">
@@ -384,7 +480,7 @@ export default function TeacherDashboard() {
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className={selectedMapel === 'pkwu' ? 'border-green-200 dark:border-green-900' : ''}>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
@@ -397,7 +493,7 @@ export default function TeacherDashboard() {
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className={selectedMapel === 'pkwu' ? 'border-green-200 dark:border-green-900' : ''}>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
@@ -422,23 +518,23 @@ export default function TeacherDashboard() {
               <TabsList className="w-full grid grid-cols-5">
                 <TabsTrigger value="trigger-answers" className="gap-2">
                   <MessageCircle className="h-4 w-4" />
-                  Pemantik
+                  <span className="hidden sm:inline">Pemantik</span>
                 </TabsTrigger>
                 <TabsTrigger value="reflection-answers" className="gap-2">
                   <Lightbulb className="h-4 w-4" />
-                  Refleksi
+                  <span className="hidden sm:inline">Refleksi</span>
                 </TabsTrigger>
                 <TabsTrigger value="lkpd-answers" className="gap-2">
                   <ClipboardList className="h-4 w-4" />
-                  LKPD
+                  <span className="hidden sm:inline">LKPD</span>
                 </TabsTrigger>
                 <TabsTrigger value="quiz-results" className="gap-2">
                   <CheckCircle2 className="h-4 w-4" />
-                  Kuis
+                  <span className="hidden sm:inline">Kuis</span>
                 </TabsTrigger>
                 <TabsTrigger value="answer-keys" className="gap-2">
                   <FileText className="h-4 w-4" />
-                  Kunci Jawaban
+                  <span className="hidden sm:inline">Kunci</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -446,7 +542,7 @@ export default function TeacherDashboard() {
               <TabsContent value="trigger-answers" className="mt-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Jawaban Pertanyaan Pemantik</CardTitle>
+                    <CardTitle>Jawaban Pertanyaan Pemantik - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
                     <CardDescription>Jawaban siswa untuk pertanyaan pemantik sebelum materi</CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -465,7 +561,7 @@ export default function TeacherDashboard() {
                           const answersForQuestion = filteredTriggerAnswers.filter(a => a.question_id === q.id);
                           return (
                             <div key={q.id} className="border rounded-lg overflow-hidden">
-                              <div className="p-4 bg-muted/50">
+                              <div className={`p-4 ${selectedMapel === 'pkwu' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-muted/50'}`}>
                                 <div className="flex items-center gap-2 mb-2">
                                   <Badge variant="outline">Pertanyaan {q.id}</Badge>
                                   <Badge variant="secondary">{answersForQuestion.length} jawaban</Badge>
@@ -518,7 +614,7 @@ export default function TeacherDashboard() {
               <TabsContent value="reflection-answers" className="mt-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Jawaban Refleksi Pembelajaran</CardTitle>
+                    <CardTitle>Jawaban Refleksi Pembelajaran - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
                     <CardDescription>Refleksi siswa setelah menyelesaikan modul</CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -590,7 +686,7 @@ export default function TeacherDashboard() {
               <TabsContent value="lkpd-answers" className="mt-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Jawaban LKPD Siswa</CardTitle>
+                    <CardTitle>Jawaban LKPD Siswa - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
                     <CardDescription>Jawaban yang dikumpulkan siswa untuk LKPD</CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -645,7 +741,7 @@ export default function TeacherDashboard() {
               <TabsContent value="quiz-results" className="mt-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Hasil Kuis Siswa</CardTitle>
+                    <CardTitle>Hasil Kuis Siswa - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
                     <CardDescription>Nilai dan progress siswa dalam mengerjakan kuis</CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -673,7 +769,7 @@ export default function TeacherDashboard() {
                         </TableHeader>
                         <TableBody>
                           {filteredQuizResults.map((result, index) => (
-                            <TableRow key={result.user_id}>
+                            <TableRow key={`${result.user_id}-${index}`}>
                               <TableCell>{index + 1}</TableCell>
                               <TableCell className="font-medium">{result.full_name}</TableCell>
                               <TableCell className="font-mono text-sm">{result.nis}</TableCell>
@@ -702,14 +798,14 @@ export default function TeacherDashboard() {
               <TabsContent value="answer-keys" className="mt-6 space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Kunci Jawaban LKPD</CardTitle>
+                    <CardTitle>Kunci Jawaban LKPD - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
                     <CardDescription>Langkah-langkah penyelesaian untuk setiap soal</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {lkpdAnswerKeys.map((key) => (
+                    {currentLkpdAnswerKeys.map((key) => (
                       <div key={key.id} className="border rounded-lg overflow-hidden">
                         <button
-                          className="w-full p-4 flex items-center justify-between bg-muted/50 hover:bg-muted transition-colors text-left"
+                          className={`w-full p-4 flex items-center justify-between hover:bg-muted transition-colors text-left ${selectedMapel === 'pkwu' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-muted/50'}`}
                           onClick={() => setExpandedAnswerKey(expandedAnswerKey === key.id ? null : key.id)}
                         >
                           <span className="font-medium">{key.title}</span>
@@ -729,8 +825,8 @@ export default function TeacherDashboard() {
                                 ))}
                               </div>
                             </div>
-                            <div className="p-4 bg-success/10 border border-success/30 rounded-lg">
-                              <h4 className="font-semibold text-success mb-2">✅ Jawaban:</h4>
+                            <div className={`p-4 rounded-lg ${selectedMapel === 'pkwu' ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-success/10 border border-success/30'}`}>
+                              <h4 className={`font-semibold mb-2 ${selectedMapel === 'pkwu' ? 'text-green-700 dark:text-green-400' : 'text-success'}`}>✅ Jawaban:</h4>
                               <p className="font-mono text-lg whitespace-pre-line">{key.answer}</p>
                             </div>
                             <div>
@@ -750,15 +846,15 @@ export default function TeacherDashboard() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Kunci Jawaban Kuis</CardTitle>
+                    <CardTitle>Kunci Jawaban Kuis - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
                     <CardDescription>Jawaban benar dan penjelasan untuk setiap soal</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {demandModule.quizQuestions.map((q, index) => (
+                      {currentModule.quizQuestions.map((q, index) => (
                         <div key={q.id} className="p-4 border rounded-lg">
                           <div className="flex items-start gap-3 mb-3">
-                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
+                            <span className={`flex-shrink-0 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center ${selectedMapel === 'pkwu' ? 'bg-green-100 text-green-700' : 'bg-primary/10 text-primary'}`}>
                               {index + 1}
                             </span>
                             <p className="font-medium">{q.question}</p>
@@ -767,11 +863,11 @@ export default function TeacherDashboard() {
                             {q.options.map((opt, optIndex) => (
                               <div 
                                 key={optIndex} 
-                                className={`p-2 rounded ${optIndex === q.correctAnswer ? 'bg-success/10 border border-success/30' : 'bg-muted/50'}`}
+                                className={`p-2 rounded ${optIndex === q.correctAnswer ? (selectedMapel === 'pkwu' ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-success/10 border border-success/30') : 'bg-muted/50'}`}
                               >
                                 <div className="flex items-center gap-2">
                                   {optIndex === q.correctAnswer ? (
-                                    <CheckCircle2 className="h-4 w-4 text-success" />
+                                    <CheckCircle2 className={`h-4 w-4 ${selectedMapel === 'pkwu' ? 'text-green-600' : 'text-success'}`} />
                                   ) : (
                                     <XCircle className="h-4 w-4 text-muted-foreground" />
                                   )}
@@ -781,7 +877,7 @@ export default function TeacherDashboard() {
                                 </div>
                               </div>
                             ))}
-                            <div className="mt-3 p-3 bg-accent/50 rounded-lg">
+                            <div className={`mt-3 p-3 rounded-lg ${selectedMapel === 'pkwu' ? 'bg-green-50/50 dark:bg-green-900/10' : 'bg-accent/50'}`}>
                               <p className="text-sm"><strong>Penjelasan:</strong> {q.explanation}</p>
                             </div>
                           </div>

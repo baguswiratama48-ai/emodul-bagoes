@@ -17,6 +17,7 @@ import { useProgress } from '@/hooks/useProgress';
 import { getModuleById, isPKWUModule } from '@/data/moduleUtils';
 import { DemandCurveChart } from '@/components/interactive/DemandCurveChart';
 import ReactMarkdown from 'react-markdown';
+import { DemandCalculator } from '@/components/interactive/DemandCalculator';
 import remarkGfm from 'remark-gfm';
 
 export default function MaterialPage() {
@@ -147,11 +148,18 @@ export default function MaterialPage() {
                       </ReactMarkdown>
                     )}
 
-                    {/* Interactive elements based on section */}
-                    {section.id === 'kurva-permintaan' && (
+                    {/* Interactive elements based on section - only for Ekonomi module */}
+                    {!isPKWU && section.id === 'kurva-permintaan' && (
                       <div className="mt-8">
                         <h3 className="text-lg font-semibold mb-4">📊 Kurva Permintaan Interaktif</h3>
                         <DemandCurveChart />
+                      </div>
+                    )}
+                    
+                    {!isPKWU && section.id === 'fungsi-permintaan' && (
+                      <div className="mt-8 space-y-6">
+                        <h3 className="text-lg font-semibold mb-4">🧮 Kalkulator Fungsi Permintaan</h3>
+                        <DemandCalculator />
                       </div>
                     )}
 
