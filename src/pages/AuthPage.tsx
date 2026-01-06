@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 import logo from '@/assets/logo.png';
 
@@ -83,12 +84,37 @@ export default function AuthPage() {
     // Convert NISN to email format
     const emailToUse = `${siswaId.trim()}@siswa.local`;
     
+    // First, verify that the selected class matches the student's registered class
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('kelas, full_name')
+      .eq('nis', siswaNis.trim())
+      .single();
+    
+    if (profileError || !profileData) {
+      toast({ title: 'Login Gagal', description: 'Data siswa tidak ditemukan', variant: 'destructive' });
+      setIsSubmitting(false);
+      return;
+    }
+    
+    // Check if selected class matches the registered class
+    if (profileData.kelas !== selectedKelas) {
+      toast({ 
+        title: 'Login Gagal', 
+        description: `Kelas yang dipilih tidak sesuai. ${profileData.full_name} terdaftar di kelas ${profileData.kelas}`, 
+        variant: 'destructive' 
+      });
+      setIsSubmitting(false);
+      return;
+    }
+    
+    // If class matches, proceed with login
     const { error } = await signIn(emailToUse, siswaNis);
     
     if (error) {
       toast({ title: 'Login Gagal', description: 'NISN atau NIS salah', variant: 'destructive' });
     } else {
-      toast({ title: 'Berhasil', description: 'Selamat datang!' });
+      toast({ title: 'Berhasil', description: `Selamat datang, ${profileData.full_name}!` });
       navigate('/');
     }
     
