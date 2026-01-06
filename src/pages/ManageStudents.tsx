@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -6,16 +6,17 @@ import {
   BookOpen,
   LogOut,
   Home,
-  Save,
   Edit2,
   Check,
-  X
+  X,
+  ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,6 +36,34 @@ export default function ManageStudents() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ nis: '', kelas: '' });
   const [saving, setSaving] = useState(false);
+  const [selectedKelas, setSelectedKelas] = useState<string>('all');
+
+  // Get unique classes from students
+  const kelasList = useMemo(() => {
+    const classes = students
+      .map(s => s.kelas)
+      .filter((k): k is string => k !== null && k !== '')
+      .sort((a, b) => {
+        // Sort by grade (X, XI, XII) then by number
+        const gradeA = a.split('.')[0];
+        const gradeB = b.split('.')[0];
+        const numA = parseInt(a.split('.')[1]) || 0;
+        const numB = parseInt(b.split('.')[1]) || 0;
+        
+        if (gradeA !== gradeB) {
+          const order = ['X', 'XI', 'XII'];
+          return order.indexOf(gradeA) - order.indexOf(gradeB);
+        }
+        return numA - numB;
+      });
+    return [...new Set(classes)];
+  }, [students]);
+
+  // Filter students by selected class
+  const filteredStudents = useMemo(() => {
+    if (selectedKelas === 'all') return students;
+    return students.filter(s => s.kelas === selectedKelas);
+  }, [students, selectedKelas]);
 
   useEffect(() => {
     if (isGuru) {
@@ -162,9 +191,29 @@ export default function ManageStudents() {
           className="space-y-8"
         >
           {/* Page Header */}
-          <motion.div variants={itemVariants}>
-            <h1 className="text-3xl font-display font-bold mb-2">Kelola Data Siswa</h1>
-            <p className="text-muted-foreground">Edit NIS dan kelas siswa</p>
+          <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-display font-bold mb-2">Kelola Data Siswa</h1>
+              <p className="text-muted-foreground">Edit NIS dan kelas siswa</p>
+            </div>
+            
+            {/* Class Filter */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Filter Kelas:</span>
+              <Select value={selectedKelas} onValueChange={setSelectedKelas}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Pilih Kelas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Kelas ({students.length})</SelectItem>
+                  {kelasList.map(kelas => (
+                    <SelectItem key={kelas} value={kelas}>
+                      Kelas {kelas} ({students.filter(s => s.kelas === kelas).length})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </motion.div>
 
           {/* Students Table */}
@@ -173,7 +222,8 @@ export default function ManageStudents() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5" />
-                  Daftar Siswa
+                  {selectedKelas === 'all' ? 'Semua Siswa' : `Siswa Kelas ${selectedKelas}`}
+                  <Badge variant="secondary" className="ml-2">{filteredStudents.length} siswa</Badge>
                 </CardTitle>
                 <CardDescription>Klik tombol edit untuk mengubah data siswa</CardDescription>
               </CardHeader>
@@ -182,24 +232,24 @@ export default function ManageStudents() {
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                   </div>
-                ) : students.length === 0 ? (
+                ) : filteredStudents.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Belum ada siswa terdaftar</p>
+                    <p>{selectedKelas === 'all' ? 'Belum ada siswa terdaftar' : `Tidak ada siswa di kelas ${selectedKelas}`}</p>
                   </div>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>No</TableHead>
+                        <TableHead className="w-16">No</TableHead>
                         <TableHead>Nama Siswa</TableHead>
                         <TableHead>NIS</TableHead>
-                        <TableHead>Kelas</TableHead>
+                        {selectedKelas === 'all' && <TableHead>Kelas</TableHead>}
                         <TableHead className="text-right">Aksi</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {students.map((student, index) => (
+                      {filteredStudents.map((student, index) => (
                         <TableRow key={student.id}>
                           <TableCell>{index + 1}</TableCell>
                           <TableCell className="font-medium">{student.full_name}</TableCell>
@@ -215,20 +265,22 @@ export default function ManageStudents() {
                               <span className="font-mono">{student.nis || '-'}</span>
                             )}
                           </TableCell>
-                          <TableCell>
-                            {editingId === student.id ? (
-                              <Input
-                                value={editForm.kelas}
-                                onChange={(e) => setEditForm(prev => ({ ...prev, kelas: e.target.value }))}
-                                placeholder="Kelas"
-                                className="w-24"
-                              />
-                            ) : (
-                              student.kelas ? (
-                                <Badge variant="outline">Kelas {student.kelas}</Badge>
-                              ) : '-'
-                            )}
-                          </TableCell>
+                          {selectedKelas === 'all' && (
+                            <TableCell>
+                              {editingId === student.id ? (
+                                <Input
+                                  value={editForm.kelas}
+                                  onChange={(e) => setEditForm(prev => ({ ...prev, kelas: e.target.value }))}
+                                  placeholder="Kelas"
+                                  className="w-24"
+                                />
+                              ) : (
+                                student.kelas ? (
+                                  <Badge variant="outline">Kelas {student.kelas}</Badge>
+                                ) : '-'
+                              )}
+                            </TableCell>
+                          )}
                           <TableCell className="text-right">
                             {editingId === student.id ? (
                               <div className="flex items-center justify-end gap-2">
