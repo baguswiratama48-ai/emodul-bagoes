@@ -15,6 +15,7 @@ import VideoPage from "./pages/module/VideoPage";
 import LKPDPage from "./pages/module/LKPDPage";
 import QuizPage from "./pages/module/QuizPage";
 import GlossaryPage from "./pages/module/GlossaryPage";
+import ReflectionPage from "./pages/module/ReflectionPage";
 import SummaryPage from "./pages/module/SummaryPage";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/modul/:moduleId/lkpd" element={<ProtectedRoute><LKPDPage /></ProtectedRoute>} />
             <Route path="/modul/:moduleId/kuis" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
             <Route path="/modul/:moduleId/glosarium" element={<ProtectedRoute><GlossaryPage /></ProtectedRoute>} />
+            <Route path="/modul/:moduleId/refleksi" element={<ProtectedRoute><ReflectionPage /></ProtectedRoute>} />
             <Route path="/modul/:moduleId/rangkuman" element={<ProtectedRoute><SummaryPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
