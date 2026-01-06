@@ -7,10 +7,26 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { z } from 'zod';
 import logo from '@/assets/logo.png';
+
+// Define available classes
+const kelasOptions = [
+  { value: 'X.9', label: 'Kelas X.9 (Ekonomi)' },
+  { value: 'X.10', label: 'Kelas X.10 (Ekonomi)' },
+  { value: 'X.11', label: 'Kelas X.11 (Ekonomi)' },
+  { value: 'XI.3', label: 'Kelas XI.3 (PKWU)' },
+  { value: 'XI.5', label: 'Kelas XI.5 (PKWU)' },
+  { value: 'XI.6', label: 'Kelas XI.6 (PKWU)' },
+  { value: 'XI.7', label: 'Kelas XI.7 (PKWU)' },
+  { value: 'XI.8', label: 'Kelas XI.8 (PKWU)' },
+  { value: 'XI.9', label: 'Kelas XI.9 (PKWU)' },
+  { value: 'XI.10', label: 'Kelas XI.10 (PKWU)' },
+  { value: 'XI.11', label: 'Kelas XI.11 (PKWU)' },
+];
 
 const emailSchema = z.string().email('Email tidak valid');
 const passwordSchema = z.string().min(5, 'Password minimal 5 karakter');
@@ -26,6 +42,7 @@ export default function AuthPage() {
   // Siswa login form
   const [siswaId, setSiswaId] = useState('');
   const [siswaNis, setSiswaNis] = useState('');
+  const [selectedKelas, setSelectedKelas] = useState('');
   
   // Guru login form
   const [guruEmail, setGuruEmail] = useState('');
@@ -52,6 +69,12 @@ export default function AuthPage() {
     const passwordResult = passwordSchema.safeParse(siswaNis);
     if (!passwordResult.success) {
       toast({ title: 'Error', description: passwordResult.error.errors[0].message, variant: 'destructive' });
+      return;
+    }
+
+    // Validate class selection
+    if (!selectedKelas) {
+      toast({ title: 'Error', description: 'Pilih kelas terlebih dahulu', variant: 'destructive' });
       return;
     }
     
@@ -149,6 +172,21 @@ export default function AuthPage() {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSiswaLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="siswa-kelas">Kelas</Label>
+                    <Select value={selectedKelas} onValueChange={setSelectedKelas}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih Kelas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {kelasOptions.map((kelas) => (
+                          <SelectItem key={kelas.value} value={kelas.value}>
+                            {kelas.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="siswa-nisn">NISN</Label>
                     <div className="relative">

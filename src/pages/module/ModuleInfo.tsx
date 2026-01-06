@@ -13,13 +13,19 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ModuleLayout } from '@/components/layout/ModuleLayout';
 import { useProgress } from '@/hooks/useProgress';
-import { demandModule } from '@/data/moduleContent';
+import { getModuleById, isPKWUModule } from '@/data/moduleUtils';
 
 export default function ModuleInfo() {
   const { moduleId } = useParams();
   const { markSectionComplete, getModuleProgress } = useProgress();
-  const module = demandModule; // For now, only one module
+  const module = getModuleById(moduleId);
+  
+  if (!module) {
+    return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
+  }
+  
   const progress = getModuleProgress(module.id);
+  const isPKWU = isPKWUModule(moduleId);
 
   const handleComplete = () => {
     markSectionComplete(module.id, 'info');
@@ -48,9 +54,9 @@ export default function ModuleInfo() {
       >
         {/* Header */}
         <motion.div variants={itemVariants}>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent text-accent-foreground text-sm mb-4">
+          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm mb-4 ${isPKWU ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-accent text-accent-foreground'}`}>
             <BookOpen className="h-4 w-4" />
-            <span>Ekonomi Kelas X</span>
+            <span>{isPKWU ? 'PKWU Kelas XI' : 'Ekonomi Kelas X'}</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
             {module.title}
@@ -149,16 +155,15 @@ export default function ModuleInfo() {
 
         {/* Understanding */}
         <motion.div variants={itemVariants}>
-          <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+          <Card className={`bg-gradient-to-br ${isPKWU ? 'from-green-500/5 to-emerald-500/5 border-green-500/20' : 'from-primary/5 to-secondary/5 border-primary/20'}`}>
             <CardHeader>
-              <CardTitle className="text-gradient">Pemahaman Bermakna</CardTitle>
+              <CardTitle className={isPKWU ? 'text-green-700 dark:text-green-300' : 'text-gradient'}>Pemahaman Bermakna</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-foreground leading-relaxed">
-                Memahami konsep permintaan sangat penting karena permintaan adalah salah satu 
-                kekuatan utama yang menggerakkan pasar. Dengan memahami bagaimana permintaan 
-                bekerja, kamu dapat menganalisis perilaku konsumen, memprediksi perubahan harga, 
-                dan membuat keputusan ekonomi yang lebih baik dalam kehidupan sehari-hari.
+                {isPKWU 
+                  ? 'Limbah bukanlah akhir dari sebuah materi, melainkan awal dari peluang ekonomi yang berkelanjutan. Kreativitas dan analisis pasar yang tajam memungkinkan kita mengubah sampah yang tidak bernilai menjadi sumber penghasilan yang berharga (green economy) melalui inovasi kerajinan.'
+                  : 'Memahami konsep permintaan sangat penting karena permintaan adalah salah satu kekuatan utama yang menggerakkan pasar. Dengan memahami bagaimana permintaan bekerja, kamu dapat menganalisis perilaku konsumen, memprediksi perubahan harga, dan membuat keputusan ekonomi yang lebih baik dalam kehidupan sehari-hari.'}
               </p>
             </CardContent>
           </Card>

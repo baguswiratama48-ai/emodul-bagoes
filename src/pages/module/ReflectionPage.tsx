@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Save, CheckCircle2, Lightbulb } from 'lucide-react';
 import { ModuleLayout } from '@/components/layout/ModuleLayout';
-import { demandModule } from '@/data/moduleContent';
+import { getModuleById, isPKWUModule } from '@/data/moduleUtils';
 import { useProgress } from '@/hooks/useProgress';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,10 +42,14 @@ const reflectionQuestions = [
 
 export default function ReflectionPage() {
   const { moduleId } = useParams();
-  const module = demandModule;
+  const module = getModuleById(moduleId);
   const { markSectionComplete } = useProgress();
   const { toast } = useToast();
   const { user } = useAuth();
+  
+  if (!module) {
+    return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
+  }
   
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [savedAnswers, setSavedAnswers] = useState<Record<number, string>>({});

@@ -19,10 +19,11 @@ import { ModuleLayout } from '@/components/layout/ModuleLayout';
 import { useProgress } from '@/hooks/useProgress';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { demandModule } from '@/data/moduleContent';
+import { getModuleById, isPKWUModule } from '@/data/moduleUtils';
 import { supabase } from '@/integrations/supabase/client';
 
-const lkpdProblems = [
+// LKPD for Ekonomi
+const ekonomiLkpdProblems = [
   {
     id: 1,
     title: "Soal 1: Penjualan Es Teh di Kantin",
@@ -53,12 +54,51 @@ const lkpdProblems = [
   },
 ];
 
+// LKPD for PKWU
+const pkwuLkpdProblems = [
+  {
+    id: 1,
+    title: "Soal 1: Identifikasi Limbah",
+    story: "Kamu diminta untuk mengamati lingkungan sekitar rumah atau sekolahmu. Identifikasi jenis-jenis limbah bangun datar yang dapat ditemukan.",
+    question: "Buatlah daftar minimal 5 jenis limbah bangun datar yang kamu temukan, beserta potensi produk kerajinan yang bisa dibuat dari masing-masing limbah tersebut!",
+    hint: "Perhatikan limbah kertas, kardus, plastik, kain, dan bahan lainnya yang memiliki bentuk datar/lembaran.",
+  },
+  {
+    id: 2,
+    title: "Soal 2: Analisis Peluang Usaha",
+    story: "Seorang pengrajin membuat tas dari bungkus kopi sachet bekas. Modal pembuatan per tas adalah Rp20.000 (tenaga kerja dan bahan pendukung). Tas tersebut dijual seharga Rp85.000.",
+    question: "a) Hitung keuntungan per tas!\nb) Jika dalam sebulan terjual 30 tas, berapa total keuntungan yang didapat?\nc) Analisis kelebihan dan kekurangan usaha ini!",
+    hint: "Keuntungan = Harga Jual - Modal. Pertimbangkan juga aspek sustainability.",
+  },
+  {
+    id: 3,
+    title: "Soal 3: Desain Produk",
+    story: "Kamu diberi tugas untuk merancang sebuah produk kerajinan dari limbah plastik sachet kemasan.",
+    question: "Buatlah rencana produk yang meliputi:\na) Nama dan jenis produk\nb) Bahan limbah yang digunakan\nc) Target pasar\nd) Estimasi harga jual\ne) Langkah-langkah pembuatan (minimal 5 langkah)",
+    hint: "Pikirkan produk yang memiliki nilai guna dan estetika tinggi.",
+  },
+  {
+    id: 4,
+    title: "Soal 4: Analisis SWOT",
+    story: "Kamu berencana memulai usaha kerajinan dari limbah kain perca untuk dijual di marketplace online.",
+    question: "Buatlah analisis SWOT (Strengths, Weaknesses, Opportunities, Threats) untuk rencana usaha tersebut! Jelaskan minimal 3 poin untuk setiap aspek.",
+    hint: "Pertimbangkan faktor internal (kekuatan & kelemahan) dan eksternal (peluang & ancaman).",
+  },
+];
+
 export default function LKPDPage() {
   const { moduleId } = useParams();
   const { markSectionComplete } = useProgress();
   const { user } = useAuth();
   const { toast } = useToast();
-  const module = demandModule;
+  const module = getModuleById(moduleId);
+  
+  if (!module) {
+    return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
+  }
+  
+  const isPKWU = isPKWUModule(moduleId);
+  const lkpdProblems = isPKWU ? pkwuLkpdProblems : ekonomiLkpdProblems;
   
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [showHints, setShowHints] = useState<Record<number, boolean>>({});

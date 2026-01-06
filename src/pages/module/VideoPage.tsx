@@ -13,13 +13,19 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ModuleLayout } from '@/components/layout/ModuleLayout';
 import { useProgress } from '@/hooks/useProgress';
-import { demandModule } from '@/data/moduleContent';
+import { getModuleById, isPKWUModule } from '@/data/moduleUtils';
 
 export default function VideoPage() {
   const { moduleId } = useParams();
   const { markSectionComplete, markVideoWatched, getModuleProgress } = useProgress();
-  const module = demandModule;
+  const module = getModuleById(moduleId);
+  
+  if (!module) {
+    return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
+  }
+  
   const progress = getModuleProgress(module.id);
+  const isPKWU = isPKWUModule(moduleId);
   
   const [selectedVideo, setSelectedVideo] = useState(module.videos[0]);
 
@@ -65,7 +71,7 @@ export default function VideoPage() {
             Tonton Video Penjelasan
           </h1>
           <p className="text-muted-foreground">
-            Simak video-video berikut untuk pemahaman yang lebih mendalam tentang konsep permintaan.
+            Simak video-video berikut untuk pemahaman yang lebih mendalam tentang {isPKWU ? 'kerajinan dari bahan limbah' : 'konsep permintaan'}.
           </p>
         </motion.div>
 
