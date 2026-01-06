@@ -95,6 +95,44 @@ export type Database = {
         }
         Relationships: []
       }
+      trigger_answers: {
+        Row: {
+          answer: string
+          id: string
+          module_id: string
+          question_id: number
+          submitted_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          id?: string
+          module_id: string
+          question_id: number
+          submitted_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          id?: string
+          module_id?: string
+          question_id?: number
+          submitted_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trigger_answers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string

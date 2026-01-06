@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -7,14 +7,18 @@ import {
   ArrowLeft,
   MessageCircle,
   Lightbulb,
-  CheckCircle
+  CheckCircle,
+  Save
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { ModuleLayout } from '@/components/layout/ModuleLayout';
 import { useProgress } from '@/hooks/useProgress';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import { demandModule } from '@/data/moduleContent';
+import { supabase } from '@/integrations/supabase/client';
 
 const triggerQuestions = [
   {
@@ -40,13 +44,80 @@ const triggerQuestions = [
 export default function TriggerQuestions() {
   const { moduleId } = useParams();
   const { markSectionComplete } = useProgress();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const module = demandModule;
   
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [revealedHints, setRevealedHints] = useState<Set<number>>(new Set());
+  const [saving, setSaving] = useState<Record<number, boolean>>({});
+  const [savedAnswers, setSavedAnswers] = useState<Record<number, boolean>>({});
+
+  // Load existing answers from database
+  useEffect(() => {
+    if (user) {
+      loadExistingAnswers();
+    }
+  }, [user]);
+
+  const loadExistingAnswers = async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
+      .from('trigger_answers')
+      .select('question_id, answer')
+      .eq('user_id', user.id)
+      .eq('module_id', module.id);
+
+    if (data) {
+      const loadedAnswers: Record<number, string> = {};
+      const loadedSaved: Record<number, boolean> = {};
+      data.forEach(item => {
+        loadedAnswers[item.question_id] = item.answer;
+        loadedSaved[item.question_id] = true;
+      });
+      setAnswers(loadedAnswers);
+      setSavedAnswers(loadedSaved);
+    }
+  };
 
   const handleAnswerChange = (id: number, value: string) => {
     setAnswers(prev => ({ ...prev, [id]: value }));
+    setSavedAnswers(prev => ({ ...prev, [id]: false }));
+  };
+
+  const saveAnswer = async (questionId: number) => {
+    if (!user || !answers[questionId]?.trim()) return;
+
+    setSaving(prev => ({ ...prev, [questionId]: true }));
+
+    const { error } = await supabase
+      .from('trigger_answers')
+      .upsert({
+        user_id: user.id,
+        module_id: module.id,
+        question_id: questionId,
+        answer: answers[questionId],
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id,module_id,question_id'
+      });
+
+    setSaving(prev => ({ ...prev, [questionId]: false }));
+
+    if (error) {
+      toast({
+        title: 'Gagal menyimpan',
+        description: 'Terjadi kesalahan saat menyimpan jawaban.',
+        variant: 'destructive'
+      });
+    } else {
+      setSavedAnswers(prev => ({ ...prev, [questionId]: true }));
+      toast({
+        title: 'Tersimpan',
+        description: `Jawaban pertanyaan ${questionId} berhasil disimpan.`
+      });
+    }
   };
 
   const toggleHint = (id: number) => {
@@ -155,12 +226,23 @@ export default function TriggerQuestions() {
                     {revealedHints.has(q.id) ? 'Sembunyikan Petunjuk' : 'Lihat Petunjuk'}
                   </Button>
                   
-                  {answers[q.id]?.trim() && (
-                    <span className="flex items-center gap-1 text-success text-sm">
-                      <CheckCircle className="h-4 w-4" />
-                      Terjawab
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {savedAnswers[q.id] && (
+                      <span className="flex items-center gap-1 text-success text-sm">
+                        <CheckCircle className="h-4 w-4" />
+                        Tersimpan
+                      </span>
+                    )}
+                    <Button
+                      size="sm"
+                      onClick={() => saveAnswer(q.id)}
+                      disabled={!answers[q.id]?.trim() || saving[q.id]}
+                      className="gap-2"
+                    >
+                      <Save className="h-4 w-4" />
+                      {saving[q.id] ? 'Menyimpan...' : 'Simpan'}
+                    </Button>
+                  </div>
                 </div>
 
                 {revealedHints.has(q.id) && (

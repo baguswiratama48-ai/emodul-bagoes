@@ -17,6 +17,7 @@ import QuizPage from "./pages/module/QuizPage";
 import GlossaryPage from "./pages/module/GlossaryPage";
 import SummaryPage from "./pages/module/SummaryPage";
 import TeacherDashboard from "./pages/TeacherDashboard";
+import StudentDashboard from "./pages/StudentDashboard";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           <Routes>
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/siswa" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
             <Route path="/guru" element={<ProtectedRoute requiredRole="guru"><TeacherDashboard /></ProtectedRoute>} />
             <Route path="/modul/:moduleId" element={<ProtectedRoute><ModuleInfo /></ProtectedRoute>} />
             <Route path="/modul/:moduleId/pemantik" element={<ProtectedRoute><TriggerQuestions /></ProtectedRoute>} />

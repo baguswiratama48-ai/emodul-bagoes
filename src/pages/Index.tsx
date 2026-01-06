@@ -73,12 +73,19 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Teacher Dashboard Link */}
-            {isGuru && (
+            {/* Dashboard Links */}
+            {isGuru ? (
               <Link to="/guru">
                 <Button variant="outline" size="sm" className="gap-2">
                   <Settings className="h-4 w-4" />
                   <span className="hidden sm:inline">Dashboard Guru</span>
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/siswa">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:inline">Dashboard Saya</span>
                 </Button>
               </Link>
             )}

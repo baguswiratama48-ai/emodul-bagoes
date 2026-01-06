@@ -12,7 +12,7 @@ import {
   Home,
   CheckCircle2,
   XCircle,
-  Eye
+  MessageCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,7 +21,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { lkpdAnswerKeys, quizAnswerKeys } from '@/data/answerKeys';
+import { lkpdAnswerKeys } from '@/data/answerKeys';
 import { demandModule } from '@/data/moduleContent';
 
 interface StudentQuizResult {
@@ -40,10 +40,19 @@ interface StudentLkpdAnswer {
   submitted_at: string;
 }
 
+interface StudentTriggerAnswer {
+  user_id: string;
+  full_name: string;
+  question_id: number;
+  answer: string;
+  submitted_at: string;
+}
+
 export default function TeacherDashboard() {
   const { user, signOut, isGuru } = useAuth();
   const [quizResults, setQuizResults] = useState<StudentQuizResult[]>([]);
   const [lkpdAnswers, setLkpdAnswers] = useState<StudentLkpdAnswer[]>([]);
+  const [triggerAnswers, setTriggerAnswers] = useState<StudentTriggerAnswer[]>([]);
   const [expandedAnswerKey, setExpandedAnswerKey] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -67,7 +76,6 @@ export default function TeacherDashboard() {
       `);
 
     if (quizData) {
-      // Group by user and calculate scores
       const userScores: Record<string, StudentQuizResult> = {};
       quizData.forEach((answer: any) => {
         if (!userScores[answer.user_id]) {
@@ -85,7 +93,6 @@ export default function TeacherDashboard() {
         }
       });
 
-      // Calculate scores
       Object.values(userScores).forEach(user => {
         user.score = Math.round((user.correct_answers / user.total_questions) * 100);
       });
@@ -115,8 +122,36 @@ export default function TeacherDashboard() {
       })));
     }
 
+    // Fetch trigger answers with profiles
+    const { data: triggerData } = await supabase
+      .from('trigger_answers')
+      .select(`
+        user_id,
+        question_id,
+        answer,
+        submitted_at,
+        profiles!inner(full_name)
+      `)
+      .order('submitted_at', { ascending: false });
+
+    if (triggerData) {
+      setTriggerAnswers(triggerData.map((item: any) => ({
+        user_id: item.user_id,
+        full_name: item.profiles?.full_name || 'Unknown',
+        question_id: item.question_id,
+        answer: item.answer,
+        submitted_at: item.submitted_at
+      })));
+    }
+
     setLoading(false);
   };
+
+  const triggerQuestions = [
+    { id: 1, question: "Pernahkah kamu memperhatikan saat ada diskon besar-besaran, mengapa orang jadi lebih banyak membeli?" },
+    { id: 2, question: "Jika uang sakumu naik 2x lipat, apakah kamu akan membeli lebih banyak jajanan? Mengapa?" },
+    { id: 3, question: "Ketika harga pulsa mahal, apa yang biasanya kamu lakukan? Apakah mencari alternatif lain?" },
+  ];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -174,7 +209,7 @@ export default function TeacherDashboard() {
           </motion.div>
 
           {/* Stats */}
-          <motion.div variants={itemVariants} className="grid sm:grid-cols-3 gap-4">
+          <motion.div variants={itemVariants} className="grid sm:grid-cols-4 gap-4">
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
@@ -183,7 +218,7 @@ export default function TeacherDashboard() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{quizResults.length}</p>
-                    <p className="text-sm text-muted-foreground">Siswa Mengerjakan Kuis</p>
+                    <p className="text-sm text-muted-foreground">Mengerjakan Kuis</p>
                   </div>
                 </div>
               </CardContent>
@@ -196,7 +231,20 @@ export default function TeacherDashboard() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{new Set(lkpdAnswers.map(a => a.user_id)).size}</p>
-                    <p className="text-sm text-muted-foreground">Siswa Mengerjakan LKPD</p>
+                    <p className="text-sm text-muted-foreground">Mengerjakan LKPD</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center">
+                    <MessageCircle className="h-6 w-6 text-warning" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{new Set(triggerAnswers.map(a => a.user_id)).size}</p>
+                    <p className="text-sm text-muted-foreground">Menjawab Pemantik</p>
                   </div>
                 </div>
               </CardContent>
@@ -213,7 +261,7 @@ export default function TeacherDashboard() {
                         ? Math.round(quizResults.reduce((acc, r) => acc + r.score, 0) / quizResults.length) 
                         : 0}%
                     </p>
-                    <p className="text-sm text-muted-foreground">Rata-rata Nilai Kuis</p>
+                    <p className="text-sm text-muted-foreground">Rata-rata Kuis</p>
                   </div>
                 </div>
               </CardContent>
@@ -222,21 +270,179 @@ export default function TeacherDashboard() {
 
           {/* Main Content */}
           <motion.div variants={itemVariants}>
-            <Tabs defaultValue="answer-keys" className="w-full">
-              <TabsList className="w-full grid grid-cols-3">
+            <Tabs defaultValue="trigger-answers" className="w-full">
+              <TabsList className="w-full grid grid-cols-4">
+                <TabsTrigger value="trigger-answers" className="gap-2">
+                  <MessageCircle className="h-4 w-4" />
+                  Pemantik
+                </TabsTrigger>
+                <TabsTrigger value="lkpd-answers" className="gap-2">
+                  <ClipboardList className="h-4 w-4" />
+                  LKPD
+                </TabsTrigger>
+                <TabsTrigger value="quiz-results" className="gap-2">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Kuis
+                </TabsTrigger>
                 <TabsTrigger value="answer-keys" className="gap-2">
                   <FileText className="h-4 w-4" />
                   Kunci Jawaban
                 </TabsTrigger>
-                <TabsTrigger value="quiz-results" className="gap-2">
-                  <CheckCircle2 className="h-4 w-4" />
-                  Hasil Kuis
-                </TabsTrigger>
-                <TabsTrigger value="lkpd-answers" className="gap-2">
-                  <ClipboardList className="h-4 w-4" />
-                  Jawaban LKPD
-                </TabsTrigger>
               </TabsList>
+
+              {/* Trigger Answers Tab */}
+              <TabsContent value="trigger-answers" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Jawaban Pertanyaan Pemantik</CardTitle>
+                    <CardDescription>Jawaban siswa untuk pertanyaan pemantik sebelum materi</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {loading ? (
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                      </div>
+                    ) : triggerAnswers.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>Belum ada siswa yang menjawab pertanyaan pemantik</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {triggerQuestions.map((q) => {
+                          const answersForQuestion = triggerAnswers.filter(a => a.question_id === q.id);
+                          return (
+                            <div key={q.id} className="border rounded-lg overflow-hidden">
+                              <div className="p-4 bg-muted/50">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Badge variant="outline">Pertanyaan {q.id}</Badge>
+                                  <Badge variant="secondary">{answersForQuestion.length} jawaban</Badge>
+                                </div>
+                                <p className="font-medium">{q.question}</p>
+                              </div>
+                              {answersForQuestion.length > 0 && (
+                                <div className="divide-y">
+                                  {answersForQuestion.map((answer, index) => (
+                                    <div key={`${answer.user_id}-${index}`} className="p-4">
+                                      <div className="flex items-center justify-between mb-2">
+                                        <span className="font-medium">{answer.full_name}</span>
+                                        <span className="text-xs text-muted-foreground">
+                                          {new Date(answer.submitted_at).toLocaleDateString('id-ID', {
+                                            day: 'numeric',
+                                            month: 'short',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                          })}
+                                        </span>
+                                      </div>
+                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{answer.answer}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* LKPD Answers Tab */}
+              <TabsContent value="lkpd-answers" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Jawaban LKPD Siswa</CardTitle>
+                    <CardDescription>Jawaban yang dikumpulkan siswa untuk LKPD</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {loading ? (
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                      </div>
+                    ) : lkpdAnswers.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <ClipboardList className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>Belum ada siswa yang mengerjakan LKPD</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {lkpdAnswers.map((answer, index) => (
+                          <div key={`${answer.user_id}-${answer.problem_id}-${index}`} className="p-4 border rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline">Soal {answer.problem_id}</Badge>
+                                <span className="font-medium">{answer.full_name}</span>
+                              </div>
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(answer.submitted_at).toLocaleDateString('id-ID', {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
+                            </div>
+                            <p className="text-sm font-mono bg-muted/50 p-3 rounded whitespace-pre-wrap">{answer.answer}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Quiz Results Tab */}
+              <TabsContent value="quiz-results" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Hasil Kuis Siswa</CardTitle>
+                    <CardDescription>Nilai dan progress siswa dalam mengerjakan kuis</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {loading ? (
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                      </div>
+                    ) : quizResults.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>Belum ada siswa yang mengerjakan kuis</p>
+                      </div>
+                    ) : (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>No</TableHead>
+                            <TableHead>Nama Siswa</TableHead>
+                            <TableHead className="text-center">Soal Dijawab</TableHead>
+                            <TableHead className="text-center">Benar</TableHead>
+                            <TableHead className="text-center">Nilai</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {quizResults.map((result, index) => (
+                            <TableRow key={result.user_id}>
+                              <TableCell>{index + 1}</TableCell>
+                              <TableCell className="font-medium">{result.full_name}</TableCell>
+                              <TableCell className="text-center">{result.total_questions}</TableCell>
+                              <TableCell className="text-center">{result.correct_answers}</TableCell>
+                              <TableCell className="text-center">
+                                <Badge variant={result.score >= 70 ? 'default' : 'destructive'}>
+                                  {result.score}%
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
               {/* Answer Keys Tab */}
               <TabsContent value="answer-keys" className="mt-6 space-y-6">
@@ -328,102 +534,6 @@ export default function TeacherDashboard() {
                         </div>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Quiz Results Tab */}
-              <TabsContent value="quiz-results" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Hasil Kuis Siswa</CardTitle>
-                    <CardDescription>Nilai dan progress siswa dalam mengerjakan kuis</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {loading ? (
-                      <div className="text-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                      </div>
-                    ) : quizResults.length === 0 ? (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                        <p>Belum ada siswa yang mengerjakan kuis</p>
-                      </div>
-                    ) : (
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>No</TableHead>
-                            <TableHead>Nama Siswa</TableHead>
-                            <TableHead className="text-center">Soal Dijawab</TableHead>
-                            <TableHead className="text-center">Benar</TableHead>
-                            <TableHead className="text-center">Nilai</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {quizResults.map((result, index) => (
-                            <TableRow key={result.user_id}>
-                              <TableCell>{index + 1}</TableCell>
-                              <TableCell className="font-medium">{result.full_name}</TableCell>
-                              <TableCell className="text-center">{result.total_questions}</TableCell>
-                              <TableCell className="text-center">{result.correct_answers}</TableCell>
-                              <TableCell className="text-center">
-                                <Badge variant={result.score >= 70 ? 'default' : 'destructive'}>
-                                  {result.score}%
-                                </Badge>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* LKPD Answers Tab */}
-              <TabsContent value="lkpd-answers" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Jawaban LKPD Siswa</CardTitle>
-                    <CardDescription>Jawaban yang dikumpulkan siswa untuk LKPD</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {loading ? (
-                      <div className="text-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                      </div>
-                    ) : lkpdAnswers.length === 0 ? (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <ClipboardList className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                        <p>Belum ada siswa yang mengerjakan LKPD</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {lkpdAnswers.map((answer, index) => (
-                          <div key={`${answer.user_id}-${answer.problem_id}-${index}`} className="p-4 border rounded-lg">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center gap-2">
-                                <Badge variant="outline">Soal {answer.problem_id}</Badge>
-                                <span className="font-medium">{answer.full_name}</span>
-                              </div>
-                              <span className="text-xs text-muted-foreground">
-                                {new Date(answer.submitted_at).toLocaleDateString('id-ID', {
-                                  day: 'numeric',
-                                  month: 'short',
-                                  year: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </span>
-                            </div>
-                            <div className="bg-muted/50 rounded-lg p-3 font-mono text-sm whitespace-pre-wrap">
-                              {answer.answer}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
