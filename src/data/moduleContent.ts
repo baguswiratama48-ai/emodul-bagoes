@@ -60,7 +60,7 @@ export const demandModule: Module = {
     'Mengenal konsep pasar dalam ekonomi',
     'Kemampuan dasar matematika (grafik koordinat)',
   ],
-  duration: '4 JP (4 x 45 menit)',
+  duration: '3 JP (3 x 45 menit)',
   sections: [
     {
       id: 'pengertian',

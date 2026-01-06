@@ -213,7 +213,7 @@ export default function LKPDPage() {
             Lembar Kerja Peserta Didik
           </h1>
           <p className="text-muted-foreground">
-            Latihan menentukan fungsi permintaan dari soal cerita
+            {isPKWU ? 'Latihan menganalisis peluang usaha kerajinan dari limbah' : 'Latihan menentukan fungsi permintaan dari soal cerita'}
           </p>
         </motion.div>
 
@@ -234,33 +234,65 @@ export default function LKPDPage() {
           </Card>
         </motion.div>
 
-        {/* Rumus Pengingat */}
-        <motion.div variants={itemVariants}>
-          <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">📐</span>
-                Rumus yang Digunakan
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="p-4 bg-card rounded-lg border">
-                  <p className="font-medium text-foreground mb-2">Rumus Slope:</p>
-                  <p className="font-mono text-lg text-primary">a = (Q₂ - Q₁) / (P₂ - P₁)</p>
+        {/* Rumus Pengingat - Only for Ekonomi */}
+        {!isPKWU && (
+          <motion.div variants={itemVariants}>
+            <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="text-2xl">📐</span>
+                  Rumus yang Digunakan
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-card rounded-lg border">
+                    <p className="font-medium text-foreground mb-2">Rumus Slope:</p>
+                    <p className="font-mono text-lg text-primary">a = (Q₂ - Q₁) / (P₂ - P₁)</p>
+                  </div>
+                  <div className="p-4 bg-card rounded-lg border">
+                    <p className="font-medium text-foreground mb-2">Bentuk Fungsi Permintaan:</p>
+                    <p className="font-mono text-lg text-primary">Qd = aP + b</p>
+                  </div>
                 </div>
                 <div className="p-4 bg-card rounded-lg border">
-                  <p className="font-medium text-foreground mb-2">Bentuk Fungsi Permintaan:</p>
-                  <p className="font-mono text-lg text-primary">Qd = aP + b</p>
+                  <p className="font-medium text-foreground mb-2">Persamaan Garis Melalui Dua Titik:</p>
+                  <p className="font-mono text-primary">(Q - Q₁) / (Q₂ - Q₁) = (P - P₁) / (P₂ - P₁)</p>
                 </div>
-              </div>
-              <div className="p-4 bg-card rounded-lg border">
-                <p className="font-medium text-foreground mb-2">Persamaan Garis Melalui Dua Titik:</p>
-                <p className="font-mono text-primary">(Q - Q₁) / (Q₂ - Q₁) = (P - P₁) / (P₂ - P₁)</p>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Panduan PKWU */}
+        {isPKWU && (
+          <motion.div variants={itemVariants}>
+            <Card className="bg-gradient-to-br from-green-500/5 to-emerald-500/5 border-green-500/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="text-2xl">♻️</span>
+                  Panduan Analisis
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-card rounded-lg border">
+                    <p className="font-medium text-foreground mb-2">Rumus Harga Jual:</p>
+                    <p className="font-mono text-lg text-green-600">Harga = Biaya Produksi + Margin</p>
+                  </div>
+                  <div className="p-4 bg-card rounded-lg border">
+                    <p className="font-medium text-foreground mb-2">Keuntungan:</p>
+                    <p className="font-mono text-lg text-green-600">Laba = Harga Jual - Modal</p>
+                  </div>
+                </div>
+                <div className="p-4 bg-card rounded-lg border">
+                  <p className="font-medium text-foreground mb-2">Analisis SWOT:</p>
+                  <p className="font-mono text-green-600">Strengths • Weaknesses • Opportunities • Threats</p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {/* Problems */}
         {lkpdProblems.map((problem, index) => (
@@ -340,22 +372,32 @@ export default function LKPDPage() {
           </motion.div>
         ))}
 
-        {/* Tips */}
+        {/* Tips - Different for each subject */}
         <motion.div variants={itemVariants}>
-          <Card className="bg-accent/50 border-accent">
+          <Card className={`border-accent ${isPKWU ? 'bg-green-50/50 dark:bg-green-900/10' : 'bg-accent/50'}`}>
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
-                <FileText className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                <FileText className={`h-5 w-5 flex-shrink-0 mt-0.5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
                 <div>
                   <p className="text-sm text-foreground font-medium mb-2">Langkah-langkah Pengerjaan:</p>
-                  <ol className="text-sm text-muted-foreground space-y-1 list-decimal pl-4">
-                    <li>Identifikasi data titik A (P₁, Q₁) dan titik B (P₂, Q₂) dari soal cerita</li>
-                    <li>Hitung ΔQ = Q₂ - Q₁ dan ΔP = P₂ - P₁</li>
-                    <li>Hitung slope: a = ΔQ / ΔP</li>
-                    <li>Substitusi ke persamaan: Q - Q₁ = a(P - P₁)</li>
-                    <li>Sederhanakan menjadi bentuk Qd = aP + b</li>
-                    <li>Verifikasi dengan memasukkan nilai P₁ dan P₂</li>
-                  </ol>
+                  {isPKWU ? (
+                    <ol className="text-sm text-muted-foreground space-y-1 list-decimal pl-4">
+                      <li>Baca soal dengan teliti dan pahami konteksnya</li>
+                      <li>Identifikasi data yang diberikan dalam soal</li>
+                      <li>Tentukan pendekatan analisis yang sesuai</li>
+                      <li>Kerjakan dengan sistematis dan runtut</li>
+                      <li>Periksa kembali jawaban sebelum disimpan</li>
+                    </ol>
+                  ) : (
+                    <ol className="text-sm text-muted-foreground space-y-1 list-decimal pl-4">
+                      <li>Identifikasi data titik A (P₁, Q₁) dan titik B (P₂, Q₂) dari soal cerita</li>
+                      <li>Hitung ΔQ = Q₂ - Q₁ dan ΔP = P₂ - P₁</li>
+                      <li>Hitung slope: a = ΔQ / ΔP</li>
+                      <li>Substitusi ke persamaan: Q - Q₁ = a(P - P₁)</li>
+                      <li>Sederhanakan menjadi bentuk Qd = aP + b</li>
+                      <li>Verifikasi dengan memasukkan nilai P₁ dan P₂</li>
+                    </ol>
+                  )}
                 </div>
               </div>
             </CardContent>

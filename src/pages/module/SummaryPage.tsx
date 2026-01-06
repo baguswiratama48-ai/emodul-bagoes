@@ -73,10 +73,18 @@ const pkwuSummaryPoints = [
   }
 ];
 
-const reflectionQuestions = [
+// Reflection questions for Ekonomi
+const ekonomiReflectionQuestions = [
   "Apa hal paling menarik yang kamu pelajari dari materi permintaan ini?",
   "Bagaimana kamu akan menerapkan konsep permintaan dalam kehidupan sehari-hari?",
   "Adakah bagian materi yang masih belum kamu pahami? Tuliskan di sini!"
+];
+
+// Reflection questions for PKWU
+const pkwuReflectionQuestions = [
+  "Apa hal paling menarik yang kamu pelajari dari materi kerajinan limbah ini?",
+  "Bagaimana kamu akan menerapkan konsep upcycling dalam kehidupan sehari-hari?",
+  "Produk kerajinan limbah apa yang ingin kamu coba buat? Jelaskan!"
 ];
 
 export default function SummaryPage() {
@@ -91,6 +99,7 @@ export default function SummaryPage() {
   const progress = getModuleProgress(module.id);
   const isPKWU = isPKWUModule(moduleId);
   const summaryPoints = isPKWU ? pkwuSummaryPoints : ekonomiSummaryPoints;
+  const reflectionQuestions = isPKWU ? pkwuReflectionQuestions : ekonomiReflectionQuestions;
   
   const [reflections, setReflections] = useState<Record<number, string>>({});
   const [isCompleted, setIsCompleted] = useState(progress.isCompleted);
@@ -142,7 +151,7 @@ export default function SummaryPage() {
             Rangkuman Materi
           </h1>
           <p className="text-muted-foreground">
-            Berikut adalah ringkasan poin-poin penting dari materi permintaan yang sudah kamu pelajari.
+            Berikut adalah ringkasan poin-poin penting dari materi {isPKWU ? 'kerajinan limbah' : 'permintaan'} yang sudah kamu pelajari.
           </p>
         </motion.div>
 
@@ -177,29 +186,57 @@ export default function SummaryPage() {
           ))}
         </motion.div>
 
-        {/* Key Formula */}
-        <motion.div variants={itemVariants}>
-          <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                Rumus Penting
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="p-4 bg-card rounded-lg border">
-                  <h4 className="font-medium mb-2">Fungsi Permintaan</h4>
-                  <p className="text-2xl font-mono text-primary">Qd = -aP + b</p>
+        {/* Key Formula - Only for Ekonomi */}
+        {!isPKWU && (
+          <motion.div variants={itemVariants}>
+            <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Rumus Penting
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-card rounded-lg border">
+                    <h4 className="font-medium mb-2">Fungsi Permintaan</h4>
+                    <p className="text-2xl font-mono text-primary">Qd = -aP + b</p>
+                  </div>
+                  <div className="p-4 bg-card rounded-lg border">
+                    <h4 className="font-medium mb-2">Menghitung Slope</h4>
+                    <p className="text-2xl font-mono text-primary">a = ΔQ / ΔP</p>
+                  </div>
                 </div>
-                <div className="p-4 bg-card rounded-lg border">
-                  <h4 className="font-medium mb-2">Menghitung Slope</h4>
-                  <p className="text-2xl font-mono text-primary">a = ΔQ / ΔP</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Key Concepts - Only for PKWU */}
+        {isPKWU && (
+          <motion.div variants={itemVariants}>
+            <Card className="bg-gradient-to-br from-green-500/5 to-emerald-500/5 border-green-500/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-green-600" />
+                  Konsep Penting
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-card rounded-lg border">
+                    <h4 className="font-medium mb-2">Rumus Harga Jual</h4>
+                    <p className="text-lg font-mono text-green-600">Harga = Biaya + Margin</p>
+                  </div>
+                  <div className="p-4 bg-card rounded-lg border">
+                    <h4 className="font-medium mb-2">Prinsip Upcycling</h4>
+                    <p className="text-lg font-mono text-green-600">Limbah → Nilai Lebih Tinggi</p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {/* Reflection */}
         <motion.div variants={itemVariants}>
@@ -228,18 +265,18 @@ export default function SummaryPage() {
         {/* Completion */}
         {!isCompleted ? (
           <motion.div variants={itemVariants}>
-            <Card className="bg-gradient-to-br from-success/5 to-success/10 border-success/30">
+            <Card className={`border-success/30 ${isPKWU ? 'bg-gradient-to-br from-green-500/5 to-green-500/10' : 'bg-gradient-to-br from-success/5 to-success/10'}`}>
               <CardContent className="pt-6 text-center">
-                <Trophy className="h-12 w-12 text-success mx-auto mb-4" />
+                <Trophy className={`h-12 w-12 mx-auto mb-4 ${isPKWU ? 'text-green-600' : 'text-success'}`} />
                 <h3 className="text-xl font-bold mb-2">Kamu Sudah di Akhir Modul!</h3>
                 <p className="text-muted-foreground mb-6">
-                  Selamat telah menyelesaikan semua materi tentang Permintaan. 
+                  Selamat telah menyelesaikan semua materi tentang {isPKWU ? 'Kerajinan dari Limbah' : 'Permintaan'}. 
                   Klik tombol di bawah untuk menandai modul ini sebagai selesai.
                 </p>
                 <Button
                   onClick={handleCompleteModule}
                   size="lg"
-                  className="gap-2 bg-success hover:bg-success/90 text-success-foreground"
+                  className={`gap-2 text-white ${isPKWU ? 'bg-green-600 hover:bg-green-700' : 'bg-success hover:bg-success/90'}`}
                 >
                   <CheckCircle2 className="h-5 w-5" />
                   Tandai Modul Selesai
@@ -249,14 +286,14 @@ export default function SummaryPage() {
           </motion.div>
         ) : (
           <motion.div variants={itemVariants}>
-            <Card className="bg-gradient-to-br from-success/10 to-primary/10 border-success/30">
+            <Card className={`border-success/30 ${isPKWU ? 'bg-gradient-to-br from-green-500/10 to-emerald-500/10' : 'bg-gradient-to-br from-success/10 to-primary/10'}`}>
               <CardContent className="pt-6 text-center">
-                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-success/20 flex items-center justify-center">
-                  <Trophy className="h-10 w-10 text-success" />
+                <div className={`w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center ${isPKWU ? 'bg-green-500/20' : 'bg-success/20'}`}>
+                  <Trophy className={`h-10 w-10 ${isPKWU ? 'text-green-600' : 'text-success'}`} />
                 </div>
                 <h3 className="text-2xl font-bold mb-2 text-gradient">Selamat! 🎉</h3>
                 <p className="text-muted-foreground mb-6">
-                  Kamu telah berhasil menyelesaikan modul <strong>Permintaan (Demand)</strong>. 
+                  Kamu telah berhasil menyelesaikan modul <strong>{isPKWU ? 'Kerajinan dari Limbah' : 'Permintaan (Demand)'}</strong>. 
                   Lanjutkan perjalanan belajarmu dengan modul berikutnya!
                 </p>
                 <div className="flex justify-center gap-4">
