@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, GraduationCap, Users } from 'lucide-react';
+import { Lock, User, GraduationCap, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { z } from 'zod';
@@ -15,23 +14,22 @@ import logo from '@/assets/logo.png';
 
 const emailSchema = z.string().email('Email tidak valid');
 const passwordSchema = z.string().min(5, 'Password minimal 5 karakter');
+const nisnSchema = z.string().regex(/^\d+$/, 'NISN harus berupa angka');
 
 export default function AuthPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, loading, signIn, signUp } = useAuth();
+  const { user, loading, signIn } = useAuth();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Login form
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
+  // Siswa login form
+  const [siswaId, setSiswaId] = useState('');
+  const [siswaNis, setSiswaNis] = useState('');
   
-  // Signup form
-  const [signupEmail, setSignupEmail] = useState('');
-  const [signupPassword, setSignupPassword] = useState('');
-  const [signupName, setSignupName] = useState('');
-  const [signupRole, setSignupRole] = useState<'siswa' | 'guru'>('siswa');
+  // Guru login form
+  const [guruEmail, setGuruEmail] = useState('');
+  const [guruPassword, setGuruPassword] = useState('');
 
   // Redirect if already logged in
   useEffect(() => {
@@ -40,23 +38,18 @@ export default function AuthPage() {
     }
   }, [user, loading, navigate]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSiswaLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Auto-format: if input looks like NISN (numbers only), append @siswa.local
-    let emailToUse = loginEmail.trim();
-    if (/^\d+$/.test(emailToUse)) {
-      emailToUse = `${emailToUse}@siswa.local`;
-    }
-    
-    // Validate
-    const emailResult = emailSchema.safeParse(emailToUse);
-    if (!emailResult.success) {
-      toast({ title: 'Error', description: 'NISN atau email tidak valid', variant: 'destructive' });
+    // Validate NISN
+    const nisnResult = nisnSchema.safeParse(siswaId.trim());
+    if (!nisnResult.success) {
+      toast({ title: 'Error', description: 'NISN harus berupa angka', variant: 'destructive' });
       return;
     }
     
-    const passwordResult = passwordSchema.safeParse(loginPassword);
+    // Validate NIS (password)
+    const passwordResult = passwordSchema.safeParse(siswaNis);
     if (!passwordResult.success) {
       toast({ title: 'Error', description: passwordResult.error.errors[0].message, variant: 'destructive' });
       return;
@@ -64,38 +57,33 @@ export default function AuthPage() {
     
     setIsSubmitting(true);
     
-    const { error } = await signIn(emailToUse, loginPassword);
+    // Convert NISN to email format
+    const emailToUse = `${siswaId.trim()}@siswa.local`;
+    
+    const { error } = await signIn(emailToUse, siswaNis);
     
     if (error) {
-      let message = 'Terjadi kesalahan saat login';
-      if (error.message.includes('Invalid login credentials')) {
-        message = 'NISN/Email atau password salah';
-      }
-      toast({ title: 'Login Gagal', description: message, variant: 'destructive' });
+      toast({ title: 'Login Gagal', description: 'NISN atau NIS salah', variant: 'destructive' });
     } else {
-      toast({ title: 'Berhasil', description: 'Selamat datang kembali!' });
+      toast({ title: 'Berhasil', description: 'Selamat datang!' });
       navigate('/');
     }
     
     setIsSubmitting(false);
   };
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleGuruLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate
-    if (!signupName.trim()) {
-      toast({ title: 'Error', description: 'Nama lengkap wajib diisi', variant: 'destructive' });
-      return;
-    }
-    
-    const emailResult = emailSchema.safeParse(signupEmail);
+    // Validate email
+    const emailResult = emailSchema.safeParse(guruEmail.trim());
     if (!emailResult.success) {
-      toast({ title: 'Error', description: emailResult.error.errors[0].message, variant: 'destructive' });
+      toast({ title: 'Error', description: 'Email tidak valid', variant: 'destructive' });
       return;
     }
     
-    const passwordResult = passwordSchema.safeParse(signupPassword);
+    // Validate password
+    const passwordResult = passwordSchema.safeParse(guruPassword);
     if (!passwordResult.success) {
       toast({ title: 'Error', description: passwordResult.error.errors[0].message, variant: 'destructive' });
       return;
@@ -103,16 +91,12 @@ export default function AuthPage() {
     
     setIsSubmitting(true);
     
-    const { error } = await signUp(signupEmail, signupPassword, signupName, signupRole);
+    const { error } = await signIn(guruEmail.trim(), guruPassword);
     
     if (error) {
-      let message = 'Terjadi kesalahan saat mendaftar';
-      if (error.message.includes('already registered')) {
-        message = 'Email sudah terdaftar. Silakan login.';
-      }
-      toast({ title: 'Pendaftaran Gagal', description: message, variant: 'destructive' });
+      toast({ title: 'Login Gagal', description: 'Email atau password salah', variant: 'destructive' });
     } else {
-      toast({ title: 'Berhasil', description: `Akun ${signupRole} berhasil dibuat!` });
+      toast({ title: 'Berhasil', description: 'Selamat datang, Bapak/Ibu Guru!' });
       navigate('/');
     }
     
@@ -142,55 +126,124 @@ export default function AuthPage() {
           <p className="text-muted-foreground mt-2">Masuk untuk melanjutkan pembelajaran</p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Masuk ke Akun</CardTitle>
-            <CardDescription>
-              Siswa: masukkan NISN dan NIS sebagai password
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="login-email">NISN / Email</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="login-email"
-                    type="text"
-                    placeholder="Masukkan NISN atau email"
-                    className="pl-10"
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="login-password">NIS / Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="login-password"
-                    type="password"
-                    placeholder="Masukkan NIS atau password"
-                    className="pl-10"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-              <Button 
-                type="submit" 
-                className="w-full bg-gradient-primary"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Memproses...' : 'Masuk'}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+        <Tabs defaultValue="siswa" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="siswa" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Login Siswa
+            </TabsTrigger>
+            <TabsTrigger value="guru" className="flex items-center gap-2">
+              <GraduationCap className="h-4 w-4" />
+              Login Guru
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Siswa Login Tab */}
+          <TabsContent value="siswa">
+            <Card>
+              <CardHeader>
+                <CardTitle>Masuk sebagai Siswa</CardTitle>
+                <CardDescription>
+                  Masukkan NISN dan NIS untuk login
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSiswaLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="siswa-nisn">NISN</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="siswa-nisn"
+                        type="text"
+                        placeholder="Masukkan NISN"
+                        className="pl-10"
+                        value={siswaId}
+                        onChange={(e) => setSiswaId(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="siswa-nis">NIS</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="siswa-nis"
+                        type="password"
+                        placeholder="Masukkan NIS"
+                        className="pl-10"
+                        value={siswaNis}
+                        onChange={(e) => setSiswaNis(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-gradient-primary"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Memproses...' : 'Masuk'}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Guru Login Tab */}
+          <TabsContent value="guru">
+            <Card>
+              <CardHeader>
+                <CardTitle>Masuk sebagai Guru</CardTitle>
+                <CardDescription>
+                  Masukkan email dan password untuk login
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleGuruLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="guru-email">Email</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="guru-email"
+                        type="email"
+                        placeholder="Masukkan email"
+                        className="pl-10"
+                        value={guruEmail}
+                        onChange={(e) => setGuruEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="guru-password">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="guru-password"
+                        type="password"
+                        placeholder="Masukkan password"
+                        className="pl-10"
+                        value={guruPassword}
+                        onChange={(e) => setGuruPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-gradient-primary"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Memproses...' : 'Masuk'}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </motion.div>
     </div>
   );
