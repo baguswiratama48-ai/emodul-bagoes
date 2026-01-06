@@ -122,29 +122,13 @@ const pkwuLkpdProblems = [
   },
 ];
 
-// Refleksi PKWU
-const pkwuRefleksiQuestions = [
-  {
-    id: 7,
-    icon: "💎",
-    title: "Ide Terbaik",
-    question: "Ide kerajinan limbah terbaik yang kamu dapatkan hari ini:",
-    hint: "Jelaskan mengapa ide ini yang terbaik menurutmu"
-  },
-  {
-    id: 8,
-    icon: "🚧",
-    title: "Hambatan",
-    question: "Hambatan yang mungkin dihadapi dalam usaha ini:",
-    hint: "Pikirkan dari segi bahan, produksi, pemasaran, dan modal"
-  },
-  {
-    id: 9,
-    icon: "✅",
-    title: "Solusi",
-    question: "Solusi untuk mengatasi hambatan tersebut:",
-    hint: "Berikan solusi yang realistis dan dapat dilaksanakan"
-  },
+// Penilaian Presentasi PKWU
+const pkwuPresentasiCriteria = [
+  { aspek: "Kelengkapan Materi", deskripsi: "Menyampaikan semua aspek analisis peluang usaha secara lengkap", skor: 20 },
+  { aspek: "Kejelasan Penyampaian", deskripsi: "Menyampaikan dengan bahasa yang jelas, runtut, dan mudah dipahami", skor: 20 },
+  { aspek: "Kreativitas Ide", deskripsi: "Menampilkan ide produk yang inovatif dan memiliki nilai jual", skor: 20 },
+  { aspek: "Penguasaan Materi", deskripsi: "Mampu menjawab pertanyaan dan menjelaskan dengan percaya diri", skor: 20 },
+  { aspek: "Visualisasi/Media", deskripsi: "Menggunakan media presentasi yang menarik dan mendukung", skor: 20 },
 ];
 
 // LKPD metadata
@@ -218,8 +202,8 @@ export default function LKPDPage() {
   const lkpdProblems = isPKWU ? pkwuLkpdProblems : ekonomiLkpdProblems;
   const lkpdMeta = isPKWU ? pkwuLkpdMeta : ekonomiLkpdMeta;
   
-  // Combine problems and refleksi for PKWU
-  const allProblems = isPKWU ? [...pkwuLkpdProblems, ...pkwuRefleksiQuestions] : ekonomiLkpdProblems;
+  // PKWU only has main problems, no refleksi
+  const allProblems = isPKWU ? pkwuLkpdProblems : ekonomiLkpdProblems;
   const totalQuestions = allProblems.length;
   
   const [answers, setAnswers] = useState<Record<number, string>>({});
@@ -618,74 +602,6 @@ export default function LKPDPage() {
           </motion.div>
         ))}
 
-        {/* Refleksi & Kesimpulan - Only for PKWU */}
-        {isPKWU && (
-          <>
-            <motion.div variants={itemVariants}>
-              <div className="flex items-center gap-2 mb-4 mt-8">
-                <span className="text-2xl">📝</span>
-                <h2 className="text-xl font-bold text-green-700 dark:text-green-400">Refleksi & Kesimpulan</h2>
-              </div>
-            </motion.div>
-
-            {pkwuRefleksiQuestions.map((refleksi) => (
-              <motion.div key={refleksi.id} variants={itemVariants}>
-                <Card className="border-green-200 dark:border-green-800">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="flex items-start gap-3 text-base">
-                      <span className="flex-shrink-0 w-8 h-8 rounded-full text-lg flex items-center justify-center bg-green-100 dark:bg-green-900/50">
-                        {refleksi.icon}
-                      </span>
-                      <span className="text-foreground">{refleksi.title}</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {/* Question */}
-                    <p className="font-medium text-foreground">{refleksi.question}</p>
-
-                    {/* Answer Area */}
-                    <div className="space-y-2">
-                      {hasSubmitted ? (
-                        <div className="p-4 bg-muted/50 rounded-lg font-mono text-sm whitespace-pre-wrap border">
-                          {answers[refleksi.id] || '(Tidak ada jawaban)'}
-                        </div>
-                      ) : (
-                        <>
-                          <Textarea
-                            id={`answer-${refleksi.id}`}
-                            placeholder={refleksi.hint}
-                            className="min-h-[80px] font-mono text-sm"
-                            value={answers[refleksi.id] || ''}
-                            onChange={(e) => handleAnswerChange(refleksi.id, e.target.value)}
-                          />
-                          <div className="flex items-center justify-between">
-                            <div>
-                              {savedAnswers[refleksi.id] && (
-                                <div className="flex items-center gap-2 text-sm text-green-600">
-                                  <CheckCircle2 className="h-4 w-4" />
-                                  <span>Tersimpan</span>
-                                </div>
-                              )}
-                            </div>
-                            <Button
-                              size="sm"
-                              onClick={() => saveAnswer(refleksi.id)}
-                              disabled={!answers[refleksi.id]?.trim() || saving[refleksi.id]}
-                              className="gap-2 bg-green-600 hover:bg-green-700"
-                            >
-                              <Save className="h-4 w-4" />
-                              {saving[refleksi.id] ? 'Menyimpan...' : 'Simpan'}
-                            </Button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </>
-        )}
 
         {/* 7. PENILAIAN (Rubrik) */}
         <motion.div variants={itemVariants}>
@@ -693,7 +609,7 @@ export default function LKPDPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Star className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
-                Rubrik Penilaian
+                Rubrik Penilaian LKPD
               </CardTitle>
               <CardDescription>
                 Panduan penilaian untuk LKPD ini
@@ -734,17 +650,12 @@ export default function LKPDPage() {
                       <tr>
                         <td className="p-3 border text-center">5</td>
                         <td className="p-3 border">Analisis SWOT</td>
-                        <td className="p-3 text-center border font-bold">20</td>
+                        <td className="p-3 text-center border font-bold">25</td>
                       </tr>
                       <tr className="bg-muted/30">
                         <td className="p-3 border text-center">6</td>
                         <td className="p-3 border">Estimasi Peluang Pasar</td>
-                        <td className="p-3 text-center border font-bold">10</td>
-                      </tr>
-                      <tr>
-                        <td className="p-3 border text-center">7-9</td>
-                        <td className="p-3 border">Refleksi & Kesimpulan (3 pertanyaan)</td>
-                        <td className="p-3 text-center border font-bold">10</td>
+                        <td className="p-3 text-center border font-bold">15</td>
                       </tr>
                     </tbody>
                     <tfoot>
@@ -809,6 +720,96 @@ export default function LKPDPage() {
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Penilaian Presentasi - Only for PKWU */}
+        {isPKWU && (
+          <motion.div variants={itemVariants}>
+            <Card className="border-green-500/30 bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-900/10 dark:to-emerald-900/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="text-xl">🎤</span>
+                  Penilaian Presentasi Hasil LKPD
+                </CardTitle>
+                <CardDescription>
+                  Panduan penilaian untuk presentasi hasil pengerjaan LKPD
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-green-50 dark:bg-green-900/20">
+                        <th className="p-3 text-left font-medium border">No</th>
+                        <th className="p-3 text-left font-medium border">Aspek Penilaian</th>
+                        <th className="p-3 text-left font-medium border">Deskripsi</th>
+                        <th className="p-3 text-center font-medium border w-20">Skor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pkwuPresentasiCriteria.map((item, index) => (
+                        <tr key={index} className={index % 2 === 1 ? 'bg-muted/30' : ''}>
+                          <td className="p-3 border text-center">{index + 1}</td>
+                          <td className="p-3 border font-medium">{item.aspek}</td>
+                          <td className="p-3 border text-muted-foreground">{item.deskripsi}</td>
+                          <td className="p-3 text-center border font-bold">{item.skor}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-green-100 dark:bg-green-900/30">
+                        <td className="p-3 border font-bold" colSpan={3}>Total Skor Maksimal Presentasi</td>
+                        <td className="p-3 text-center border font-bold">100</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+
+                <div className="mt-6 p-4 bg-green-100/50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <h4 className="font-semibold text-green-800 dark:text-green-300 mb-3 flex items-center gap-2">
+                    📋 Pedoman Presentasi
+                  </h4>
+                  <ul className="space-y-2 text-sm text-green-700 dark:text-green-400">
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600">•</span>
+                      <span>Presentasikan hasil analisis peluang usaha kerajinan limbah yang telah kalian kerjakan</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600">•</span>
+                      <span>Waktu presentasi maksimal 5-7 menit per kelompok/individu</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600">•</span>
+                      <span>Siapkan contoh produk atau visualisasi ide produk kerajinan</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600">•</span>
+                      <span>Sesi tanya jawab akan dilakukan setelah presentasi</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-center border border-green-200 dark:border-green-800">
+                    <p className="text-2xl font-bold text-green-600">86-100</p>
+                    <p className="text-xs text-muted-foreground">Sangat Baik (A)</p>
+                  </div>
+                  <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-center border border-blue-200 dark:border-blue-800">
+                    <p className="text-2xl font-bold text-blue-600">71-85</p>
+                    <p className="text-xs text-muted-foreground">Baik (B)</p>
+                  </div>
+                  <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-center border border-amber-200 dark:border-amber-800">
+                    <p className="text-2xl font-bold text-amber-600">56-70</p>
+                    <p className="text-xs text-muted-foreground">Cukup (C)</p>
+                  </div>
+                  <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-center border border-red-200 dark:border-red-800">
+                    <p className="text-2xl font-bold text-red-600">&lt;56</p>
+                    <p className="text-xs text-muted-foreground">Perlu Perbaikan (D)</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {/* Navigation */}
         <motion.div variants={itemVariants}>
