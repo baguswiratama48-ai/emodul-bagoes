@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -17,12 +17,15 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { ModuleLayout } from '@/components/layout/ModuleLayout';
 import { useProgress } from '@/hooks/useProgress';
+import { useAuth } from '@/hooks/useAuth';
 import { demandModule } from '@/data/moduleContent';
+import { supabase } from '@/integrations/supabase/client';
 import confetti from 'canvas-confetti';
 
 export default function QuizPage() {
   const { moduleId } = useParams();
   const { markSectionComplete, saveQuizScore, getModuleProgress } = useProgress();
+  const { user } = useAuth();
   const module = demandModule;
   const progress = getModuleProgress(module.id);
   
@@ -53,9 +56,36 @@ export default function QuizPage() {
     }
   };
 
-  const handleSubmitQuiz = () => {
+  const saveAnswersToDatabase = async () => {
+    if (!user) return;
+
+    // Save each answer to the database
+    const answers = questions.map((q, index) => ({
+      user_id: user.id,
+      module_id: module.id,
+      question_id: q.id,
+      selected_answer: selectedAnswers[index] ?? -1,
+      is_correct: selectedAnswers[index] === q.correctAnswer
+    }));
+
+    for (const answer of answers) {
+      if (answer.selected_answer >= 0) {
+        await supabase
+          .from('quiz_answers')
+          .upsert(answer, {
+            onConflict: 'user_id,module_id,question_id'
+          });
+      }
+    }
+  };
+
+  const handleSubmitQuiz = async () => {
     const score = calculateScore();
     saveQuizScore(module.id, 'main-quiz', score);
+    
+    // Save to database
+    await saveAnswersToDatabase();
+    
     setShowResults(true);
     
     if (score >= 70) {
