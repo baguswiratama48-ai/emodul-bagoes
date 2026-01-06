@@ -221,6 +221,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_student_info_by_nis: {
+        Args: { p_nis: string }
+        Returns: {
+          full_name: string
+          kelas: string
+        }[]
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
