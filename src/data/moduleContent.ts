@@ -329,35 +329,49 @@ Jika diketahui **dua titik** pada kurva permintaan, gunakan langkah berikut:
 
 ## 📊 Contoh Soal
 
-**Diketahui:**
-- Titik A: P₁ = 10.000, Q₁ = 20
-- Titik B: P₂ = 8.000, Q₂ = 40
+### Soal Cerita:
 
-**Tentukan fungsi permintaannya!**
+> Pak Budi memiliki toko sepatu di pasar tradisional. Ketika harga sepatu **Rp100.000 per pasang**, jumlah sepatu yang terjual adalah **20 pasang per hari**. Setelah Pak Budi menurunkan harga menjadi **Rp80.000 per pasang**, jumlah sepatu yang terjual meningkat menjadi **40 pasang per hari**.
+>
+> Berdasarkan data tersebut, tentukan fungsi permintaan sepatu di toko Pak Budi!
+
+### Data yang Diketahui:
+- **Titik A:** P₁ = 100.000, Q₁ = 20
+- **Titik B:** P₂ = 80.000, Q₂ = 40
 
 ### Penyelesaian:
 
 **Langkah 1:** Hitung perubahan
 - ΔQ = Q₂ - Q₁ = 40 - 20 = **20**
-- ΔP = P₂ - P₁ = 8.000 - 10.000 = **-2.000**
+- ΔP = P₂ - P₁ = 80.000 - 100.000 = **-20.000**
 
-**Langkah 2:** Hitung slope
-- a = ΔQ / ΔP = 20 / (-2.000) = **-0,01**
+**Langkah 2:** Hitung slope (a)
+- a = ΔQ / ΔP = 20 / (-20.000) = **-0,001**
 
-**Langkah 3:** Substitusi ke persamaan
+**Langkah 3:** Substitusi ke persamaan garis
 
-(Q - 20) / (40 - 20) = (P - 10.000) / (8.000 - 10.000)
+Gunakan rumus: (Q - Q₁) / (Q₂ - Q₁) = (P - P₁) / (P₂ - P₁)
 
-(Q - 20) / 20 = (P - 10.000) / (-2.000)
+(Q - 20) / (40 - 20) = (P - 100.000) / (80.000 - 100.000)
 
-Q - 20 = 20 × (P - 10.000) / (-2.000)
+(Q - 20) / 20 = (P - 100.000) / (-20.000)
 
-Q - 20 = -0,01P + 100
+Q - 20 = 20 × (P - 100.000) / (-20.000)
 
-**Q = -0,01P + 120**
+Q - 20 = -0,001P + 100
 
-### Jawaban:
-**Qd = -0,01P + 120** atau **Qd = 120 - 0,01P**
+Q = -0,001P + 100 + 20
+
+**Q = -0,001P + 120**
+
+### ✅ Jawaban:
+**Qd = -0,001P + 120** atau **Qd = 120 - 0,001P**
+
+---
+
+### Verifikasi Jawaban:
+- Jika P = 100.000 → Qd = -0,001(100.000) + 120 = -100 + 120 = **20** ✓
+- Jika P = 80.000 → Qd = -0,001(80.000) + 120 = -80 + 120 = **40** ✓
       `,
     },
     {
