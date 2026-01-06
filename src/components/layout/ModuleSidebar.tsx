@@ -9,7 +9,8 @@ import {
   BookMarked,
   FileCheck,
   Home,
-  ChevronRight
+  ChevronRight,
+  Lightbulb
 } from 'lucide-react';
 import {
   Sidebar,
@@ -43,6 +44,7 @@ const sectionIcons: Record<string, any> = {
   lkpd: ClipboardList,
   kuis: CheckCircle2,
   glosarium: BookMarked,
+  refleksi: Lightbulb,
   rangkuman: FileCheck,
 };
 
@@ -59,6 +61,7 @@ export function ModuleSidebar({ module, currentSection, progress }: ModuleSideba
     { id: 'lkpd', label: 'LKPD', icon: ClipboardList, path: `/modul/${module.id}/lkpd` },
     { id: 'kuis', label: 'Kuis & Latihan', icon: CheckCircle2, path: `/modul/${module.id}/kuis` },
     { id: 'glosarium', label: 'Glosarium', icon: BookMarked, path: `/modul/${module.id}/glosarium` },
+    { id: 'refleksi', label: 'Refleksi', icon: Lightbulb, path: `/modul/${module.id}/refleksi` },
     { id: 'rangkuman', label: 'Rangkuman', icon: FileCheck, path: `/modul/${module.id}/rangkuman` },
   ];
 
@@ -157,10 +160,10 @@ export function ModuleSidebar({ module, currentSection, progress }: ModuleSideba
           <div className="space-y-2">
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>Progress</span>
-              <span>{progress.completedSections.length} / 8 bagian</span>
+              <span>{progress.completedSections.length} / 9 bagian</span>
             </div>
             <Progress 
-              value={(progress.completedSections.length / 8) * 100} 
+              value={(progress.completedSections.length / 9) * 100} 
               className="h-2"
             />
           </div>
