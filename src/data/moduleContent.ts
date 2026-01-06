@@ -635,4 +635,8 @@ Perubahan jumlah barang yang diminta pada **setiap tingkat harga** akibat peruba
   },
 };
 
+// Ekonomi module for Kelas X
+export const ekonomiModules: Module[] = [demandModule];
+
+// All modules (untuk backwards compatibility)
 export const modules: Module[] = [demandModule];
