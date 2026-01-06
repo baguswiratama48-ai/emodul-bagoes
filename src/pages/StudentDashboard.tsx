@@ -19,6 +19,7 @@ import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { demandModule } from '@/data/moduleContent';
+import { pkwuModule } from '@/data/pkwuModuleContent';
 
 interface QuizAnswer {
   question_id: string;
@@ -39,6 +40,41 @@ interface TriggerAnswer {
   submitted_at: string;
 }
 
+// Kelas untuk mapel Ekonomi
+const EKONOMI_KELAS = ['X.9', 'X.10', 'X.11'];
+// Kelas untuk mapel PKWU
+const PKWU_KELAS = ['XI.3', 'XI.5', 'XI.6', 'XI.7', 'XI.8', 'XI.9', 'XI.10', 'XI.11'];
+
+// Trigger questions untuk Ekonomi
+const ekonomiTriggerQuestions = [
+  { id: 1, question: "Pernahkah kamu memperhatikan saat ada diskon besar-besaran, mengapa orang jadi lebih banyak membeli?" },
+  { id: 2, question: "Jika uang sakumu naik 2x lipat, apakah kamu akan membeli lebih banyak jajanan? Mengapa?" },
+  { id: 3, question: "Ketika harga pulsa mahal, apa yang biasanya kamu lakukan? Apakah mencari alternatif lain?" },
+];
+
+// Trigger questions untuk PKWU
+const pkwuTriggerQuestions = [
+  { id: 1, question: "Pernahkah kamu melihat sampah plastik atau kardus di sekitarmu? Menurut kamu, bisakah sampah tersebut diubah menjadi sesuatu yang berguna?" },
+  { id: 2, question: "Jika kamu bisa membuat kerajinan dari barang bekas, produk apa yang akan kamu buat dan siapa yang akan membelinya?" },
+  { id: 3, question: "Menurutmu, mengapa produk dari bahan daur ulang semakin diminati orang-orang sekarang?" },
+];
+
+// LKPD problems untuk Ekonomi
+const ekonomiLkpdProblems = [
+  { id: 1, title: "Soal 1: Penjualan Es Teh di Kantin" },
+  { id: 2, title: "Soal 2: Penjualan Pulpen di Koperasi" },
+  { id: 3, title: "Soal 3: Penjualan Bakso di Stadion" },
+  { id: 4, title: "Soal 4: Analisis Kasus" },
+];
+
+// LKPD problems untuk PKWU
+const pkwuLkpdProblems = [
+  { id: 1, title: "Soal 1: Identifikasi Limbah" },
+  { id: 2, title: "Soal 2: Analisis Peluang Usaha" },
+  { id: 3, title: "Soal 3: Desain Produk" },
+  { id: 4, title: "Soal 4: Analisis SWOT" },
+];
+
 export default function StudentDashboard() {
   const { user, signOut } = useAuth();
   const [quizAnswers, setQuizAnswers] = useState<QuizAnswer[]>([]);
@@ -48,6 +84,12 @@ export default function StudentDashboard() {
   const [fullName, setFullName] = useState('');
   const [nis, setNis] = useState('');
   const [kelas, setKelas] = useState('');
+
+  // Determine if student is in PKWU class based on their kelas
+  const isPKWU = PKWU_KELAS.includes(kelas);
+  const currentModule = isPKWU ? pkwuModule : demandModule;
+  const triggerQuestions = isPKWU ? pkwuTriggerQuestions : ekonomiTriggerQuestions;
+  const lkpdProblems = isPKWU ? pkwuLkpdProblems : ekonomiLkpdProblems;
 
   useEffect(() => {
     if (user) {
@@ -59,49 +101,55 @@ export default function StudentDashboard() {
     if (!user) return;
     setLoading(true);
 
-    // Fetch profile with NIS and kelas
+    // Fetch profile with NIS and kelas first
     const { data: profileData } = await supabase
       .from('profiles')
       .select('full_name, nis, kelas')
       .eq('id', user.id)
       .maybeSingle();
     
+    let studentKelas = '';
     if (profileData) {
       setFullName(profileData.full_name || 'Siswa');
       setNis(profileData.nis || '-');
       setKelas(profileData.kelas || '-');
+      studentKelas = profileData.kelas || '';
     }
 
-    // Fetch quiz answers
+    // Determine module based on kelas
+    const studentIsPKWU = PKWU_KELAS.includes(studentKelas);
+    const moduleId = studentIsPKWU ? pkwuModule.id : demandModule.id;
+
+    // Fetch quiz answers for the correct module
     const { data: quizData } = await supabase
       .from('quiz_answers')
       .select('question_id, selected_answer, is_correct, answered_at')
       .eq('user_id', user.id)
-      .eq('module_id', demandModule.id)
+      .eq('module_id', moduleId)
       .order('answered_at', { ascending: false });
 
     if (quizData) {
       setQuizAnswers(quizData);
     }
 
-    // Fetch LKPD answers
+    // Fetch LKPD answers for the correct module
     const { data: lkpdData } = await supabase
       .from('lkpd_answers')
       .select('problem_id, answer, submitted_at')
       .eq('user_id', user.id)
-      .eq('module_id', demandModule.id)
+      .eq('module_id', moduleId)
       .order('submitted_at', { ascending: false });
 
     if (lkpdData) {
       setLkpdAnswers(lkpdData);
     }
 
-    // Fetch trigger answers
+    // Fetch trigger answers for the correct module
     const { data: triggerData } = await supabase
       .from('trigger_answers')
       .select('question_id, answer, submitted_at')
       .eq('user_id', user.id)
-      .eq('module_id', demandModule.id)
+      .eq('module_id', moduleId)
       .order('submitted_at', { ascending: false });
 
     if (triggerData) {
@@ -110,19 +158,6 @@ export default function StudentDashboard() {
 
     setLoading(false);
   };
-
-  const triggerQuestions = [
-    { id: 1, question: "Pernahkah kamu memperhatikan saat ada diskon besar-besaran, mengapa orang jadi lebih banyak membeli?" },
-    { id: 2, question: "Jika uang sakumu naik 2x lipat, apakah kamu akan membeli lebih banyak jajanan? Mengapa?" },
-    { id: 3, question: "Ketika harga pulsa mahal, apa yang biasanya kamu lakukan? Apakah mencari alternatif lain?" },
-  ];
-
-  const lkpdProblems = [
-    { id: 1, title: "Soal 1: Penjualan Es Teh di Kantin" },
-    { id: 2, title: "Soal 2: Penjualan Pulpen di Koperasi" },
-    { id: 3, title: "Soal 3: Penjualan Bakso di Stadion" },
-    { id: 4, title: "Soal 4: Analisis Kasus" },
-  ];
 
   // Calculate quiz score
   const correctAnswers = quizAnswers.filter(a => a.is_correct).length;
@@ -188,6 +223,9 @@ export default function StudentDashboard() {
               {kelas !== '-' && (
                 <Badge variant="secondary">Kelas {kelas}</Badge>
               )}
+              <Badge className={isPKWU ? 'bg-green-600' : 'bg-primary'}>
+                {isPKWU ? 'PKWU' : 'Ekonomi'}
+              </Badge>
             </div>
           </motion.div>
 
@@ -213,7 +251,7 @@ export default function StudentDashboard() {
                     <CheckCircle2 className="h-6 w-6 text-success" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{quizAnswers.length}/{demandModule.quizQuestions.length}</p>
+                    <p className="text-2xl font-bold">{quizAnswers.length}/{currentModule.quizQuestions.length}</p>
                     <p className="text-sm text-muted-foreground">Kuis Dijawab</p>
                   </div>
                 </div>
@@ -226,7 +264,7 @@ export default function StudentDashboard() {
                     <ClipboardList className="h-6 w-6 text-secondary" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{lkpdAnswers.length}/4</p>
+                    <p className="text-2xl font-bold">{lkpdAnswers.length}/{lkpdProblems.length}</p>
                     <p className="text-sm text-muted-foreground">LKPD Dikerjakan</p>
                   </div>
                 </div>
@@ -239,7 +277,7 @@ export default function StudentDashboard() {
                     <MessageCircle className="h-6 w-6 text-warning" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{triggerAnswers.length}/3</p>
+                    <p className="text-2xl font-bold">{triggerAnswers.length}/{triggerQuestions.length}</p>
                     <p className="text-sm text-muted-foreground">Pemantik Dijawab</p>
                   </div>
                 </div>
@@ -284,7 +322,7 @@ export default function StudentDashboard() {
                       <div className="text-center py-8 text-muted-foreground">
                         <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50" />
                         <p className="mb-4">Kamu belum mengerjakan kuis</p>
-                        <Link to={`/modul/${demandModule.id}/kuis`}>
+                        <Link to={`/module/${currentModule.id}/kuis`}>
                           <Button>Mulai Kuis</Button>
                         </Link>
                       </div>
@@ -309,7 +347,7 @@ export default function StudentDashboard() {
                         {/* Answer Review */}
                         <div className="space-y-4">
                           <h4 className="font-semibold">Review Jawaban</h4>
-                          {demandModule.quizQuestions.map((q, index) => {
+                          {currentModule.quizQuestions.map((q, index) => {
                             const answer = quizAnswers.find(a => a.question_id === q.id);
                             if (!answer) return null;
                             return (
@@ -359,7 +397,7 @@ export default function StudentDashboard() {
                       <div className="text-center py-8 text-muted-foreground">
                         <ClipboardList className="h-12 w-12 mx-auto mb-4 opacity-50" />
                         <p className="mb-4">Kamu belum mengerjakan LKPD</p>
-                        <Link to={`/modul/${demandModule.id}/lkpd`}>
+                        <Link to={`/module/${currentModule.id}/lkpd`}>
                           <Button>Kerjakan LKPD</Button>
                         </Link>
                       </div>
@@ -424,7 +462,7 @@ export default function StudentDashboard() {
                       <div className="text-center py-8 text-muted-foreground">
                         <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
                         <p className="mb-4">Kamu belum menjawab pertanyaan pemantik</p>
-                        <Link to={`/modul/${demandModule.id}/pemantik`}>
+                        <Link to={`/module/${currentModule.id}/pemantik`}>
                           <Button>Jawab Pertanyaan</Button>
                         </Link>
                       </div>
@@ -435,17 +473,12 @@ export default function StudentDashboard() {
                           return (
                             <div key={q.id} className="border rounded-lg overflow-hidden">
                               <div className="p-4 bg-muted/50">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <Badge variant="outline">Pertanyaan {q.id}</Badge>
-                                  {answer ? (
-                                    <Badge variant="default" className="bg-success">Sudah Dijawab</Badge>
-                                  ) : (
-                                    <Badge variant="secondary">Belum Dijawab</Badge>
-                                  )}
+                                <div className="flex items-start gap-3">
+                                  <Badge variant="outline" className="flex-shrink-0">{q.id}</Badge>
+                                  <p className="font-medium">{q.question}</p>
                                 </div>
-                                <p className="font-medium">{q.question}</p>
                               </div>
-                              {answer && (
+                              {answer ? (
                                 <div className="p-4">
                                   <p className="text-xs text-muted-foreground mb-2">
                                     Dijawab: {new Date(answer.submitted_at).toLocaleDateString('id-ID', {
@@ -456,14 +489,27 @@ export default function StudentDashboard() {
                                       minute: '2-digit'
                                     })}
                                   </p>
-                                  <div className="bg-muted/30 rounded-lg p-4 text-sm whitespace-pre-wrap">
+                                  <div className="bg-muted/30 rounded-lg p-4 text-sm">
                                     {answer.answer}
                                   </div>
+                                </div>
+                              ) : (
+                                <div className="p-4 text-center text-muted-foreground text-sm">
+                                  Belum dijawab
                                 </div>
                               )}
                             </div>
                           );
                         })}
+                        
+                        {/* Link to answer more if not all answered */}
+                        {triggerAnswers.length < triggerQuestions.length && (
+                          <div className="text-center pt-4">
+                            <Link to={`/module/${currentModule.id}/pemantik`}>
+                              <Button variant="outline">Lanjut Menjawab</Button>
+                            </Link>
+                          </div>
+                        )}
                       </div>
                     )}
                   </CardContent>

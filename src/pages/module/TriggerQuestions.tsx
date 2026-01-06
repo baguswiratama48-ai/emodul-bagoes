@@ -336,13 +336,13 @@ export default function TriggerQuestions() {
 
         {/* Navigation */}
         <motion.div variants={itemVariants} className="flex justify-between items-center pt-8 border-t border-border">
-          <Link to={`/modul/${module.id}`}>
+          <Link to={`/module/${module.id}`}>
             <Button variant="outline" className="gap-2">
               <ArrowLeft className="h-4 w-4" />
               Kembali
             </Button>
           </Link>
-          <Link to={`/modul/${module.id}/materi`}>
+          <Link to={`/module/${module.id}/materi`}>
             <Button 
               onClick={handleComplete}
               className="gap-2 bg-gradient-primary hover:opacity-90"
