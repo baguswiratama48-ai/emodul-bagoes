@@ -12,7 +12,8 @@ import {
   Home,
   CheckCircle2,
   XCircle,
-  MessageCircle
+  MessageCircle,
+  Lightbulb
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -53,6 +54,7 @@ export default function TeacherDashboard() {
   const [quizResults, setQuizResults] = useState<StudentQuizResult[]>([]);
   const [lkpdAnswers, setLkpdAnswers] = useState<StudentLkpdAnswer[]>([]);
   const [triggerAnswers, setTriggerAnswers] = useState<StudentTriggerAnswer[]>([]);
+  const [reflectionAnswers, setReflectionAnswers] = useState<StudentTriggerAnswer[]>([]);
   const [expandedAnswerKey, setExpandedAnswerKey] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -122,20 +124,46 @@ export default function TeacherDashboard() {
       })));
     }
 
-    // Fetch trigger answers with profiles
+    // Fetch trigger answers with profiles (only pemantik, not refleksi)
     const { data: triggerData } = await supabase
       .from('trigger_answers')
       .select(`
         user_id,
+        module_id,
         question_id,
         answer,
         submitted_at,
         profiles!inner(full_name)
       `)
+      .not('module_id', 'like', '%-refleksi')
       .order('submitted_at', { ascending: false });
 
     if (triggerData) {
       setTriggerAnswers(triggerData.map((item: any) => ({
+        user_id: item.user_id,
+        full_name: item.profiles?.full_name || 'Unknown',
+        question_id: item.question_id,
+        answer: item.answer,
+        submitted_at: item.submitted_at
+      })));
+    }
+
+    // Fetch reflection answers with profiles
+    const { data: reflectionData } = await supabase
+      .from('trigger_answers')
+      .select(`
+        user_id,
+        module_id,
+        question_id,
+        answer,
+        submitted_at,
+        profiles!inner(full_name)
+      `)
+      .like('module_id', '%-refleksi')
+      .order('submitted_at', { ascending: false });
+
+    if (reflectionData) {
+      setReflectionAnswers(reflectionData.map((item: any) => ({
         user_id: item.user_id,
         full_name: item.profiles?.full_name || 'Unknown',
         question_id: item.question_id,
@@ -151,6 +179,14 @@ export default function TeacherDashboard() {
     { id: 1, question: "Pernahkah kamu memperhatikan saat ada diskon besar-besaran, mengapa orang jadi lebih banyak membeli?" },
     { id: 2, question: "Jika uang sakumu naik 2x lipat, apakah kamu akan membeli lebih banyak jajanan? Mengapa?" },
     { id: 3, question: "Ketika harga pulsa mahal, apa yang biasanya kamu lakukan? Apakah mencari alternatif lain?" },
+  ];
+
+  const reflectionQuestions = [
+    { id: 1, question: "Bagaimana perasaanmu belajar hari ini?" },
+    { id: 2, question: "Apa yang kamu sukai dari pembelajaran hari ini?" },
+    { id: 3, question: "Menurut Anda bagaimana belajar menggunakan media e-modul ini?" },
+    { id: 4, question: "Apa yang perlu ditambahkan dari media pembelajaran e-modul ini?" },
+    { id: 5, question: "Apa yang kamu sukai dari Bapak Bagus Panca Wiratama, S.Pd., M.Pd.? (Boleh Kritik dan Saran)" },
   ];
 
   const containerVariants = {
@@ -209,7 +245,7 @@ export default function TeacherDashboard() {
           </motion.div>
 
           {/* Stats */}
-          <motion.div variants={itemVariants} className="grid sm:grid-cols-4 gap-4">
+          <motion.div variants={itemVariants} className="grid sm:grid-cols-5 gap-4">
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
@@ -252,6 +288,19 @@ export default function TeacherDashboard() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                    <Lightbulb className="h-6 w-6 text-amber-500" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{new Set(reflectionAnswers.map(a => a.user_id)).size}</p>
+                    <p className="text-sm text-muted-foreground">Mengisi Refleksi</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
                     <CheckCircle2 className="h-6 w-6 text-success" />
                   </div>
@@ -271,10 +320,14 @@ export default function TeacherDashboard() {
           {/* Main Content */}
           <motion.div variants={itemVariants}>
             <Tabs defaultValue="trigger-answers" className="w-full">
-              <TabsList className="w-full grid grid-cols-4">
+              <TabsList className="w-full grid grid-cols-5">
                 <TabsTrigger value="trigger-answers" className="gap-2">
                   <MessageCircle className="h-4 w-4" />
                   Pemantik
+                </TabsTrigger>
+                <TabsTrigger value="reflection-answers" className="gap-2">
+                  <Lightbulb className="h-4 w-4" />
+                  Refleksi
                 </TabsTrigger>
                 <TabsTrigger value="lkpd-answers" className="gap-2">
                   <ClipboardList className="h-4 w-4" />
@@ -316,6 +369,66 @@ export default function TeacherDashboard() {
                               <div className="p-4 bg-muted/50">
                                 <div className="flex items-center gap-2 mb-2">
                                   <Badge variant="outline">Pertanyaan {q.id}</Badge>
+                                  <Badge variant="secondary">{answersForQuestion.length} jawaban</Badge>
+                                </div>
+                                <p className="font-medium">{q.question}</p>
+                              </div>
+                              {answersForQuestion.length > 0 && (
+                                <div className="divide-y">
+                                  {answersForQuestion.map((answer, index) => (
+                                    <div key={`${answer.user_id}-${index}`} className="p-4">
+                                      <div className="flex items-center justify-between mb-2">
+                                        <span className="font-medium">{answer.full_name}</span>
+                                        <span className="text-xs text-muted-foreground">
+                                          {new Date(answer.submitted_at).toLocaleDateString('id-ID', {
+                                            day: 'numeric',
+                                            month: 'short',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                          })}
+                                        </span>
+                                      </div>
+                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{answer.answer}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Reflection Answers Tab */}
+              <TabsContent value="reflection-answers" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Jawaban Refleksi Pembelajaran</CardTitle>
+                    <CardDescription>Refleksi siswa setelah menyelesaikan modul</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {loading ? (
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                      </div>
+                    ) : reflectionAnswers.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Lightbulb className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>Belum ada siswa yang mengisi refleksi</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {reflectionQuestions.map((q) => {
+                          const answersForQuestion = reflectionAnswers.filter(a => a.question_id === q.id);
+                          return (
+                            <div key={q.id} className="border rounded-lg overflow-hidden">
+                              <div className="p-4 bg-amber-50 dark:bg-amber-900/20">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Badge variant="outline" className="border-amber-500 text-amber-700">Refleksi {q.id}</Badge>
                                   <Badge variant="secondary">{answersForQuestion.length} jawaban</Badge>
                                 </div>
                                 <p className="font-medium">{q.question}</p>
