@@ -1,33 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Lock, User, GraduationCap, Users } from 'lucide-react';
+import { Lock, User, GraduationCap, Users, Loader2, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 import logo from '@/assets/logo.png';
-
-// Define available classes
-const kelasOptions = [
-  { value: 'X.9', label: 'Kelas X.9 (Ekonomi)' },
-  { value: 'X.10', label: 'Kelas X.10 (Ekonomi)' },
-  { value: 'X.11', label: 'Kelas X.11 (Ekonomi)' },
-  { value: 'XI.3', label: 'Kelas XI.3 (PKWU)' },
-  { value: 'XI.5', label: 'Kelas XI.5 (PKWU)' },
-  { value: 'XI.6', label: 'Kelas XI.6 (PKWU)' },
-  { value: 'XI.7', label: 'Kelas XI.7 (PKWU)' },
-  { value: 'XI.8', label: 'Kelas XI.8 (PKWU)' },
-  { value: 'XI.9', label: 'Kelas XI.9 (PKWU)' },
-  { value: 'XI.10', label: 'Kelas XI.10 (PKWU)' },
-  { value: 'XI.11', label: 'Kelas XI.11 (PKWU)' },
-];
 
 const emailSchema = z.string().email('Email tidak valid');
 const passwordSchema = z.string().min(5, 'Password minimal 5 karakter');
@@ -43,7 +27,10 @@ export default function AuthPage() {
   // Siswa login form
   const [siswaId, setSiswaId] = useState('');
   const [siswaNis, setSiswaNis] = useState('');
-  const [selectedKelas, setSelectedKelas] = useState('');
+  
+  // Auto-detected student info
+  const [detectedStudent, setDetectedStudent] = useState<{ full_name: string; kelas: string } | null>(null);
+  const [isDetecting, setIsDetecting] = useState(false);
   
   // Guru login form
   const [guruEmail, setGuruEmail] = useState('');
@@ -55,6 +42,33 @@ export default function AuthPage() {
       navigate('/');
     }
   }, [user, loading, navigate]);
+
+  // Auto-detect student class when NIS changes
+  useEffect(() => {
+    const detectStudent = async () => {
+      if (siswaNis.length >= 5) {
+        setIsDetecting(true);
+        try {
+          const { data, error } = await supabase
+            .rpc('get_student_info_by_nis', { p_nis: siswaNis.trim() });
+          
+          if (data && data.length > 0 && !error) {
+            setDetectedStudent({ full_name: data[0].full_name, kelas: data[0].kelas });
+          } else {
+            setDetectedStudent(null);
+          }
+        } catch {
+          setDetectedStudent(null);
+        }
+        setIsDetecting(false);
+      } else {
+        setDetectedStudent(null);
+      }
+    };
+
+    const debounce = setTimeout(detectStudent, 500);
+    return () => clearTimeout(debounce);
+  }, [siswaNis]);
 
   const handleSiswaLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,9 +87,9 @@ export default function AuthPage() {
       return;
     }
 
-    // Validate class selection
-    if (!selectedKelas) {
-      toast({ title: 'Error', description: 'Pilih kelas terlebih dahulu', variant: 'destructive' });
+    // Check if student is detected
+    if (!detectedStudent) {
+      toast({ title: 'Error', description: 'Data siswa tidak ditemukan. Pastikan NIS benar.', variant: 'destructive' });
       return;
     }
     
@@ -84,37 +98,12 @@ export default function AuthPage() {
     // Convert NISN to email format
     const emailToUse = `${siswaId.trim()}@siswa.local`;
     
-    // First, verify that the selected class matches the student's registered class
-    const { data: profileData, error: profileError } = await supabase
-      .from('profiles')
-      .select('kelas, full_name')
-      .eq('nis', siswaNis.trim())
-      .single();
-    
-    if (profileError || !profileData) {
-      toast({ title: 'Login Gagal', description: 'Data siswa tidak ditemukan', variant: 'destructive' });
-      setIsSubmitting(false);
-      return;
-    }
-    
-    // Check if selected class matches the registered class
-    if (profileData.kelas !== selectedKelas) {
-      toast({ 
-        title: 'Login Gagal', 
-        description: `Kelas yang dipilih tidak sesuai. ${profileData.full_name} terdaftar di kelas ${profileData.kelas}`, 
-        variant: 'destructive' 
-      });
-      setIsSubmitting(false);
-      return;
-    }
-    
-    // If class matches, proceed with login
     const { error } = await signIn(emailToUse, siswaNis);
     
     if (error) {
       toast({ title: 'Login Gagal', description: 'NISN atau NIS salah', variant: 'destructive' });
     } else {
-      toast({ title: 'Berhasil', description: `Selamat datang, ${profileData.full_name}!` });
+      toast({ title: 'Berhasil', description: `Selamat datang, ${detectedStudent.full_name}!` });
       navigate('/');
     }
     
@@ -228,25 +217,50 @@ export default function AuthPage() {
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="siswa-kelas">Kelas</Label>
-                    <Select value={selectedKelas} onValueChange={setSelectedKelas}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih Kelas" />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-[200px] overflow-y-auto">
-                        {kelasOptions.map((kelas) => (
-                          <SelectItem key={kelas.value} value={kelas.value}>
-                            {kelas.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  
+                  {/* Auto-detected student info */}
+                  {isDetecting && (
+                    <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      <span className="text-sm text-muted-foreground">Mencari data siswa...</span>
+                    </div>
+                  )}
+                  
+                  {detectedStudent && !isDetecting && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg"
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-700 dark:text-green-400">Data Siswa Ditemukan</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">Nama:</span>
+                          <p className="font-medium">{detectedStudent.full_name}</p>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Kelas:</span>
+                          <p className="font-medium">{detectedStudent.kelas}</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                  
+                  {siswaNis.length >= 5 && !detectedStudent && !isDetecting && (
+                    <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                      <p className="text-sm text-red-600 dark:text-red-400">
+                        Data siswa tidak ditemukan. Pastikan NIS benar.
+                      </p>
+                    </div>
+                  )}
+                  
                   <Button 
                     type="submit" 
                     className="w-full bg-gradient-primary"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !detectedStudent}
                   >
                     {isSubmitting ? 'Memproses...' : 'Masuk'}
                   </Button>
