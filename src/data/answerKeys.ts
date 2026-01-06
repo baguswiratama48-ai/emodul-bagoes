@@ -152,8 +152,8 @@ export const lkpdAnswerKeys = [
   }
 ];
 
-// Kunci jawaban kuis
-export const quizAnswerKeys = {
+// Kunci jawaban kuis Ekonomi
+export const quizAnswerKeysEkonomi = {
   'q1': {
     correctAnswer: 1,
     explanation: 'Permintaan adalah jumlah barang yang INGIN dan MAMPU dibeli oleh konsumen pada berbagai tingkat harga dalam periode waktu tertentu. Kata kunci: ingin + mampu + berbagai tingkat harga.'
@@ -195,3 +195,132 @@ export const quizAnswerKeys = {
     explanation: 'Pendapatan naik menyebabkan daya beli meningkat. Untuk barang normal, hal ini menyebabkan kurva permintaan bergeser ke KANAN (permintaan meningkat pada setiap tingkat harga).'
   }
 };
+
+// Kunci jawaban kuis PKWU
+export const quizAnswerKeysPKWU = {
+  'pkwu-q1': {
+    correctAnswer: 1,
+    explanation: 'Limbah bangun datar adalah bahan sisa atau sampah yang memiliki bentuk dasar dua dimensi, seperti kertas, kardus, plastik lembaran, dan kain perca.'
+  },
+  'pkwu-q2': {
+    correctAnswer: 1,
+    explanation: 'Upcycling mengubah limbah menjadi produk bernilai lebih tinggi dari bentuk aslinya, sementara recycling mengolah kembali menjadi bahan dasar.'
+  },
+  'pkwu-q3': {
+    correctAnswer: 1,
+    explanation: 'Wirausaha kerajinan limbah ramah lingkungan karena mengurangi limbah, menghemat sumber daya, dan mendukung konsep ekonomi hijau (green economy).'
+  },
+  'pkwu-q4': {
+    correctAnswer: 1,
+    explanation: 'Green Economy adalah model ekonomi yang berfokus pada pembangunan berkelanjutan tanpa merusak lingkungan, di mana bisnis limbah termasuk di dalamnya.'
+  },
+  'pkwu-q5': {
+    correctAnswer: 1,
+    explanation: 'USP (Unique Selling Point) adalah keunikan atau nilai tambah yang membedakan produk Anda dari produk pesaing, menjadi alasan mengapa konsumen harus memilih produk Anda.'
+  },
+  'pkwu-q6': {
+    correctAnswer: 1,
+    explanation: 'Plastik sachet cocok untuk tas atau dompet karena karakteristiknya yang anti air, kuat, ringan, dan memiliki warna/merk yang bervariasi.'
+  },
+  'pkwu-q7': {
+    correctAnswer: 2,
+    explanation: 'Tren eco-friendly yang meningkat adalah faktor eksternal yang menguntungkan, sehingga termasuk kategori Opportunity (Peluang).'
+  },
+  'pkwu-q8': {
+    correctAnswer: 1,
+    explanation: 'Marketplace online memberikan keuntungan jangkauan pasar yang luas dan kemudahan akses bagi pembeli dari berbagai daerah.'
+  },
+  'pkwu-q9': {
+    correctAnswer: 1,
+    explanation: 'Storytelling bertujuan untuk menceritakan proses pembuatan dan dampak positif produk, sehingga membangun koneksi emosional dengan konsumen.'
+  },
+  'pkwu-q10': {
+    correctAnswer: 2,
+    explanation: 'Harga jual = Biaya produksi + Margin. Dengan margin 100%, maka Rp 40.000 + (100% × Rp 40.000) = Rp 80.000.'
+  }
+};
+
+// Kunci LKPD untuk PKWU
+export const lkpdAnswerKeysPKWU = [
+  {
+    id: 1,
+    title: "Soal 1: Identifikasi Limbah di Lingkungan",
+    steps: [
+      "Langkah 1: Observasi lingkungan sekitar",
+      "• Identifikasi jenis-jenis limbah yang ada",
+      "• Klasifikasikan berdasarkan bentuk (bangun datar/ruang)",
+      "",
+      "Langkah 2: Analisis potensi",
+      "• Tentukan jumlah ketersediaan limbah",
+      "• Nilai kondisi dan kelayakan limbah",
+      "",
+      "Langkah 3: Ide produk",
+      "• Sesuaikan dengan karakteristik limbah",
+      "• Pertimbangkan target pasar"
+    ],
+    answer: "Jawaban bersifat terbuka, dinilai berdasarkan kelengkapan analisis dan kreativitas ide produk",
+    verification: [
+      "Kriteria penilaian:",
+      "• Kelengkapan identifikasi limbah (25%)",
+      "• Ketepatan klasifikasi (25%)",
+      "• Kreativitas ide produk (25%)",
+      "• Analisis potensi pasar (25%)"
+    ]
+  },
+  {
+    id: 2,
+    title: "Soal 2: Analisis SWOT Produk Kerajinan",
+    steps: [
+      "Langkah 1: Identifikasi Strengths (Kekuatan)",
+      "• Bahan baku murah/gratis",
+      "• Produk unik dan ramah lingkungan",
+      "",
+      "Langkah 2: Identifikasi Weaknesses (Kelemahan)",
+      "• Butuh keterampilan khusus",
+      "• Waktu produksi relatif lama",
+      "",
+      "Langkah 3: Identifikasi Opportunities (Peluang)",
+      "• Tren eco-friendly meningkat",
+      "• Pasar online berkembang",
+      "",
+      "Langkah 4: Identifikasi Threats (Ancaman)",
+      "• Persaingan meningkat",
+      "• Perubahan tren pasar"
+    ],
+    answer: "Analisis SWOT yang lengkap dengan minimal 3 poin per kategori",
+    verification: [
+      "Kriteria penilaian:",
+      "• Kelengkapan analisis per kategori (40%)",
+      "• Relevansi dengan produk yang dipilih (30%)",
+      "• Strategi berdasarkan analisis (30%)"
+    ]
+  },
+  {
+    id: 3,
+    title: "Soal 3: Perhitungan Harga Jual",
+    steps: [
+      "Langkah 1: Hitung biaya bahan baku",
+      "• Total biaya bahan = jumlah × harga satuan",
+      "",
+      "Langkah 2: Hitung biaya tenaga kerja",
+      "• Estimasi waktu × upah per jam",
+      "",
+      "Langkah 3: Hitung biaya overhead",
+      "• Listrik, transportasi, dll",
+      "",
+      "Langkah 4: Total biaya produksi",
+      "• Total = bahan + tenaga kerja + overhead",
+      "",
+      "Langkah 5: Tentukan margin keuntungan",
+      "• Harga jual = Total biaya × (1 + margin%)"
+    ],
+    answer: "Perhitungan yang sistematis dengan margin keuntungan minimal 50-100%",
+    verification: [
+      "Contoh: Biaya Rp 40.000, margin 100%",
+      "Harga jual = 40.000 × (1 + 1) = Rp 80.000"
+    ]
+  }
+];
+
+// Backward compatibility
+export const quizAnswerKeys = quizAnswerKeysEkonomi;
