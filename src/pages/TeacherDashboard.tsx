@@ -332,7 +332,15 @@ export default function TeacherDashboard() {
               <h1 className="text-3xl font-display font-bold mb-2">Dashboard Guru</h1>
               <p className="text-muted-foreground">Kelola modul, lihat hasil siswa, dan berikan feedback</p>
             </div>
-            <KelasFilter />
+            <div className="flex items-center gap-3">
+              <Link to="/guru/kelola-siswa">
+                <Button variant="outline" className="gap-2">
+                  <Users className="h-4 w-4" />
+                  Kelola Siswa
+                </Button>
+              </Link>
+              <KelasFilter />
+            </div>
           </motion.div>
 
           {/* Stats */}
