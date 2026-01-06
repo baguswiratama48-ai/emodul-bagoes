@@ -15,23 +15,28 @@ import { useAuth } from '@/hooks/useAuth';
 const reflectionQuestions = [
   {
     id: 1,
-    question: 'Apa hal baru yang kamu pelajari dari modul ini tentang konsep permintaan?',
-    hint: 'Pikirkan tentang pengertian, hukum, dan faktor-faktor yang mempengaruhi permintaan.',
+    question: 'Bagaimana perasaanmu belajar hari ini?',
+    hint: 'Ceritakan perasaanmu selama mengikuti pembelajaran.',
   },
   {
     id: 2,
-    question: 'Bagaimana kamu bisa menerapkan konsep permintaan dalam kehidupan sehari-hari?',
-    hint: 'Contoh: saat berbelanja, mengamati harga di pasar, atau memahami perilaku konsumen.',
+    question: 'Apa yang kamu sukai dari pembelajaran hari ini?',
+    hint: 'Bagian mana yang paling menarik atau menyenangkan.',
   },
   {
     id: 3,
-    question: 'Bagian mana dari materi ini yang menurutmu paling menantang? Mengapa?',
-    hint: 'Identifikasi kesulitan untuk bisa mencari bantuan atau belajar lebih dalam.',
+    question: 'Menurut Anda bagaimana belajar menggunakan media e-modul ini?',
+    hint: 'Berikan pendapatmu tentang pengalaman belajar dengan e-modul.',
   },
   {
     id: 4,
-    question: 'Apa pertanyaan yang masih kamu miliki tentang permintaan dan kurva permintaan?',
-    hint: 'Tidak apa-apa jika masih ada yang belum dipahami, itu bagian dari proses belajar.',
+    question: 'Apa yang perlu ditambahkan dari media pembelajaran e-modul ini?',
+    hint: 'Saran untuk pengembangan e-modul ke depannya.',
+  },
+  {
+    id: 5,
+    question: 'Apa yang kamu sukai dari Bapak Bagus Panca Wiratama, S.Pd., M.Pd.? (Boleh Kritik dan Saran)',
+    hint: 'Berikan feedback jujur untuk guru.',
   },
 ];
 
