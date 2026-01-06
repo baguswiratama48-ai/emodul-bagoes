@@ -64,39 +64,86 @@ const ekonomiLkpdProblems = [
   },
 ];
 
-// LKPD for PKWU
+// LKPD for PKWU - Lembar Analisis Peluang Usaha
 const pkwuLkpdProblems = [
   {
     id: 1,
-    title: "Soal 1: Identifikasi Limbah",
-    story: "Kamu diminta untuk mengamati lingkungan sekitar rumah atau sekolahmu. Identifikasi jenis-jenis limbah bangun datar yang dapat ditemukan.",
+    icon: "🗑️",
+    title: "Identifikasi Limbah",
+    story: "Amati lingkungan sekitar rumah atau sekolahmu. Identifikasi jenis-jenis limbah bangun datar yang dapat ditemukan.",
     question: "Buatlah daftar minimal 5 jenis limbah bangun datar yang kamu temukan, beserta potensi produk kerajinan yang bisa dibuat dari masing-masing limbah tersebut!",
-    hint: "Perhatikan limbah kertas, kardus, plastik, kain, dan bahan lainnya yang memiliki bentuk datar/lembaran.",
-    rubrik: "Skor 25: Minimal 5 limbah dengan potensi produk yang relevan dan kreatif"
+    hint: "Contoh: Botol minuman, Plastik sachet minuman, kardus bekas, kain perca, kertas bekas",
+    rubrik: "Skor 15: Minimal 5 limbah dengan potensi produk yang relevan dan kreatif"
   },
   {
     id: 2,
-    title: "Soal 2: Analisis Peluang Usaha",
-    story: "Seorang pengrajin membuat tas dari bungkus kopi sachet bekas. Modal pembuatan per tas adalah Rp20.000 (tenaga kerja dan bahan pendukung). Tas tersebut dijual seharga Rp85.000.",
-    question: "a) Hitung keuntungan per tas!\nb) Jika dalam sebulan terjual 30 tas, berapa total keuntungan yang didapat?\nc) Analisis kelebihan dan kekurangan usaha ini!",
-    hint: "Keuntungan = Harga Jual - Modal. Pertimbangkan juga aspek sustainability.",
-    rubrik: "Skor 25: Perhitungan benar dan analisis kelebihan/kekurangan lengkap"
+    icon: "💡",
+    title: "Ide Produk Kerajinan",
+    story: "Berdasarkan limbah yang kamu temukan, pikirkan produk kerajinan yang bisa dibuat.",
+    question: "Tuliskan ide produk kerajinan yang bisa kamu buat dari limbah yang kamu temukan!",
+    hint: "Contoh: Tas Laptop atau Dompet Multifungsi dari plastik sachet",
+    rubrik: "Skor 15: Ide produk kreatif, inovatif, dan memiliki nilai jual"
   },
   {
     id: 3,
-    title: "Soal 3: Desain Produk",
-    story: "Kamu diberi tugas untuk merancang sebuah produk kerajinan dari limbah plastik sachet kemasan.",
-    question: "Buatlah rencana produk yang meliputi:\na) Nama dan jenis produk\nb) Bahan limbah yang digunakan\nc) Target pasar\nd) Estimasi harga jual\ne) Langkah-langkah pembuatan (minimal 5 langkah)",
-    hint: "Pikirkan produk yang memiliki nilai guna dan estetika tinggi.",
-    rubrik: "Skor 25: Rencana produk lengkap dengan semua komponen terisi detail"
+    icon: "🔍",
+    title: "Karakteristik Limbah",
+    story: "Analisis karakteristik limbah yang akan kamu gunakan untuk membuat produk kerajinan.",
+    question: "Jelaskan karakteristik limbah yang kamu pilih untuk membuat produk kerajinan!",
+    hint: "Contoh: Anti air, kuat, ringan, warna bervariasi, mudah dibentuk",
+    rubrik: "Skor 15: Karakteristik lengkap dan relevan dengan produk yang akan dibuat"
   },
   {
     id: 4,
-    title: "Soal 4: Analisis SWOT",
-    story: "Kamu berencana memulai usaha kerajinan dari limbah kain perca untuk dijual di marketplace online.",
-    question: "Buatlah analisis SWOT (Strengths, Weaknesses, Opportunities, Threats) untuk rencana usaha tersebut! Jelaskan minimal 3 poin untuk setiap aspek.",
-    hint: "Pertimbangkan faktor internal (kekuatan & kelemahan) dan eksternal (peluang & ancaman).",
-    rubrik: "Skor 25: Analisis SWOT lengkap dengan minimal 3 poin per aspek"
+    icon: "👥",
+    title: "Target Pasar Utama",
+    story: "Tentukan siapa yang akan menjadi target pasar dari produk kerajinan yang kamu buat.",
+    question: "Siapa target pasar utama dari produk kerajinan yang kamu buat? Jelaskan alasannya!",
+    hint: "Contoh: Mahasiswa/pekerja kantoran yang mencari produk unik & ramah lingkungan",
+    rubrik: "Skor 15: Target pasar jelas dengan alasan yang logis"
+  },
+  {
+    id: 5,
+    icon: "⭐",
+    title: "Analisis SWOT",
+    story: "Lakukan analisis SWOT untuk rencana usaha kerajinan dari limbah yang kamu pilih.",
+    question: "Buatlah analisis SWOT (Strengths, Weaknesses, Opportunities, Threats) untuk rencana usaha kerajinan limbahmu!",
+    hint: "Pertimbangkan faktor internal (kekuatan & kelemahan) dan eksternal (peluang & ancaman)",
+    rubrik: "Skor 20: Analisis SWOT lengkap dengan penjelasan yang logis"
+  },
+  {
+    id: 6,
+    icon: "📊",
+    title: "Estimasi Peluang Pasar",
+    story: "Berdasarkan analisis yang telah kamu lakukan, estimasikan peluang pasar untuk produk kerajinanmu.",
+    question: "Berapa estimasi peluang pasar untuk produk kerajinanmu? (Tinggi/Sedang/Rendah) Berikan alasan yang logis!",
+    hint: "Pertimbangkan target pasar, kompetitor, dan tren pasar saat ini",
+    rubrik: "Skor 10: Estimasi dengan alasan yang logis dan didukung data/fakta"
+  },
+];
+
+// Refleksi PKWU
+const pkwuRefleksiQuestions = [
+  {
+    id: 7,
+    icon: "💎",
+    title: "Ide Terbaik",
+    question: "Ide kerajinan limbah terbaik yang kamu dapatkan hari ini:",
+    hint: "Jelaskan mengapa ide ini yang terbaik menurutmu"
+  },
+  {
+    id: 8,
+    icon: "🚧",
+    title: "Hambatan",
+    question: "Hambatan yang mungkin dihadapi dalam usaha ini:",
+    hint: "Pikirkan dari segi bahan, produksi, pemasaran, dan modal"
+  },
+  {
+    id: 9,
+    icon: "✅",
+    title: "Solusi",
+    question: "Solusi untuk mengatasi hambatan tersebut:",
+    hint: "Berikan solusi yang realistis dan dapat dilaksanakan"
   },
 ];
 
@@ -130,28 +177,29 @@ const ekonomiLkpdMeta = {
 
 const pkwuLkpdMeta = {
   title: "Lembar Kerja Peserta Didik (LKPD)",
-  subtitle: "Analisis Peluang Usaha Kerajinan dari Limbah Bangun Datar",
+  subtitle: "Lembar Analisis Peluang Usaha",
   mapel: "Prakarya dan Kewirausahaan (PKWU)",
   kelas: "XI",
   waktu: "45 menit",
   tujuan: [
     "Siswa mampu mengidentifikasi berbagai limbah bangun datar di lingkungan sekitar",
-    "Siswa mampu menganalisis peluang usaha kerajinan dari limbah",
-    "Siswa mampu merancang produk kerajinan yang bernilai jual",
-    "Siswa mampu melakukan analisis SWOT untuk rencana usaha"
+    "Siswa mampu menganalisis karakteristik limbah untuk produk kerajinan",
+    "Siswa mampu menentukan target pasar yang tepat",
+    "Siswa mampu melakukan analisis SWOT untuk rencana usaha",
+    "Siswa mampu mengestimasi peluang pasar dengan logis"
   ],
-  kompetensi: "Menganalisis dan merancang peluang usaha kerajinan dari bahan limbah berbentuk bangun datar",
+  kompetensi: "Menganalisis peluang usaha kerajinan dari bahan limbah berbentuk bangun datar",
   petunjuk: [
-    "Bacalah setiap soal dengan teliti dan pahami konteks permasalahan",
-    "Identifikasi limbah yang ada di sekitar lingkunganmu",
-    "Gunakan kreativitas dalam merancang produk kerajinan",
-    "Pertimbangkan aspek ekonomi dan keberlanjutan dalam analisis",
+    "Bacalah setiap pertanyaan dengan teliti",
+    "Jawab berdasarkan pengamatan dan analisis kamu sendiri",
+    "Gunakan kreativitas dalam menjawab",
+    "Pertimbangkan aspek ekonomi dan keberlanjutan",
     "Tuliskan jawaban dengan jelas dan sistematis"
   ],
   rumus: [
-    { nama: "Harga Jual", formula: "Harga Jual = Biaya Produksi + Margin Keuntungan" },
-    { nama: "Keuntungan", formula: "Laba = Harga Jual - Modal" },
-    { nama: "Total Keuntungan", formula: "Total Laba = Laba per Unit × Jumlah Terjual" }
+    { nama: "Peluang Usaha", formula: "Kebutuhan Pasar + Keunikan Produk + Modal Tersedia" },
+    { nama: "Keuntungan", formula: "Laba = Harga Jual - Modal Produksi" },
+    { nama: "Analisis SWOT", formula: "Strengths, Weaknesses, Opportunities, Threats" }
   ]
 };
 
@@ -169,6 +217,10 @@ export default function LKPDPage() {
   const isPKWU = isPKWUModule(moduleId);
   const lkpdProblems = isPKWU ? pkwuLkpdProblems : ekonomiLkpdProblems;
   const lkpdMeta = isPKWU ? pkwuLkpdMeta : ekonomiLkpdMeta;
+  
+  // Combine problems and refleksi for PKWU
+  const allProblems = isPKWU ? [...pkwuLkpdProblems, ...pkwuRefleksiQuestions] : ekonomiLkpdProblems;
+  const totalQuestions = allProblems.length;
   
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [showHints, setShowHints] = useState<Record<number, boolean>>({});
@@ -220,7 +272,7 @@ export default function LKPDPage() {
       setAnswers(loadedAnswers);
       setSavedAnswers(loadedSaved);
       
-      const allAnswered = lkpdProblems.every(p => loadedAnswers[p.id]?.trim());
+      const allAnswered = allProblems.every(p => loadedAnswers[p.id]?.trim());
       setHasSubmitted(allAnswered);
     }
     setLoadingCheck(false);
@@ -273,8 +325,8 @@ export default function LKPDPage() {
     markSectionComplete(module.id, 'lkpd');
   };
 
-  const answeredCount = Object.values(answers).filter(a => a.trim().length > 0).length;
-  const totalScore = answeredCount * 25;
+  const answeredCount = Object.values(answers).filter(a => a?.trim()?.length > 0).length;
+  const maxScore = isPKWU ? 100 : 100; // PKWU: 15+15+15+15+20+10+10 = 100
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -447,7 +499,7 @@ export default function LKPDPage() {
                   <span className="text-foreground font-medium">Progress LKPD</span>
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  {answeredCount} dari {lkpdProblems.length} soal terjawab
+                  {answeredCount} dari {totalQuestions} soal terjawab
                 </span>
               </div>
             </CardContent>
@@ -467,8 +519,12 @@ export default function LKPDPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-start gap-3 text-lg">
-                  <span className={`flex-shrink-0 w-8 h-8 rounded-full text-sm font-bold flex items-center justify-center text-white ${isPKWU ? 'bg-green-600' : 'bg-primary'}`}>
-                    {index + 1}
+                  <span className={`flex-shrink-0 w-8 h-8 rounded-full text-lg flex items-center justify-center ${isPKWU ? 'bg-green-100 dark:bg-green-900/50' : 'bg-primary/10'}`}>
+                    {isPKWU && 'icon' in problem ? (problem as { icon: string }).icon : (
+                      <span className={`text-sm font-bold text-white ${isPKWU ? 'bg-green-600' : 'bg-primary'} w-full h-full rounded-full flex items-center justify-center`}>
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                    )}
                   </span>
                   <span className="text-foreground">{problem.title}</span>
                 </CardTitle>
@@ -476,7 +532,7 @@ export default function LKPDPage() {
               <CardContent className="space-y-4">
                 {/* Story/Context */}
                 <div className={`p-4 rounded-lg border-l-4 ${isPKWU ? 'border-green-500 bg-green-50/50 dark:bg-green-900/10' : 'border-primary bg-muted/50'}`}>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">📖 Konteks/Cerita:</p>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">📖 Konteks:</p>
                   <p className="text-foreground leading-relaxed">{problem.story}</p>
                 </div>
 
@@ -500,7 +556,7 @@ export default function LKPDPage() {
                 {showHints[problem.id] && (
                   <div className={`p-3 rounded-lg border ${isPKWU ? 'bg-amber-50/50 border-amber-200 dark:bg-amber-900/10 dark:border-amber-700' : 'bg-warning/10 border-warning/30'}`}>
                     <p className="text-sm text-foreground">
-                      <strong>💡 Petunjuk:</strong> {problem.hint}
+                      <strong>💡 Contoh:</strong> {problem.hint}
                     </p>
                   </div>
                 )}
@@ -523,8 +579,8 @@ export default function LKPDPage() {
                     <>
                       <Textarea
                         id={`answer-${problem.id}`}
-                        placeholder="Tuliskan langkah-langkah penyelesaian dan jawabanmu di sini..."
-                        className="min-h-[150px] font-mono text-sm"
+                        placeholder="Tuliskan jawabanmu di sini..."
+                        className="min-h-[120px] font-mono text-sm"
                         value={answers[problem.id] || ''}
                         onChange={(e) => handleAnswerChange(problem.id, e.target.value)}
                       />
@@ -551,14 +607,85 @@ export default function LKPDPage() {
                   )}
                 </div>
 
-                {/* Rubrik per soal */}
-                <div className={`p-3 rounded-lg border text-sm ${isPKWU ? 'bg-green-50/30 border-green-200 dark:bg-green-900/10 dark:border-green-800' : 'bg-primary/5 border-primary/20'}`}>
-                  <span className="font-medium">📊 Kriteria Penilaian:</span> {problem.rubrik}
-                </div>
+                {/* Rubrik per soal - only show if has rubrik */}
+                {'rubrik' in problem && problem.rubrik && (
+                  <div className={`p-3 rounded-lg border text-sm ${isPKWU ? 'bg-green-50/30 border-green-200 dark:bg-green-900/10 dark:border-green-800' : 'bg-primary/5 border-primary/20'}`}>
+                    <span className="font-medium">📊 Kriteria Penilaian:</span> {problem.rubrik}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
         ))}
+
+        {/* Refleksi & Kesimpulan - Only for PKWU */}
+        {isPKWU && (
+          <>
+            <motion.div variants={itemVariants}>
+              <div className="flex items-center gap-2 mb-4 mt-8">
+                <span className="text-2xl">📝</span>
+                <h2 className="text-xl font-bold text-green-700 dark:text-green-400">Refleksi & Kesimpulan</h2>
+              </div>
+            </motion.div>
+
+            {pkwuRefleksiQuestions.map((refleksi) => (
+              <motion.div key={refleksi.id} variants={itemVariants}>
+                <Card className="border-green-200 dark:border-green-800">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-start gap-3 text-base">
+                      <span className="flex-shrink-0 w-8 h-8 rounded-full text-lg flex items-center justify-center bg-green-100 dark:bg-green-900/50">
+                        {refleksi.icon}
+                      </span>
+                      <span className="text-foreground">{refleksi.title}</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {/* Question */}
+                    <p className="font-medium text-foreground">{refleksi.question}</p>
+
+                    {/* Answer Area */}
+                    <div className="space-y-2">
+                      {hasSubmitted ? (
+                        <div className="p-4 bg-muted/50 rounded-lg font-mono text-sm whitespace-pre-wrap border">
+                          {answers[refleksi.id] || '(Tidak ada jawaban)'}
+                        </div>
+                      ) : (
+                        <>
+                          <Textarea
+                            id={`answer-${refleksi.id}`}
+                            placeholder={refleksi.hint}
+                            className="min-h-[80px] font-mono text-sm"
+                            value={answers[refleksi.id] || ''}
+                            onChange={(e) => handleAnswerChange(refleksi.id, e.target.value)}
+                          />
+                          <div className="flex items-center justify-between">
+                            <div>
+                              {savedAnswers[refleksi.id] && (
+                                <div className="flex items-center gap-2 text-sm text-green-600">
+                                  <CheckCircle2 className="h-4 w-4" />
+                                  <span>Tersimpan</span>
+                                </div>
+                              )}
+                            </div>
+                            <Button
+                              size="sm"
+                              onClick={() => saveAnswer(refleksi.id)}
+                              disabled={!answers[refleksi.id]?.trim() || saving[refleksi.id]}
+                              className="gap-2 bg-green-600 hover:bg-green-700"
+                            >
+                              <Save className="h-4 w-4" />
+                              {saving[refleksi.id] ? 'Menyimpan...' : 'Simpan'}
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </>
+        )}
 
         {/* 7. PENILAIAN (Rubrik) */}
         <motion.div variants={itemVariants}>
@@ -574,42 +701,97 @@ export default function LKPDPage() {
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className={`${isPKWU ? 'bg-green-50 dark:bg-green-900/20' : 'bg-primary/5'}`}>
-                      <th className="p-3 text-left font-medium border">Kriteria</th>
-                      <th className="p-3 text-center font-medium border w-20">Skor</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="p-3 border">Jawaban lengkap dengan langkah sistematis dan hasil benar</td>
-                      <td className="p-3 text-center border font-bold">25</td>
-                    </tr>
-                    <tr className="bg-muted/30">
-                      <td className="p-3 border">Jawaban benar namun langkah kurang lengkap</td>
-                      <td className="p-3 text-center border font-bold">20</td>
-                    </tr>
-                    <tr>
-                      <td className="p-3 border">Langkah benar namun hasil akhir salah</td>
-                      <td className="p-3 text-center border font-bold">15</td>
-                    </tr>
-                    <tr className="bg-muted/30">
-                      <td className="p-3 border">Ada usaha menjawab namun banyak kesalahan</td>
-                      <td className="p-3 text-center border font-bold">10</td>
-                    </tr>
-                    <tr>
-                      <td className="p-3 border">Tidak menjawab atau jawaban tidak relevan</td>
-                      <td className="p-3 text-center border font-bold">0</td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr className={`${isPKWU ? 'bg-green-100 dark:bg-green-900/30' : 'bg-primary/10'}`}>
-                      <td className="p-3 border font-bold">Total Skor Maksimal</td>
-                      <td className="p-3 text-center border font-bold">100</td>
-                    </tr>
-                  </tfoot>
-                </table>
+                {isPKWU ? (
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-green-50 dark:bg-green-900/20">
+                        <th className="p-3 text-left font-medium border">No</th>
+                        <th className="p-3 text-left font-medium border">Aspek Penilaian</th>
+                        <th className="p-3 text-center font-medium border w-20">Skor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="p-3 border text-center">1</td>
+                        <td className="p-3 border">Identifikasi Limbah (minimal 5 jenis)</td>
+                        <td className="p-3 text-center border font-bold">15</td>
+                      </tr>
+                      <tr className="bg-muted/30">
+                        <td className="p-3 border text-center">2</td>
+                        <td className="p-3 border">Ide Produk Kerajinan</td>
+                        <td className="p-3 text-center border font-bold">15</td>
+                      </tr>
+                      <tr>
+                        <td className="p-3 border text-center">3</td>
+                        <td className="p-3 border">Karakteristik Limbah</td>
+                        <td className="p-3 text-center border font-bold">15</td>
+                      </tr>
+                      <tr className="bg-muted/30">
+                        <td className="p-3 border text-center">4</td>
+                        <td className="p-3 border">Target Pasar Utama</td>
+                        <td className="p-3 text-center border font-bold">15</td>
+                      </tr>
+                      <tr>
+                        <td className="p-3 border text-center">5</td>
+                        <td className="p-3 border">Analisis SWOT</td>
+                        <td className="p-3 text-center border font-bold">20</td>
+                      </tr>
+                      <tr className="bg-muted/30">
+                        <td className="p-3 border text-center">6</td>
+                        <td className="p-3 border">Estimasi Peluang Pasar</td>
+                        <td className="p-3 text-center border font-bold">10</td>
+                      </tr>
+                      <tr>
+                        <td className="p-3 border text-center">7-9</td>
+                        <td className="p-3 border">Refleksi & Kesimpulan (3 pertanyaan)</td>
+                        <td className="p-3 text-center border font-bold">10</td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-green-100 dark:bg-green-900/30">
+                        <td className="p-3 border font-bold" colSpan={2}>Total Skor Maksimal</td>
+                        <td className="p-3 text-center border font-bold">100</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                ) : (
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-primary/5">
+                        <th className="p-3 text-left font-medium border">Kriteria</th>
+                        <th className="p-3 text-center font-medium border w-20">Skor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="p-3 border">Jawaban lengkap dengan langkah sistematis dan hasil benar</td>
+                        <td className="p-3 text-center border font-bold">25</td>
+                      </tr>
+                      <tr className="bg-muted/30">
+                        <td className="p-3 border">Jawaban benar namun langkah kurang lengkap</td>
+                        <td className="p-3 text-center border font-bold">20</td>
+                      </tr>
+                      <tr>
+                        <td className="p-3 border">Langkah benar namun hasil akhir salah</td>
+                        <td className="p-3 text-center border font-bold">15</td>
+                      </tr>
+                      <tr className="bg-muted/30">
+                        <td className="p-3 border">Ada usaha menjawab namun banyak kesalahan</td>
+                        <td className="p-3 text-center border font-bold">10</td>
+                      </tr>
+                      <tr>
+                        <td className="p-3 border">Tidak menjawab atau jawaban tidak relevan</td>
+                        <td className="p-3 text-center border font-bold">0</td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-primary/10">
+                        <td className="p-3 border font-bold">Total Skor Maksimal</td>
+                        <td className="p-3 text-center border font-bold">100</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                )}
               </div>
               
               {hasSubmitted && (
@@ -620,7 +802,7 @@ export default function LKPDPage() {
                     <span className="font-bold text-lg">LKPD Sudah Dikumpulkan</span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Semua {lkpdProblems.length} soal telah terjawab dan disimpan
+                    Semua {totalQuestions} soal telah terjawab dan disimpan
                   </p>
                 </div>
               )}
