@@ -18,6 +18,7 @@ import { demandModule } from '@/data/moduleContent';
 import { DemandCurveChart } from '@/components/interactive/DemandCurveChart';
 import { DemandCalculator } from '@/components/interactive/DemandCalculator';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function MaterialPage() {
   const { moduleId } = useParams();
@@ -110,6 +111,7 @@ export default function MaterialPage() {
                   <CardContent className="prose prose-slate dark:prose-invert max-w-none">
                     {section.content && (
                       <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
                         components={{
                           h1: ({ children }) => <h1 className="text-2xl font-bold text-foreground mb-4">{children}</h1>,
                           h2: ({ children }) => <h2 className="text-xl font-semibold text-foreground mt-6 mb-3">{children}</h2>,
@@ -125,13 +127,15 @@ export default function MaterialPage() {
                           ),
                           strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
                           table: ({ children }) => (
-                            <div className="overflow-x-auto my-4">
-                              <table className="w-full border-collapse border border-border">{children}</table>
+                            <div className="overflow-x-auto my-6 rounded-lg border border-border">
+                              <table className="w-full border-collapse">{children}</table>
                             </div>
                           ),
                           thead: ({ children }) => <thead className="bg-muted">{children}</thead>,
-                          th: ({ children }) => <th className="border border-border px-4 py-2 text-left font-medium">{children}</th>,
-                          td: ({ children }) => <td className="border border-border px-4 py-2">{children}</td>,
+                          tbody: ({ children }) => <tbody>{children}</tbody>,
+                          tr: ({ children }) => <tr className="border-b border-border last:border-0">{children}</tr>,
+                          th: ({ children }) => <th className="px-4 py-3 text-left font-semibold text-foreground bg-muted">{children}</th>,
+                          td: ({ children }) => <td className="px-4 py-3 text-foreground">{children}</td>,
                           hr: () => <hr className="my-6 border-border" />,
                         }}
                       >
