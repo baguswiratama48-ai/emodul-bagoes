@@ -328,10 +328,14 @@ export default function TeacherDashboard() {
   const currentModuleId = selectedMapel === 'ekonomi' ? 'permintaan' : 'kerajinan-limbah';
   const currentLkpdAnswerKeys = selectedMapel === 'ekonomi' ? lkpdAnswerKeys : lkpdAnswerKeysPKWU;
 
-  // Filter students by mapel kelas
+  // Filter students by mapel kelas AND selected kelas
   const filteredStudents = useMemo(() => {
-    return allStudents.filter(s => s.kelas && mapelKelas.includes(s.kelas));
-  }, [allStudents, mapelKelas]);
+    let students = allStudents.filter(s => s.kelas && mapelKelas.includes(s.kelas));
+    if (selectedKelas !== 'all') {
+      students = students.filter(s => s.kelas === selectedKelas);
+    }
+    return students;
+  }, [allStudents, mapelKelas, selectedKelas]);
 
   const containerVariants = {
     hidden: { opacity: 0 },

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { RefreshCw, Trash2, MessageCircle, ClipboardList, CheckCircle2, Lightbulb } from 'lucide-react';
+import { RefreshCw, Trash2, MessageCircle, ClipboardList, CheckCircle2, Lightbulb, Search } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -28,6 +29,17 @@ export function ResetStudentWork({ students, moduleId, onReset }: ResetStudentWo
   const [selectedStudent, setSelectedStudent] = useState<string>('');
   const [resetType, setResetType] = useState<ResetType>('all');
   const [isResetting, setIsResetting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Filter students by search query
+  const filteredStudents = useMemo(() => {
+    if (!searchQuery.trim()) return students;
+    const query = searchQuery.toLowerCase();
+    return students.filter(s => 
+      s.full_name.toLowerCase().includes(query) ||
+      s.nis?.toLowerCase().includes(query)
+    );
+  }, [students, searchQuery]);
 
   const handleReset = async () => {
     if (!selectedStudent) {
@@ -122,26 +134,43 @@ export function ResetStudentWork({ students, moduleId, onReset }: ResetStudentWo
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Search Input */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Cari nama siswa atau NIS..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Pilih Siswa</label>
+            <label className="text-sm font-medium">Pilih Siswa ({filteredStudents.length} siswa)</label>
             <Select value={selectedStudent} onValueChange={setSelectedStudent}>
               <SelectTrigger>
                 <SelectValue placeholder="Pilih siswa..." />
               </SelectTrigger>
               <SelectContent className="max-h-[200px]">
-                {students.map((student) => (
-                  <SelectItem key={student.id} value={student.id}>
-                    <div className="flex items-center gap-2">
-                      <span>{student.full_name}</span>
-                      {student.kelas && (
-                        <Badge variant="outline" className="text-xs">
-                          {student.kelas}
-                        </Badge>
-                      )}
-                    </div>
-                  </SelectItem>
-                ))}
+                {filteredStudents.length === 0 ? (
+                  <div className="p-2 text-sm text-muted-foreground text-center">
+                    Tidak ada siswa ditemukan
+                  </div>
+                ) : (
+                  filteredStudents.map((student) => (
+                    <SelectItem key={student.id} value={student.id}>
+                      <div className="flex items-center gap-2">
+                        <span>{student.full_name}</span>
+                        {student.kelas && (
+                          <Badge variant="outline" className="text-xs">
+                            {student.kelas}
+                          </Badge>
+                        )}
+                      </div>
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
