@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -8,16 +8,19 @@ import {
   FileText,
   CheckCircle2,
   HelpCircle,
-  Calculator
+  Calculator,
+  Save
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ModuleLayout } from '@/components/layout/ModuleLayout';
 import { useProgress } from '@/hooks/useProgress';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import { demandModule } from '@/data/moduleContent';
+import { supabase } from '@/integrations/supabase/client';
 
 const lkpdProblems = [
   {
@@ -53,13 +56,80 @@ const lkpdProblems = [
 export default function LKPDPage() {
   const { moduleId } = useParams();
   const { markSectionComplete } = useProgress();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const module = demandModule;
   
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [showHints, setShowHints] = useState<Record<number, boolean>>({});
+  const [saving, setSaving] = useState<Record<number, boolean>>({});
+  const [savedAnswers, setSavedAnswers] = useState<Record<number, boolean>>({});
+
+  // Load existing answers from database
+  useEffect(() => {
+    if (user) {
+      loadExistingAnswers();
+    }
+  }, [user]);
+
+  const loadExistingAnswers = async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
+      .from('lkpd_answers')
+      .select('problem_id, answer')
+      .eq('user_id', user.id)
+      .eq('module_id', module.id);
+
+    if (data) {
+      const loadedAnswers: Record<number, string> = {};
+      const loadedSaved: Record<number, boolean> = {};
+      data.forEach(item => {
+        loadedAnswers[item.problem_id] = item.answer;
+        loadedSaved[item.problem_id] = true;
+      });
+      setAnswers(loadedAnswers);
+      setSavedAnswers(loadedSaved);
+    }
+  };
 
   const handleAnswerChange = (id: number, value: string) => {
     setAnswers(prev => ({ ...prev, [id]: value }));
+    setSavedAnswers(prev => ({ ...prev, [id]: false }));
+  };
+
+  const saveAnswer = async (problemId: number) => {
+    if (!user || !answers[problemId]?.trim()) return;
+
+    setSaving(prev => ({ ...prev, [problemId]: true }));
+
+    const { error } = await supabase
+      .from('lkpd_answers')
+      .upsert({
+        user_id: user.id,
+        module_id: module.id,
+        problem_id: problemId,
+        answer: answers[problemId],
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id,module_id,problem_id'
+      });
+
+    setSaving(prev => ({ ...prev, [problemId]: false }));
+
+    if (error) {
+      toast({
+        title: 'Gagal menyimpan',
+        description: 'Terjadi kesalahan saat menyimpan jawaban.',
+        variant: 'destructive'
+      });
+    } else {
+      setSavedAnswers(prev => ({ ...prev, [problemId]: true }));
+      toast({
+        title: 'Tersimpan',
+        description: `Jawaban soal ${problemId} berhasil disimpan.`
+      });
+    }
   };
 
   const toggleHint = (id: number) => {
@@ -172,7 +242,7 @@ export default function LKPDPage() {
 
                 {/* Question */}
                 <div className="p-3 bg-accent/50 rounded-lg">
-                  <p className="font-medium text-foreground">{problem.question}</p>
+                  <p className="font-medium text-foreground whitespace-pre-line">{problem.question}</p>
                 </div>
 
                 {/* Hint Toggle */}
@@ -206,12 +276,25 @@ export default function LKPDPage() {
                   />
                 </div>
                 
-                {answers[problem.id]?.trim() && (
-                  <div className="flex items-center gap-2 text-success text-sm">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span>Jawaban tersimpan</span>
+                <div className="flex items-center justify-between">
+                  <div>
+                    {savedAnswers[problem.id] && (
+                      <div className="flex items-center gap-2 text-success text-sm">
+                        <CheckCircle2 className="h-4 w-4" />
+                        <span>Tersimpan di database</span>
+                      </div>
+                    )}
                   </div>
-                )}
+                  <Button
+                    size="sm"
+                    onClick={() => saveAnswer(problem.id)}
+                    disabled={!answers[problem.id]?.trim() || saving[problem.id]}
+                    className="gap-2"
+                  >
+                    <Save className="h-4 w-4" />
+                    {saving[problem.id] ? 'Menyimpan...' : 'Simpan Jawaban'}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </motion.div>

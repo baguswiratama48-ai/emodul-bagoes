@@ -9,16 +9,22 @@ import {
   Sparkles,
   GraduationCap,
   Target,
-  Clock
+  Clock,
+  LogOut,
+  Settings,
+  User
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 import { useProgress } from '@/hooks/useProgress';
+import { useAuth } from '@/hooks/useAuth';
 import { modules } from '@/data/moduleContent';
 
 const Index = () => {
   const { darkMode, toggleDarkMode, getModuleProgress, calculateProgress } = useProgress();
+  const { user, role, signOut, isGuru } = useAuth();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -54,18 +60,53 @@ const Index = () => {
               <p className="text-xs text-muted-foreground">Belajar Jadi Lebih Bagoes</p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleDarkMode}
-            className="rounded-full"
-          >
-            {darkMode ? (
-              <Sun className="h-5 w-5 text-warning" />
-            ) : (
-              <Moon className="h-5 w-5" />
+          
+          <div className="flex items-center gap-2">
+            {/* User Info */}
+            <div className="hidden sm:flex items-center gap-2 mr-2">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted">
+                <User className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">{user?.user_metadata?.full_name || user?.email}</span>
+                <Badge variant={isGuru ? 'default' : 'secondary'} className="text-xs">
+                  {role === 'guru' ? 'Guru' : 'Siswa'}
+                </Badge>
+              </div>
+            </div>
+
+            {/* Teacher Dashboard Link */}
+            {isGuru && (
+              <Link to="/guru">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Settings className="h-4 w-4" />
+                  <span className="hidden sm:inline">Dashboard Guru</span>
+                </Button>
+              </Link>
             )}
-          </Button>
+
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleDarkMode}
+              className="rounded-full"
+            >
+              {darkMode ? (
+                <Sun className="h-5 w-5 text-warning" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
+
+            {/* Logout */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={signOut}
+              className="rounded-full text-muted-foreground hover:text-destructive"
+            >
+              <LogOut className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -106,6 +147,14 @@ const Index = () => {
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
+              {isGuru && (
+                <Link to="/guru">
+                  <Button size="lg" variant="outline" className="gap-2">
+                    <Settings className="h-4 w-4" />
+                    Dashboard Guru
+                  </Button>
+                </Link>
+              )}
             </div>
           </motion.div>
 
