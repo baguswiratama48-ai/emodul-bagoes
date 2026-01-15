@@ -53,13 +53,13 @@ export default function NoteUpload() {
 
             // 2. Save metadata to Database
             const { error: dbError } = await supabase
-                .from('student_notes')
+                .from('student_notes' as any)
                 .insert({
                     user_id: user.id,
                     title: title,
                     file_path: fileName,
                     file_size: file.size
-                });
+                } as any);
 
             if (dbError) throw dbError;
 

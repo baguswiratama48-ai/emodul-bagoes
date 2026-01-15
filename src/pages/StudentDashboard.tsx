@@ -159,7 +159,7 @@ export default function StudentDashboard() {
 
     // Fetch notes count
     const { count } = await supabase
-      .from('student_notes')
+      .from('student_notes' as any)
       .select('*', { count: 'exact', head: true })
       .eq('user_id', user.id);
 
