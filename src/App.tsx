@@ -23,7 +23,7 @@ import ManageStudents from "./pages/ManageStudents";
 import NoteUpload from "./pages/NoteUpload";
 import BackupData from "./pages/BackupData";
 import RestoreData from "./pages/RestoreData";
-import DebugPage from "./pages/DebugPage";
+
 
 const queryClient = new QueryClient();
 
@@ -52,7 +52,7 @@ const App = () => (
             <Route path="/upload-catatan" element={<ProtectedRoute><NoteUpload /></ProtectedRoute>} />
             <Route path="/backup" element={<ProtectedRoute requiredRole="guru"><BackupData /></ProtectedRoute>} />
             <Route path="/restore" element={<RestoreData />} />
-            <Route path="/debug" element={<DebugPage />} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
