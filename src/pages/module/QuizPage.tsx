@@ -69,13 +69,13 @@ export default function QuizPage() {
     // Check quiz setting/status first
     try {
       const { data: settingData } = await supabase
-        .from('quiz_settings')
+        .from('quiz_settings' as any)
         .select('is_active')
         .eq('module_id', module.id)
         .single();
 
       if (settingData) {
-        setIsQuizActive(settingData.is_active);
+        setIsQuizActive((settingData as any).is_active);
       } else {
         setIsQuizActive(false);
       }

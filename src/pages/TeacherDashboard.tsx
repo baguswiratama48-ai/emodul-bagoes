@@ -272,12 +272,12 @@ export default function TeacherDashboard() {
 
     // Fetch quiz status
     const { data: settingsData } = await supabase
-      .from('quiz_settings')
+      .from('quiz_settings' as any)
       .select('*');
 
     if (settingsData) {
       const settingsMap: Record<string, boolean> = {};
-      settingsData.forEach((s: any) => {
+      (settingsData as any[]).forEach((s: any) => {
         settingsMap[s.module_id] = s.is_active;
       });
       setQuizSettings(settingsMap);
@@ -328,7 +328,7 @@ export default function TeacherDashboard() {
   const handleToggleQuiz = async (isActive: boolean) => {
     try {
       const { error } = await supabase
-        .from('quiz_settings')
+        .from('quiz_settings' as any)
         .upsert({
           module_id: currentModuleId,
           is_active: isActive,

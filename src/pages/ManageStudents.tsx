@@ -76,11 +76,11 @@ export default function ManageStudents() {
     
     // Get all student user_ids (not guru)
     const { data: studentRoles } = await supabase
-      .from('user_roles')
+      .from('user_roles' as any)
       .select('user_id')
       .eq('role', 'siswa');
     
-    const studentIds = studentRoles?.map(r => r.user_id) || [];
+    const studentIds = studentRoles?.map((r: any) => r.user_id) || [];
     
     if (studentIds.length > 0) {
       const { data: profilesData } = await supabase

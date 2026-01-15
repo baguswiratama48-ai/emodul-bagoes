@@ -155,7 +155,7 @@ export default function RestoreData() {
 
                 if (newRows.length > 0) {
                     // Batch insert
-                    const { error } = await supabase.from(tableName).insert(newRows);
+                    const { error } = await supabase.from(tableName as any).insert(newRows);
                     if (error) {
                         addLog(`❌ Gagal restore ${tableName}: ${error.message}`);
                     } else {
@@ -176,7 +176,7 @@ export default function RestoreData() {
                     const { id, ...rest } = s;
                     return rest;
                 });
-                await supabase.from('quiz_settings').upsert(cleanSettings, { onConflict: 'module_id' });
+                await supabase.from('quiz_settings' as any).upsert(cleanSettings as any, { onConflict: 'module_id' });
                 addLog('✅ Pengaturan Kuis dipulihkan.');
             }
 
