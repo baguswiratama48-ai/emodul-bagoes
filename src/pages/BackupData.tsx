@@ -58,7 +58,7 @@ export default function BackupData() {
 
             // 5. Student Notes
             addLog('Mengambil metadata Catatan Siswa...');
-            const { data: notes, error: errNotes } = await supabase.from('student_notes').select('*');
+            const { data: notes, error: errNotes } = await supabase.from('student_notes' as any).select('*');
             // Don't throw if table doesn't exist yet (in case migration failed previously)
             if (!errNotes) {
                 backupData.tables.student_notes = notes;
@@ -69,7 +69,7 @@ export default function BackupData() {
 
             // 6. Quiz Settings
             addLog('Mengambil pengaturan Kuis...');
-            const { data: settings, error: errSettings } = await supabase.from('quiz_settings').select('*');
+            const { data: settings, error: errSettings } = await supabase.from('quiz_settings' as any).select('*');
             if (!errSettings) {
                 backupData.tables.quiz_settings = settings;
                 addLog(`✅ ${settings?.length || 0} pengaturan kuis berhasil diambil.`);
