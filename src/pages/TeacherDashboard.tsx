@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Users, 
-  ClipboardList, 
-  FileText, 
-  ChevronDown, 
+import {
+  Users,
+  ClipboardList,
+  FileText,
+  ChevronDown,
   ChevronUp,
   BookOpen,
   LogOut,
@@ -17,7 +17,10 @@ import {
   Filter,
   Recycle,
   TrendingUp,
-  RefreshCw
+  RefreshCw,
+  Lock,
+  Unlock,
+  Database
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,6 +28,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -97,6 +102,7 @@ export default function TeacherDashboard() {
   const [availableKelas, setAvailableKelas] = useState<string[]>([]);
   const [feedbackMap, setFeedbackMap] = useState<FeedbackMap>({});
   const [selectedMapel, setSelectedMapel] = useState<'ekonomi' | 'pkwu'>('ekonomi');
+  const [quizSettings, setQuizSettings] = useState<Record<string, boolean>>({});
 
   // Determine which classes to show based on selected mapel
   const mapelKelas = useMemo(() => {
@@ -126,10 +132,10 @@ export default function TeacherDashboard() {
     const { data: profilesData } = await supabase
       .from('profiles')
       .select('id, full_name, nis, kelas');
-    
+
     const profilesMap: Record<string, StudentProfile> = {};
     const kelasSet = new Set<string>();
-    
+
     profilesData?.forEach((p) => {
       profilesMap[p.id] = {
         id: p.id,
@@ -141,7 +147,7 @@ export default function TeacherDashboard() {
         kelasSet.add(p.kelas);
       }
     });
-    
+
     setAllStudents(Object.values(profilesMap));
     setAvailableKelas(Array.from(kelasSet).sort());
 
@@ -149,13 +155,13 @@ export default function TeacherDashboard() {
     const { data: feedbackData } = await supabase
       .from('teacher_feedback')
       .select('answer_id, answer_type, feedback');
-    
+
     const fbMap: FeedbackMap = {};
     feedbackData?.forEach((fb: any) => {
       fbMap[`${fb.answer_type}-${fb.answer_id}`] = fb.feedback;
     });
     setFeedbackMap(fbMap);
-    
+
     // Fetch quiz answers with module_id
     const { data: quizData } = await supabase
       .from('quiz_answers')
@@ -245,6 +251,8 @@ export default function TeacherDashboard() {
       .like('module_id', '%-refleksi')
       .order('submitted_at', { ascending: false });
 
+
+
     if (reflectionData) {
       setReflectionAnswers(reflectionData.map((item: any) => {
         const profile = profilesMap[item.user_id];
@@ -262,7 +270,83 @@ export default function TeacherDashboard() {
       }));
     }
 
+    // Fetch quiz status
+    const { data: settingsData } = await supabase
+      .from('quiz_settings')
+      .select('*');
+
+    if (settingsData) {
+      const settingsMap: Record<string, boolean> = {};
+      settingsData.forEach((s: any) => {
+        settingsMap[s.module_id] = s.is_active;
+      });
+      setQuizSettings(settingsMap);
+    }
+
     setLoading(false);
+  };
+
+  // Realtime Subscription
+  useEffect(() => {
+    const channels = supabase.channel('custom-all-channel')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'quiz_answers' },
+        (payload) => {
+          console.log('Change received!', payload);
+          fetchStudentData();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'lkpd_answers' },
+        (payload) => {
+          fetchStudentData();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'trigger_answers' },
+        (payload) => {
+          fetchStudentData();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'student_notes' },
+        (payload) => {
+          fetchStudentData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channels);
+    };
+  }, []);
+
+  const handleToggleQuiz = async (isActive: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('quiz_settings')
+        .upsert({
+          module_id: currentModuleId,
+          is_active: isActive,
+          updated_at: new Date().toISOString()
+        } as any, { onConflict: 'module_id' });
+
+      if (error) throw error;
+
+      setQuizSettings(prev => ({
+        ...prev,
+        [currentModuleId]: isActive
+      }));
+
+      toast.success(`Kuis berhasil ${isActive ? 'dibuka' : 'ditutup'}`);
+    } catch (error) {
+      console.error('Error updating quiz status:', error);
+      toast.error('Gagal mengubah status kuis');
+    }
   };
 
   // Filter functions based on mapel and kelas
@@ -279,7 +363,7 @@ export default function TeacherDashboard() {
     }
     return results;
   }, [quizResults, mapelKelas, selectedKelas, selectedMapel]);
-  
+
   const filteredLkpdAnswers = useMemo(() => {
     let answers = lkpdAnswers.filter(a => mapelKelas.includes(a.kelas));
     if (selectedKelas !== 'all') {
@@ -287,7 +371,7 @@ export default function TeacherDashboard() {
     }
     return answers;
   }, [lkpdAnswers, mapelKelas, selectedKelas]);
-  
+
   const filteredTriggerAnswers = useMemo(() => {
     let answers = triggerAnswers.filter(a => mapelKelas.includes(a.kelas));
     if (selectedKelas !== 'all') {
@@ -295,7 +379,7 @@ export default function TeacherDashboard() {
     }
     return answers;
   }, [triggerAnswers, mapelKelas, selectedKelas]);
-  
+
   const filteredReflectionAnswers = useMemo(() => {
     let answers = reflectionAnswers.filter(a => mapelKelas.includes(a.kelas));
     if (selectedKelas !== 'all') {
@@ -434,12 +518,18 @@ export default function TeacherDashboard() {
                   Dashboard Guru - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}
                 </h1>
                 <p className="text-muted-foreground">
-                  {selectedMapel === 'ekonomi' 
-                    ? 'Kelola modul Ekonomi untuk Kelas X.9, X.10, X.11' 
+                  {selectedMapel === 'ekonomi'
+                    ? 'Kelola modul Ekonomi untuk Kelas X.9, X.10, X.11'
                     : 'Kelola modul PKWU untuk Kelas XI.3 - XI.11'}
                 </p>
               </div>
               <div className="flex items-center gap-3">
+                <Link to="/backup">
+                  <Button variant="outline" className="gap-2 border-primary/20 bg-primary/5 text-primary hover:bg-primary/10">
+                    <Database className="h-4 w-4" />
+                    Backup Data
+                  </Button>
+                </Link>
                 <Link to="/guru/kelola-siswa">
                   <Button variant="outline" className="gap-2">
                     <Users className="h-4 w-4" />
@@ -451,6 +541,20 @@ export default function TeacherDashboard() {
             <div className="flex flex-wrap items-center gap-3">
               <MapelSelector />
               <KelasFilter />
+
+              <div className="ml-auto flex items-center gap-3 bg-card border rounded-lg p-2 shadow-sm">
+                <div className={`p-1.5 rounded-full ${quizSettings[currentModuleId] ? 'bg-success/20 text-success' : 'bg-destructive/10 text-destructive'}`}>
+                  {quizSettings[currentModuleId] ? <Unlock className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">Status Kuis</span>
+                  <span className="text-xs text-muted-foreground">{quizSettings[currentModuleId] ? 'Terbuka' : 'Tertutup'}</span>
+                </div>
+                <Switch
+                  checked={quizSettings[currentModuleId] || false}
+                  onCheckedChange={handleToggleQuiz}
+                />
+              </div>
             </div>
           </motion.div>
 
@@ -516,8 +620,8 @@ export default function TeacherDashboard() {
                   </div>
                   <div>
                     <p className="text-2xl font-bold">
-                      {filteredQuizResults.length > 0 
-                        ? Math.round(filteredQuizResults.reduce((acc, r) => acc + r.score, 0) / filteredQuizResults.length) 
+                      {filteredQuizResults.length > 0
+                        ? Math.round(filteredQuizResults.reduce((acc, r) => acc + r.score, 0) / filteredQuizResults.length)
                         : 0}%
                     </p>
                     <p className="text-sm text-muted-foreground">Rata-rata Kuis</p>
@@ -880,8 +984,8 @@ export default function TeacherDashboard() {
                           </div>
                           <div className="ml-9 space-y-2">
                             {q.options.map((opt, optIndex) => (
-                              <div 
-                                key={optIndex} 
+                              <div
+                                key={optIndex}
                                 className={`p-2 rounded ${optIndex === q.correctAnswer ? (selectedMapel === 'pkwu' ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-success/10 border border-success/30') : 'bg-muted/50'}`}
                               >
                                 <div className="flex items-center gap-2">

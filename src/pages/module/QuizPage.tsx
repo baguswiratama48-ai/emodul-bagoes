@@ -1,19 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  CheckCircle2, 
-  ArrowRight, 
+import {
+  CheckCircle2,
+  ArrowRight,
   ArrowLeft,
   XCircle,
   Trophy,
   RotateCcw,
-  ChevronRight
+  ChevronRight,
+  Lock,
+  Unlock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { Progress } from '@/components/ui/progress';
 import { ModuleLayout } from '@/components/layout/ModuleLayout';
 import { useProgress } from '@/hooks/useProgress';
@@ -25,16 +28,17 @@ import confetti from 'canvas-confetti';
 export default function QuizPage() {
   const { moduleId } = useParams();
   const { markSectionComplete, saveQuizScore, getModuleProgress } = useProgress();
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const module = getModuleById(moduleId);
-  
+
+  const isGuru = role === 'guru';
+
   if (!module) {
     return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
   }
-  
+
   const progress = getModuleProgress(module.id);
-  const isPKWU = isPKWUModule(moduleId);
-  
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
   const [showResults, setShowResults] = useState(false);
@@ -42,21 +46,45 @@ export default function QuizPage() {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [loadingCheck, setLoadingCheck] = useState(true);
 
+  // Quiz Control States
+  const [isQuizActive, setIsQuizActive] = useState(false);
+  const [checkingStatus, setCheckingStatus] = useState(true);
+
   const questions = module.quizQuestions;
   const totalQuestions = questions.length;
 
-  // Check if already submitted
+  // Check if already submitted & Quiz Status
   useEffect(() => {
     if (user) {
       checkSubmissionStatus();
     } else {
       setLoadingCheck(false);
+      setCheckingStatus(false);
     }
   }, [user]);
 
   const checkSubmissionStatus = async () => {
     if (!user) return;
-    
+
+    // Check quiz setting/status first
+    try {
+      const { data: settingData } = await supabase
+        .from('quiz_settings')
+        .select('is_active')
+        .eq('module_id', module.id)
+        .single();
+
+      if (settingData) {
+        setIsQuizActive(settingData.is_active);
+      } else {
+        setIsQuizActive(false);
+      }
+    } catch (error) {
+      console.error("Error fetching settings", error);
+    }
+    setCheckingStatus(false);
+
+    // Check submission status
     const { data } = await supabase
       .from('quiz_answers')
       .select('question_id, selected_answer, is_correct')
@@ -77,7 +105,7 @@ export default function QuizPage() {
   };
 
   const handleAnswerSelect = (questionIndex: number, answerIndex: number) => {
-    if (hasSubmitted) return; // Prevent changes if already submitted
+    if (hasSubmitted) return;
     setSelectedAnswers(prev => ({ ...prev, [questionIndex]: answerIndex }));
     setShowExplanation(false);
   };
@@ -99,7 +127,6 @@ export default function QuizPage() {
   const saveAnswersToDatabase = async () => {
     if (!user) return;
 
-    // Save each answer to the database
     const answers = questions.map((q, index) => ({
       user_id: user.id,
       module_id: module.id,
@@ -112,7 +139,7 @@ export default function QuizPage() {
       if (answer.selected_answer >= 0) {
         await supabase
           .from('quiz_answers')
-          .upsert(answer, {
+          .upsert(answer as any, {
             onConflict: 'user_id,module_id,question_id'
           });
       }
@@ -122,12 +149,11 @@ export default function QuizPage() {
   const handleSubmitQuiz = async () => {
     const score = calculateScore();
     saveQuizScore(module.id, 'main-quiz', score);
-    
-    // Save to database
+
     await saveAnswersToDatabase();
-    
+
     setShowResults(true);
-    
+
     if (score >= 70) {
       confetti({
         particleCount: 100,
@@ -138,10 +164,7 @@ export default function QuizPage() {
   };
 
   const handleRetry = () => {
-    if (hasSubmitted) {
-      // Already submitted - cannot retry
-      return;
-    }
+    if (hasSubmitted) return;
     setSelectedAnswers({});
     setCurrentQuestion(0);
     setShowResults(false);
@@ -162,6 +185,25 @@ export default function QuizPage() {
     markSectionComplete(module.id, 'kuis');
   };
 
+  const handleToggleQuiz = async (checked: boolean) => {
+    if (!isGuru) return;
+
+    try {
+      const { error } = await supabase
+        .from('quiz_settings' as any)
+        .upsert({
+          module_id: module.id,
+          is_active: checked,
+          updated_at: new Date().toISOString()
+        } as any, { onConflict: 'module_id' });
+
+      if (error) throw error;
+      setIsQuizActive(checked);
+    } catch (error) {
+      console.error('Error updating quiz status:', error);
+    }
+  };
+
   const currentQ = questions[currentQuestion];
   const answeredCount = Object.keys(selectedAnswers).length;
   const score = calculateScore();
@@ -169,10 +211,7 @@ export default function QuizPage() {
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 },
-    },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
   };
 
   const itemVariants = {
@@ -180,6 +219,62 @@ export default function QuizPage() {
     visible: { y: 0, opacity: 1 },
   };
 
+  // 1. Teacher Control UI
+  const TeacherControl = () => (
+    <Card className="mb-6 border-primary/20 bg-primary/5">
+      <CardContent className="flex items-center justify-between p-4">
+        <div className="flex items-center gap-3">
+          <div className={`p-2 rounded-full ${isQuizActive ? 'bg-success/20 text-success' : 'bg-muted text-muted-foreground'}`}>
+            {isQuizActive ? <Unlock className="h-5 w-5" /> : <Lock className="h-5 w-5" />}
+          </div>
+          <div>
+            <p className="font-medium">Status Kuis: {isQuizActive ? 'Dibuka' : 'Ditutup'}</p>
+            <p className="text-sm text-muted-foreground">
+              {isQuizActive ? 'Siswa dapat mengerjakan kuis' : 'Siswa tidak dapat mengakses kuis'}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Switch
+            checked={isQuizActive}
+            onCheckedChange={handleToggleQuiz}
+          />
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  // 2. Student Blocked View
+  if (!isGuru && !isQuizActive && !checkingStatus) {
+    return (
+      <ModuleLayout module={module} currentSection="kuis">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+          className="space-y-8"
+        >
+          <div className="text-center py-12">
+            <div className="w-24 h-24 mx-auto bg-muted rounded-full flex items-center justify-center mb-6">
+              <Lock className="h-10 w-10 text-muted-foreground" />
+            </div>
+            <h2 className="text-2xl font-bold mb-2">Kuis Belum Dibuka</h2>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Guru belum membuka akses untuk kuis ini. Silakan tunggu instruksi dari guru Anda.
+            </p>
+            <Link to={`/modul/${module.id}/materi`}>
+              <Button variant="outline" className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Kembali ke Materi
+              </Button>
+            </Link>
+          </div>
+        </motion.div>
+      </ModuleLayout>
+    );
+  }
+
+  // 3. Results View
   if (showResults) {
     return (
       <ModuleLayout module={module} currentSection="kuis">
@@ -189,23 +284,24 @@ export default function QuizPage() {
           variants={containerVariants}
           className="space-y-8"
         >
+          {isGuru && <TeacherControl />}
+
           <motion.div variants={itemVariants} className="text-center">
-            <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6 ${
-              score >= 70 ? 'bg-success/10' : 'bg-destructive/10'
-            }`}>
+            <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6 ${score >= 70 ? 'bg-success/10' : 'bg-destructive/10'
+              }`}>
               {score >= 70 ? (
                 <Trophy className="h-12 w-12 text-success" />
               ) : (
                 <RotateCcw className="h-12 w-12 text-destructive" />
               )}
             </div>
-            
+
             <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
               {score >= 70 ? 'Selamat! 🎉' : 'Belum Berhasil'}
             </h1>
-            
+
             <p className="text-muted-foreground mb-8">
-              {score >= 70 
+              {score >= 70
                 ? 'Kamu telah berhasil menyelesaikan kuis dengan baik!'
                 : 'Jangan menyerah! Pelajari lagi materinya dan coba lagi.'}
             </p>
@@ -228,7 +324,7 @@ export default function QuizPage() {
                     </div>
                     <Progress value={score} className="h-3" />
                   </div>
-                  
+
                   {previousScore !== undefined && previousScore !== score && (
                     <p className="text-sm text-muted-foreground text-center">
                       Skor sebelumnya: {previousScore}%
@@ -236,8 +332,8 @@ export default function QuizPage() {
                   )}
 
                   <div className="flex gap-3 pt-4">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={handleRetry}
                       className="flex-1 gap-2"
                     >
@@ -246,7 +342,7 @@ export default function QuizPage() {
                     </Button>
                     {score >= 70 && (
                       <Link to={`/modul/${module.id}/glosarium`} className="flex-1">
-                        <Button 
+                        <Button
                           onClick={handleComplete}
                           className="w-full gap-2 bg-gradient-primary"
                         >
@@ -301,33 +397,12 @@ export default function QuizPage() {
               })}
             </div>
           </motion.div>
-
-          {/* Navigation for those who didn't pass */}
-          {score < 70 && (
-            <motion.div variants={itemVariants} className="flex justify-between items-center pt-8 border-t border-border">
-              <Link to={`/modul/${module.id}/materi`}>
-                <Button variant="outline" className="gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  Kembali ke Materi
-                </Button>
-              </Link>
-              <Link to={`/modul/${module.id}/glosarium`}>
-                <Button 
-                  variant="ghost"
-                  onClick={handleComplete}
-                  className="gap-2"
-                >
-                  Lewati ke Glosarium
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-            </motion.div>
-          )}
         </motion.div>
       </ModuleLayout>
     );
   }
 
+  // 4. Default View (Quiz Active)
   return (
     <ModuleLayout module={module} currentSection="kuis">
       <motion.div
@@ -336,6 +411,8 @@ export default function QuizPage() {
         variants={containerVariants}
         className="space-y-8"
       >
+        {isGuru && <TeacherControl />}
+
         {/* Header */}
         <motion.div variants={itemVariants}>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent text-accent-foreground text-sm mb-4">
@@ -368,7 +445,7 @@ export default function QuizPage() {
         </motion.div>
 
         {/* Question */}
-        <motion.div 
+        <motion.div
           key={currentQuestion}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -388,13 +465,12 @@ export default function QuizPage() {
                 className="space-y-3"
               >
                 {currentQ.options.map((option, index) => (
-                  <div 
+                  <div
                     key={index}
-                    className={`flex items-center space-x-3 p-4 rounded-lg border transition-all cursor-pointer ${
-                      selectedAnswers[currentQuestion] === index
+                    className={`flex items-center space-x-3 p-4 rounded-lg border transition-all cursor-pointer ${selectedAnswers[currentQuestion] === index
                         ? 'border-primary bg-primary/5'
                         : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                    }`}
+                      }`}
                     onClick={() => handleAnswerSelect(currentQuestion, index)}
                   >
                     <RadioGroupItem value={index.toString()} id={`option-${index}`} />
@@ -416,7 +492,7 @@ export default function QuizPage() {
                     {showExplanation ? 'Sembunyikan' : 'Lihat'} Penjelasan
                     <ChevronRight className={`h-4 w-4 ml-1 transition-transform ${showExplanation ? 'rotate-90' : ''}`} />
                   </Button>
-                  
+
                   {showExplanation && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
@@ -444,13 +520,12 @@ export default function QuizPage() {
               <button
                 key={index}
                 onClick={() => setCurrentQuestion(index)}
-                className={`w-10 h-10 rounded-lg font-medium transition-all ${
-                  currentQuestion === index
+                className={`w-10 h-10 rounded-lg font-medium transition-all ${currentQuestion === index
                     ? 'bg-primary text-primary-foreground'
                     : selectedAnswers[index] !== undefined
-                    ? 'bg-success/10 text-success border border-success/30'
-                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                }`}
+                      ? 'bg-success/10 text-success border border-success/30'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  }`}
               >
                 {index + 1}
               </button>
@@ -469,7 +544,7 @@ export default function QuizPage() {
             <ArrowLeft className="h-4 w-4" />
             Sebelumnya
           </Button>
-          
+
           {currentQuestion === totalQuestions - 1 ? (
             <Button
               onClick={handleSubmitQuiz}

@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  BookOpen, 
-  TrendingUp, 
-  ArrowRight, 
-  Sun, 
+import {
+  BookOpen,
+  TrendingUp,
+  ArrowRight,
+  Sun,
   Moon,
   Sparkles,
   GraduationCap,
@@ -13,7 +13,8 @@ import {
   LogOut,
   Settings,
   User,
-  Recycle
+  Recycle,
+  Upload
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -49,7 +50,7 @@ const Index = () => {
   const { availableModules, mapelName, mapelKelas } = useMemo(() => {
     const isKelasX = userKelas?.startsWith('X.');
     const isKelasXI = userKelas?.startsWith('XI.');
-    
+
     if (isGuru) {
       return { availableModules: [...ekonomiModules, pkwuModule], mapelName: 'Semua Mapel', mapelKelas: 'Guru' };
     }
@@ -83,7 +84,7 @@ const Index = () => {
               <p className="text-xs text-muted-foreground">Belajar Jadi Lebih Bagoes</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <div className="hidden sm:flex items-center gap-2 mr-2">
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted">
@@ -126,44 +127,27 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-hero opacity-10" />
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl" />
         <div className="absolute bottom-10 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl" />
-        
+
         <motion.div className="container mx-auto px-4 py-20 relative z-10" initial="hidden" animate="visible" variants={containerVariants}>
           <motion.div variants={itemVariants} className="text-center max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent text-accent-foreground text-sm font-medium mb-6">
               <Sparkles className="h-4 w-4" />
               <span>{mapelName} {mapelKelas}</span>
             </div>
-            
+
             <h1 className="text-4xl md:text-6xl font-display font-bold mb-6">
               <span className="text-gradient">E-Modul Bagoes</span>
             </h1>
-            
+
             <p className="text-xl md:text-2xl text-muted-foreground mb-4">
               "Belajar Jadi Lebih <span className="text-primary font-semibold">Bagoes</span>"
             </p>
-            
+
             <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
               Platform pembelajaran interaktif untuk memahami konsep {mapelName === 'PKWU' ? 'prakarya dan kewirausahaan' : 'ekonomi'} dengan cara yang menyenangkan.
             </p>
 
-            <div className="flex flex-wrap justify-center gap-4">
-              {availableModules.length > 0 && (
-                <Link to={`/modul/${availableModules[0].id}`}>
-                  <Button size="lg" className="bg-gradient-primary hover:opacity-90 text-white shadow-lg gap-2">
-                    Mulai Belajar
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-              )}
-              {isGuru && (
-                <Link to="/guru">
-                  <Button size="lg" variant="outline" className="gap-2">
-                    <Settings className="h-4 w-4" />
-                    Dashboard Guru
-                  </Button>
-                </Link>
-              )}
-            </div>
+            {/* Buttons removed as requested */}
           </motion.div>
 
           <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 max-w-4xl mx-auto">
@@ -197,7 +181,7 @@ const Index = () => {
               const progress = getModuleProgress(module.id);
               const progressPercent = calculateProgress(module.id, 8);
               const isPKWU = module.id === 'kerajinan-limbah';
-              
+
               return (
                 <motion.div key={module.id} variants={itemVariants}>
                   <Link to={`/modul/${module.id}`}>

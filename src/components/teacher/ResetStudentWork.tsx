@@ -1,13 +1,14 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { RefreshCw, Trash2, MessageCircle, ClipboardList, CheckCircle2, Lightbulb, Search } from 'lucide-react';
+import { RefreshCw, Trash2, MessageCircle, ClipboardList, CheckCircle2, Lightbulb, Search, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface StudentProfile {
   id: string;
@@ -35,11 +36,20 @@ export function ResetStudentWork({ students, moduleId, onReset }: ResetStudentWo
   const filteredStudents = useMemo(() => {
     if (!searchQuery.trim()) return students;
     const query = searchQuery.toLowerCase();
-    return students.filter(s => 
+    return students.filter(s =>
       s.full_name.toLowerCase().includes(query) ||
       s.nis?.toLowerCase().includes(query)
     );
   }, [students, searchQuery]);
+
+  // Auto-select first student when searching
+  useEffect(() => {
+    if (searchQuery.trim() && filteredStudents.length > 0) {
+      setSelectedStudent(filteredStudents[0].id);
+    } else if (!searchQuery.trim()) {
+      setSelectedStudent('');
+    }
+  }, [searchQuery, filteredStudents]);
 
   const handleReset = async () => {
     if (!selectedStudent) {
@@ -48,53 +58,70 @@ export function ResetStudentWork({ students, moduleId, onReset }: ResetStudentWo
     }
 
     setIsResetting(true);
+    const studentName = students.find(s => s.id === selectedStudent)?.full_name || 'Siswa';
 
     try {
-      if (resetType === 'pemantik' || resetType === 'all') {
-        await supabase
-          .from('trigger_answers')
-          .delete()
-          .eq('user_id', selectedStudent)
-          .eq('module_id', moduleId);
-      }
+      console.log(`Starting reset for ${studentName} (${selectedStudent}) on module ${moduleId}`);
 
-      if (resetType === 'refleksi' || resetType === 'all') {
-        await supabase
-          .from('trigger_answers')
-          .delete()
-          .eq('user_id', selectedStudent)
-          .eq('module_id', `${moduleId}-refleksi`);
-      }
-
-      if (resetType === 'lkpd' || resetType === 'all') {
-        await supabase
-          .from('lkpd_answers')
-          .delete()
-          .eq('user_id', selectedStudent)
-          .eq('module_id', moduleId);
-      }
-
+      // We perform delete operations sequentially to ensure stability
+      // Kuis
       if (resetType === 'kuis' || resetType === 'all') {
-        await supabase
-          .from('quiz_answers')
-          .delete()
-          .eq('user_id', selectedStudent)
-          .eq('module_id', moduleId);
+        // Delete specific module entries
+        const { error: err1 } = await supabase.from('quiz_answers')
+          .delete().eq('user_id', selectedStudent).eq('module_id', moduleId);
+        if (err1) throw err1;
+
+        // Delete entries with NO module_id (legacy/buggy data)
+        const { error: err2 } = await supabase.from('quiz_answers')
+          .delete().eq('user_id', selectedStudent).is('module_id', null);
+        if (err2) throw err2;
+
+        // Also try deleting by 'default' module id if it exists
+        const { error: err3 } = await supabase.from('quiz_answers')
+          .delete().eq('user_id', selectedStudent).eq('module_id', 'default');
+        if (err3) throw err3;
       }
 
-      const selectedStudentName = students.find(s => s.id === selectedStudent)?.full_name || 'Siswa';
-      
+      // LKPD
+      if (resetType === 'lkpd' || resetType === 'all') {
+        await supabase.from('lkpd_answers')
+          .delete().eq('user_id', selectedStudent).eq('module_id', moduleId);
+
+        await supabase.from('lkpd_answers')
+          .delete().eq('user_id', selectedStudent).is('module_id', null);
+      }
+
+      // Pemantik
+      if (resetType === 'pemantik' || resetType === 'all') {
+        await supabase.from('trigger_answers')
+          .delete().eq('user_id', selectedStudent).eq('module_id', moduleId);
+
+        await supabase.from('trigger_answers')
+          .delete().eq('user_id', selectedStudent).is('module_id', null);
+      }
+
+      // Refleksi
+      if (resetType === 'refleksi' || resetType === 'all') {
+        await supabase.from('trigger_answers')
+          .delete().eq('user_id', selectedStudent).eq('module_id', `${moduleId}-refleksi`);
+      }
+
       toast({
-        title: 'Berhasil',
-        description: `Pengerjaan ${resetType === 'all' ? 'semua tugas' : resetType} ${selectedStudentName} telah direset.`,
+        title: 'Reset Berhasil',
+        description: `Data ${studentName} berhasil dihapus permanen.`,
+        duration: 3000,
       });
 
+      // Clear selection and refresh data
+      setSearchQuery('');
       setSelectedStudent('');
       onReset();
-    } catch (error) {
+
+    } catch (error: any) {
+      console.error('Reset error:', error);
       toast({
-        title: 'Gagal',
-        description: 'Terjadi kesalahan saat mereset pengerjaan.',
+        title: 'Gagal Reset',
+        description: error.message || 'Terjadi kesalahan sistem',
         variant: 'destructive'
       });
     } finally {
@@ -102,77 +129,39 @@ export function ResetStudentWork({ students, moduleId, onReset }: ResetStudentWo
     }
   };
 
-  const getResetTypeLabel = (type: ResetType) => {
-    switch (type) {
-      case 'pemantik': return 'Pemantik';
-      case 'refleksi': return 'Refleksi';
-      case 'lkpd': return 'LKPD';
-      case 'kuis': return 'Kuis';
-      case 'all': return 'Semua Tugas';
-    }
-  };
-
-  const getResetTypeIcon = (type: ResetType) => {
-    switch (type) {
-      case 'pemantik': return <MessageCircle className="h-4 w-4" />;
-      case 'refleksi': return <Lightbulb className="h-4 w-4" />;
-      case 'lkpd': return <ClipboardList className="h-4 w-4" />;
-      case 'kuis': return <CheckCircle2 className="h-4 w-4" />;
-      case 'all': return <RefreshCw className="h-4 w-4" />;
-    }
-  };
-
   return (
-    <Card className="border-orange-200 dark:border-orange-900 bg-orange-50/50 dark:bg-orange-900/10">
+    <Card className="border-destructive/20 bg-destructive/5 dark:bg-destructive/10">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-orange-700 dark:text-orange-400">
-          <RefreshCw className="h-5 w-5" />
-          Reset Pengerjaan Siswa
+        <CardTitle className="flex items-center gap-2 text-destructive">
+          <Trash2 className="h-5 w-5" />
+          Hapus Data Siswa (Reset)
         </CardTitle>
         <CardDescription>
-          Reset pengerjaan agar siswa bisa mengerjakan ulang
+          Gunakan fitur ini jika siswa mengalami kendala dan perlu mengerjakan ulang dari awal.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Search Input */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Cari nama siswa atau NIS..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
+      <CardContent className="space-y-6">
 
-        <div className="grid sm:grid-cols-2 gap-4">
+        <Alert variant="destructive" className="bg-destructive/10 border-destructive/20 text-destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Peringatan</AlertTitle>
+          <AlertDescription>
+            Tindakan ini tidak dapat dibatalkan. Data jawaban dan nilai siswa akan dihapus permanen.
+          </AlertDescription>
+        </Alert>
+
+        <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Pilih Siswa ({filteredStudents.length} siswa)</label>
-            <Select value={selectedStudent} onValueChange={setSelectedStudent}>
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih siswa..." />
-              </SelectTrigger>
-              <SelectContent className="max-h-[200px]">
-                {filteredStudents.length === 0 ? (
-                  <div className="p-2 text-sm text-muted-foreground text-center">
-                    Tidak ada siswa ditemukan
-                  </div>
-                ) : (
-                  filteredStudents.map((student) => (
-                    <SelectItem key={student.id} value={student.id}>
-                      <div className="flex items-center gap-2">
-                        <span>{student.full_name}</span>
-                        {student.kelas && (
-                          <Badge variant="outline" className="text-xs">
-                            {student.kelas}
-                          </Badge>
-                        )}
-                      </div>
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
+            <label className="text-sm font-medium">Cari Siswa</label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Ketik nama siswa..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -182,71 +171,54 @@ export function ResetStudentWork({ students, moduleId, onReset }: ResetStudentWo
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">
-                  <div className="flex items-center gap-2">
-                    <RefreshCw className="h-4 w-4" />
-                    Semua Tugas
-                  </div>
-                </SelectItem>
-                <SelectItem value="pemantik">
-                  <div className="flex items-center gap-2">
-                    <MessageCircle className="h-4 w-4" />
-                    Pemantik
-                  </div>
-                </SelectItem>
-                <SelectItem value="lkpd">
-                  <div className="flex items-center gap-2">
-                    <ClipboardList className="h-4 w-4" />
-                    LKPD
-                  </div>
-                </SelectItem>
-                <SelectItem value="kuis">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4" />
-                    Kuis
-                  </div>
-                </SelectItem>
-                <SelectItem value="refleksi">
-                  <div className="flex items-center gap-2">
-                    <Lightbulb className="h-4 w-4" />
-                    Refleksi
-                  </div>
-                </SelectItem>
+                <SelectItem value="all">Semua Data (Kuis, LKPD, dll)</SelectItem>
+                <SelectItem value="kuis">Hanya Kuis</SelectItem>
+                <SelectItem value="lkpd">Hanya LKPD</SelectItem>
+                <SelectItem value="pemantik">Hanya Pemantik</SelectItem>
+                <SelectItem value="refleksi">Hanya Refleksi</SelectItem>
               </SelectContent>
             </Select>
           </div>
-        </div>
 
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button 
-              variant="destructive" 
-              className="w-full gap-2"
-              disabled={!selectedStudent || isResetting}
-            >
-              <Trash2 className="h-4 w-4" />
-              {isResetting ? 'Mereset...' : 'Reset Pengerjaan'}
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Konfirmasi Reset</AlertDialogTitle>
-              <AlertDialogDescription>
-                Apakah Anda yakin ingin mereset pengerjaan{' '}
-                <strong>{getResetTypeLabel(resetType)}</strong> untuk siswa{' '}
-                <strong>{students.find(s => s.id === selectedStudent)?.full_name}</strong>?
-                <br /><br />
-                Data yang sudah dikerjakan akan dihapus dan siswa dapat mengerjakan ulang.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Batal</AlertDialogCancel>
-              <AlertDialogAction onClick={handleReset} className="bg-destructive text-destructive-foreground">
-                Ya, Reset
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+          {selectedStudent && (
+            <div className="p-3 bg-secondary/20 rounded-lg flex items-center justify-between">
+              <div>
+                <p className="font-medium text-sm">Siswa Terpilih:</p>
+                <p className="font-bold">{students.find(s => s.id === selectedStudent)?.full_name}</p>
+              </div>
+              <Badge variant="outline">{students.find(s => s.id === selectedStudent)?.kelas}</Badge>
+            </div>
+          )}
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="destructive"
+                className="w-full font-bold"
+                size="lg"
+                disabled={!selectedStudent || isResetting}
+              >
+                {isResetting ? 'Sedang Menghapus...' : 'HAPUS DATA SISWA'}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Hapus Data Permanen?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Anda akan menghapus data pengerjaan milik <strong>{students.find(s => s.id === selectedStudent)?.full_name}</strong>.
+                  <br /><br />
+                  Siswa harus mengerjakan ulang dari awal setelah ini.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Batal</AlertDialogCancel>
+                <AlertDialogAction onClick={handleReset} className="bg-destructive text-destructive-foreground">
+                  Ya, Hapus
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </CardContent>
     </Card>
   );

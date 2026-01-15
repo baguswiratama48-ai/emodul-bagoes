@@ -20,6 +20,9 @@ import SummaryPage from "./pages/module/SummaryPage";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 import ManageStudents from "./pages/ManageStudents";
+import NoteUpload from "./pages/NoteUpload";
+import BackupData from "./pages/BackupData";
+import RestoreData from "./pages/RestoreData";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +48,9 @@ const App = () => (
             <Route path="/modul/:moduleId/glosarium" element={<ProtectedRoute><GlossaryPage /></ProtectedRoute>} />
             <Route path="/modul/:moduleId/refleksi" element={<ProtectedRoute><ReflectionPage /></ProtectedRoute>} />
             <Route path="/modul/:moduleId/rangkuman" element={<ProtectedRoute><SummaryPage /></ProtectedRoute>} />
+            <Route path="/upload-catatan" element={<ProtectedRoute><NoteUpload /></ProtectedRoute>} />
+            <Route path="/backup" element={<ProtectedRoute requiredRole="guru"><BackupData /></ProtectedRoute>} />
+            <Route path="/restore" element={<RestoreData />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

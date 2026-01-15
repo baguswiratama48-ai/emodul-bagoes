@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  CheckCircle2, 
-  ClipboardList, 
+import {
+  CheckCircle2,
+  ClipboardList,
   MessageCircle,
   BookOpen,
   LogOut,
@@ -80,6 +80,7 @@ export default function StudentDashboard() {
   const [quizAnswers, setQuizAnswers] = useState<QuizAnswer[]>([]);
   const [lkpdAnswers, setLkpdAnswers] = useState<LkpdAnswer[]>([]);
   const [triggerAnswers, setTriggerAnswers] = useState<TriggerAnswer[]>([]);
+  const [notesCount, setNotesCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [fullName, setFullName] = useState('');
   const [nis, setNis] = useState('');
@@ -107,7 +108,7 @@ export default function StudentDashboard() {
       .select('full_name, nis, kelas')
       .eq('id', user.id)
       .maybeSingle();
-    
+
     let studentKelas = '';
     if (profileData) {
       setFullName(profileData.full_name || 'Siswa');
@@ -155,6 +156,14 @@ export default function StudentDashboard() {
     if (triggerData) {
       setTriggerAnswers(triggerData);
     }
+
+    // Fetch notes count
+    const { count } = await supabase
+      .from('student_notes')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id);
+
+    setNotesCount(count || 0);
 
     setLoading(false);
   };
@@ -230,7 +239,7 @@ export default function StudentDashboard() {
           </motion.div>
 
           {/* Stats */}
-          <motion.div variants={itemVariants} className="grid sm:grid-cols-4 gap-4">
+          <motion.div variants={itemVariants} className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
@@ -270,19 +279,22 @@ export default function StudentDashboard() {
                 </div>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center">
-                    <MessageCircle className="h-6 w-6 text-warning" />
+
+            <Link to="/upload-catatan">
+              <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                      <FileText className="h-6 w-6 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold">{notesCount}</p>
+                      <p className="text-sm text-muted-foreground">Catatan Diupload</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-2xl font-bold">{triggerAnswers.length}/{triggerQuestions.length}</p>
-                    <p className="text-sm text-muted-foreground">Pemantik Dijawab</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           </motion.div>
 
           {/* Main Content */}
@@ -330,9 +342,8 @@ export default function StudentDashboard() {
                       <div className="space-y-6">
                         {/* Score Summary */}
                         <div className="p-6 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl text-center">
-                          <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 ${
-                            quizScore >= 70 ? 'bg-success/10' : 'bg-destructive/10'
-                          }`}>
+                          <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 ${quizScore >= 70 ? 'bg-success/10' : 'bg-destructive/10'
+                            }`}>
                             <span className="text-3xl font-bold">{quizScore}%</span>
                           </div>
                           <p className="text-lg font-medium">
@@ -501,7 +512,7 @@ export default function StudentDashboard() {
                             </div>
                           );
                         })}
-                        
+
                         {/* Link to answer more if not all answered */}
                         {triggerAnswers.length < triggerQuestions.length && (
                           <div className="text-center pt-4">
@@ -518,7 +529,7 @@ export default function StudentDashboard() {
             </Tabs>
           </motion.div>
         </motion.div>
-      </main>
-    </div>
+      </main >
+    </div >
   );
 }
