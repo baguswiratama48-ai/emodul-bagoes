@@ -29,9 +29,10 @@ import { supabase } from '@/integrations/supabase/client';
 import logo from '@/assets/logo.png';
 
 const Index = () => {
-  const { darkMode, toggleDarkMode, getModuleProgress, calculateProgress } = useProgress();
+  const { darkMode, toggleDarkMode, getModuleProgress } = useProgress(); // Removed calculateProgress
   const { user, role, signOut, isGuru } = useAuth();
   const [userKelas, setUserKelas] = useState<string | null>(null);
+  const [progressMap, setProgressMap] = useState<Record<string, number>>({});
 
   useEffect(() => {
     const fetchUserKelas = async () => {
@@ -62,6 +63,55 @@ const Index = () => {
     }
     return { availableModules: [...ekonomiModules, pkwuModule], mapelName: 'E-Modul', mapelKelas: '' };
   }, [userKelas, isGuru]);
+
+  // Fetch real progress from database
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (!user) return;
+
+      const newProgressMap: Record<string, number> = {};
+
+      for (const module of availableModules) {
+        // 1. Quiz Answers
+        const { count: quizCount } = await supabase
+          .from('quiz_answers')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('module_id', module.id);
+
+        // 2. LKPD Answers
+        const { count: lkpdCount } = await supabase
+          .from('lkpd_answers')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('module_id', module.id);
+
+        // 3. Trigger Answers (Pemantik)
+        const { count: triggerCount } = await supabase
+          .from('trigger_answers')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('module_id', module.id);
+
+        // 4. Reflection Answers (Refleksi) - stored with suffix '-refleksi'
+        const { count: reflectionCount } = await supabase
+          .from('trigger_answers')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('module_id', `${module.id}-refleksi`);
+
+        const totalCompleted = (quizCount || 0) + (lkpdCount || 0) + (triggerCount || 0) + (reflectionCount || 0);
+        // Total items = 10 Quiz + 4 LKPD + 3 Pemantik + 5 Refleksi = 22
+        const percentage = Math.round((totalCompleted / 22) * 100);
+
+        newProgressMap[module.id] = Math.min(percentage, 100);
+      }
+
+      setProgressMap(newProgressMap);
+    };
+
+    fetchProgress();
+  }, [user, availableModules]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -179,7 +229,8 @@ const Index = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {availableModules.map((module) => {
               const progress = getModuleProgress(module.id);
-              const progressPercent = calculateProgress(module.id, 8);
+              // Use real DB progress if available, fallback to 0
+              const progressPercent = progressMap[module.id] || 0;
               const isPKWU = module.id === 'kerajinan-limbah';
 
               return (
