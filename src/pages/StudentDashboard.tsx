@@ -9,7 +9,8 @@ import {
   LogOut,
   Home,
   Trophy,
-  FileText
+  FileText,
+  MessageSquare
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,15 +30,25 @@ interface QuizAnswer {
 }
 
 interface LkpdAnswer {
+  id: string;
   problem_id: number;
   answer: string;
   submitted_at: string;
 }
 
 interface TriggerAnswer {
+  id: string;
   question_id: number;
   answer: string;
   submitted_at: string;
+}
+
+interface TeacherFeedback {
+  id: string;
+  answer_id: string;
+  answer_type: 'trigger' | 'lkpd' | 'reflection';
+  feedback: string;
+  created_at: string;
 }
 
 // Kelas untuk mapel Ekonomi
@@ -80,6 +91,7 @@ export default function StudentDashboard() {
   const [quizAnswers, setQuizAnswers] = useState<QuizAnswer[]>([]);
   const [lkpdAnswers, setLkpdAnswers] = useState<LkpdAnswer[]>([]);
   const [triggerAnswers, setTriggerAnswers] = useState<TriggerAnswer[]>([]);
+  const [feedbackList, setFeedbackList] = useState<TeacherFeedback[]>([]);
   const [notesCount, setNotesCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [fullName, setFullName] = useState('');
@@ -136,7 +148,7 @@ export default function StudentDashboard() {
     // Fetch LKPD answers for the correct module
     const { data: lkpdData } = await supabase
       .from('lkpd_answers')
-      .select('problem_id, answer, submitted_at')
+      .select('id, problem_id, answer, submitted_at')
       .eq('user_id', user.id)
       .eq('module_id', moduleId)
       .order('submitted_at', { ascending: false });
@@ -148,13 +160,23 @@ export default function StudentDashboard() {
     // Fetch trigger answers for the correct module
     const { data: triggerData } = await supabase
       .from('trigger_answers')
-      .select('question_id, answer, submitted_at')
+      .select('id, question_id, answer, submitted_at')
       .eq('user_id', user.id)
       .eq('module_id', moduleId)
       .order('submitted_at', { ascending: false });
 
     if (triggerData) {
       setTriggerAnswers(triggerData);
+    }
+
+    // Fetch teacher feedback
+    const { data: feedbackData } = await supabase
+      .from('teacher_feedback')
+      .select('*')
+      .eq('student_id', user.id);
+
+    if (feedbackData) {
+      setFeedbackList(feedbackData as TeacherFeedback[]);
     }
 
     // Fetch notes count
@@ -443,6 +465,19 @@ export default function StudentDashboard() {
                                   <div className="bg-muted/30 rounded-lg p-4 font-mono text-sm whitespace-pre-wrap">
                                     {answer.answer}
                                   </div>
+
+                                  {/* Teacher Feedback */}
+                                  {feedbackList.find(f => f.answer_type === 'lkpd' && f.answer_id === answer.id) && (
+                                    <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                      <div className="flex items-center gap-2 mb-1 text-blue-700 dark:text-blue-400">
+                                        <MessageSquare className="h-4 w-4" />
+                                        <span className="font-medium text-sm">Feedback Guru</span>
+                                      </div>
+                                      <p className="text-sm text-blue-800 dark:text-blue-300">
+                                        {feedbackList.find(f => f.answer_type === 'lkpd' && f.answer_id === answer.id)?.feedback}
+                                      </p>
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -503,6 +538,19 @@ export default function StudentDashboard() {
                                   <div className="bg-muted/30 rounded-lg p-4 text-sm">
                                     {answer.answer}
                                   </div>
+
+                                  {/* Teacher Feedback */}
+                                  {feedbackList.find(f => f.answer_type === 'trigger' && f.answer_id === answer.id) && (
+                                    <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                      <div className="flex items-center gap-2 mb-1 text-blue-700 dark:text-blue-400">
+                                        <MessageSquare className="h-4 w-4" />
+                                        <span className="font-medium text-sm">Feedback Guru</span>
+                                      </div>
+                                      <p className="text-sm text-blue-800 dark:text-blue-300">
+                                        {feedbackList.find(f => f.answer_type === 'trigger' && f.answer_id === answer.id)?.feedback}
+                                      </p>
+                                    </div>
+                                  )}
                                 </div>
                               ) : (
                                 <div className="p-4 text-center text-muted-foreground text-sm">
