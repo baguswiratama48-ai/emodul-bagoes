@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Save, CheckCircle2, Lightbulb } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, CheckCircle2, Lightbulb, MessageSquare } from 'lucide-react';
 import { ModuleLayout } from '@/components/layout/ModuleLayout';
 import { getModuleById, isPKWUModule } from '@/data/moduleUtils';
 import { useProgress } from '@/hooks/useProgress';
@@ -46,13 +46,15 @@ export default function ReflectionPage() {
   const { markSectionComplete } = useProgress();
   const { toast } = useToast();
   const { user } = useAuth();
-  
+
   if (!module) {
     return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
   }
-  
+
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [savedAnswers, setSavedAnswers] = useState<Record<number, string>>({});
+  const [answerIds, setAnswerIds] = useState<Record<number, string>>({}); // Store IDs for feedback
+  const [feedbackMap, setFeedbackMap] = useState<Record<number, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -61,23 +63,46 @@ export default function ReflectionPage() {
   useEffect(() => {
     const fetchAnswers = async () => {
       if (!user) return;
-      
+
       try {
+        // Fetch ID as well
         const { data, error } = await supabase
           .from('trigger_answers')
-          .select('question_id, answer')
+          .select('id, question_id, answer')
           .eq('user_id', user.id)
           .eq('module_id', `${moduleId}-refleksi`);
 
         if (error) throw error;
 
         const answersMap: Record<number, string> = {};
+        const idsMap: Record<number, string> = {};
+
         data?.forEach((item) => {
           answersMap[item.question_id] = item.answer;
+          idsMap[item.question_id] = item.id;
         });
         setAnswers(answersMap);
         setSavedAnswers(answersMap);
-        
+        setAnswerIds(idsMap);
+
+        // Fetch Feedback
+        if (data && data.length > 0) {
+          const { data: feedbackData } = await supabase
+            .from('teacher_feedback')
+            .select('answer_id, feedback')
+            .eq('answer_type', 'reflection') // Corrected to reflection
+            .in('answer_id', Object.values(idsMap));
+
+          if (feedbackData) {
+            const fbMap: Record<number, string> = {};
+            feedbackData.forEach((fb: any) => {
+              const qId = Object.keys(idsMap).find(key => idsMap[Number(key)] === fb.answer_id);
+              if (qId) fbMap[Number(qId)] = fb.feedback;
+            });
+            setFeedbackMap(fbMap);
+          }
+        }
+
         // Check if all questions are answered (meaning submitted)
         const allAnswered = reflectionQuestions.every(q => answersMap[q.id]?.trim());
         setHasSubmitted(allAnswered);
@@ -127,11 +152,14 @@ export default function ReflectionPage() {
 
       setSavedAnswers({ ...answers });
       markSectionComplete(moduleId || 'permintaan', 'refleksi');
-      
+
       toast({
         title: "Berhasil!",
         description: "Jawaban refleksi berhasil disimpan",
       });
+
+      // Re-fetch to get IDs if new insert? simplified by just refreshing page or assumption.
+      // Ideally we should reload data to get new IDs but for now we assume they exist if fetching.
     } catch (error) {
       console.error('Error saving reflection answers:', error);
       toast({
@@ -181,7 +209,7 @@ export default function ReflectionPage() {
             Refleksi Pembelajaran
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Luangkan waktu untuk merefleksikan apa yang telah kamu pelajari. 
+            Luangkan waktu untuk merefleksikan apa yang telah kamu pelajari.
             Refleksi membantu memperdalam pemahaman dan mengidentifikasi area yang perlu dipelajari lebih lanjut.
           </p>
         </motion.div>
@@ -209,6 +237,17 @@ export default function ReflectionPage() {
                       <CheckCircle2 className="h-3 w-3" />
                       Sudah dikumpulkan
                     </p>
+                    {feedbackMap[item.id] && (
+                      <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <div className="flex items-center gap-2 mb-1 text-blue-700 dark:text-blue-400">
+                          <MessageSquare className="h-4 w-4" />
+                          <span className="font-medium text-sm">Feedback Guru</span>
+                        </div>
+                        <p className="text-sm text-blue-800 dark:text-blue-300">
+                          {feedbackMap[item.id]}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <>
@@ -258,7 +297,7 @@ export default function ReflectionPage() {
               Refleksi Selesai! 🎉
             </h3>
             <p className="text-muted-foreground">
-              Terima kasih telah meluangkan waktu untuk merefleksikan pembelajaran. 
+              Terima kasih telah meluangkan waktu untuk merefleksikan pembelajaran.
               Kamu bisa melanjutkan ke rangkuman modul.
             </p>
           </motion.div>

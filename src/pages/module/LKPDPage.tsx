@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  ClipboardList, 
-  ArrowRight, 
+import {
+  ClipboardList,
+  ArrowRight,
   ArrowLeft,
   FileText,
   CheckCircle2,
@@ -14,7 +14,8 @@ import {
   BookOpen,
   Target,
   ListChecks,
-  Star
+  Star,
+  MessageSquare
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -193,20 +194,22 @@ export default function LKPDPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const module = getModuleById(moduleId);
-  
+
   if (!module) {
     return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
   }
-  
+
   const isPKWU = isPKWUModule(moduleId);
   const lkpdProblems = isPKWU ? pkwuLkpdProblems : ekonomiLkpdProblems;
   const lkpdMeta = isPKWU ? pkwuLkpdMeta : ekonomiLkpdMeta;
-  
+
   // PKWU only has main problems, no refleksi
   const allProblems = isPKWU ? pkwuLkpdProblems : ekonomiLkpdProblems;
   const totalQuestions = allProblems.length;
-  
+
   const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [answerIds, setAnswerIds] = useState<Record<number, string>>({});
+  const [feedbackMap, setFeedbackMap] = useState<Record<number, string>>({});
   const [showHints, setShowHints] = useState<Record<number, boolean>>({});
   const [saving, setSaving] = useState<Record<number, boolean>>({});
   const [savedAnswers, setSavedAnswers] = useState<Record<number, boolean>>({});
@@ -231,7 +234,7 @@ export default function LKPDPage() {
       .select('full_name, kelas, nis')
       .eq('id', user.id)
       .single();
-    
+
     if (data) {
       setStudentProfile(data);
     }
@@ -239,23 +242,45 @@ export default function LKPDPage() {
 
   const checkSubmissionStatus = async () => {
     if (!user) return;
-    
+
+    // FETCH 'id' IS CRITICAL
     const { data } = await supabase
       .from('lkpd_answers')
-      .select('problem_id, answer')
+      .select('id, problem_id, answer')
       .eq('user_id', user.id)
       .eq('module_id', module.id);
 
     if (data && data.length > 0) {
       const loadedAnswers: Record<number, string> = {};
       const loadedSaved: Record<number, boolean> = {};
+      const loadedIds: Record<number, string> = {};
+
       data.forEach(item => {
         loadedAnswers[item.problem_id] = item.answer;
         loadedSaved[item.problem_id] = true;
+        loadedIds[item.problem_id] = item.id;
       });
       setAnswers(loadedAnswers);
       setSavedAnswers(loadedSaved);
-      
+      setAnswerIds(loadedIds);
+
+      // Fetch feedback
+      const { data: feedbackData } = await supabase
+        .from('teacher_feedback')
+        .select('answer_id, feedback')
+        // We use 'lkpd' as answer_type
+        .eq('answer_type', 'lkpd')
+        .in('answer_id', Object.values(loadedIds));
+
+      if (feedbackData) {
+        const fbMap: Record<number, string> = {};
+        feedbackData.forEach((fb: any) => {
+          const pId = Object.keys(loadedIds).find(key => loadedIds[Number(key)] === fb.answer_id);
+          if (pId) fbMap[Number(pId)] = fb.feedback;
+        });
+        setFeedbackMap(fbMap);
+      }
+
       const allAnswered = allProblems.every(p => loadedAnswers[p.id]?.trim());
       setHasSubmitted(allAnswered);
     }
@@ -556,8 +581,21 @@ export default function LKPDPage() {
                     )}
                   </Label>
                   {hasSubmitted ? (
-                    <div className="p-4 bg-muted/50 rounded-lg font-mono text-sm whitespace-pre-wrap border">
-                      {answers[problem.id] || '(Tidak ada jawaban)'}
+                    <div>
+                      <div className="p-4 bg-muted/50 rounded-lg font-mono text-sm whitespace-pre-wrap border">
+                        {answers[problem.id] || '(Tidak ada jawaban)'}
+                      </div>
+                      {feedbackMap[problem.id] && (
+                        <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                          <div className="flex items-center gap-2 mb-1 text-blue-700 dark:text-blue-400">
+                            <MessageSquare className="h-4 w-4" />
+                            <span className="font-medium text-sm">Feedback Guru</span>
+                          </div>
+                          <p className="text-sm text-blue-800 dark:text-blue-300">
+                            {feedbackMap[problem.id]}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <>
@@ -704,7 +742,7 @@ export default function LKPDPage() {
                   </table>
                 )}
               </div>
-              
+
               {hasSubmitted && (
                 <div className={`mt-4 p-4 rounded-lg text-center ${isPKWU ? 'bg-green-50 dark:bg-green-900/20' : 'bg-primary/5'}`}>
                   <p className="text-sm text-muted-foreground mb-1">Status Pengumpulan</p>
@@ -802,8 +840,8 @@ export default function LKPDPage() {
                     <p className="text-xs text-muted-foreground">Cukup (C)</p>
                   </div>
                   <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-center border border-red-200 dark:border-red-800">
-                    <p className="text-2xl font-bold text-red-600">&lt;56</p>
-                    <p className="text-xs text-muted-foreground">Perlu Perbaikan (D)</p>
+                    <p className="text-2xl font-bold text-red-600">&lt; 56</p>
+                    <p className="text-xs text-muted-foreground">Kurang (D)</p>
                   </div>
                 </div>
               </CardContent>
@@ -811,27 +849,6 @@ export default function LKPDPage() {
           </motion.div>
         )}
 
-        {/* Navigation */}
-        <motion.div variants={itemVariants}>
-          <div className="flex flex-col sm:flex-row gap-4 justify-between pt-4">
-            <Button variant="outline" asChild className="gap-2">
-              <Link to={`/modul/${module.id}/video`}>
-                <ArrowLeft className="h-4 w-4" />
-                Video Pembelajaran
-              </Link>
-            </Button>
-            <Button 
-              asChild 
-              onClick={handleComplete}
-              className={`gap-2 ${isPKWU ? 'bg-green-600 hover:bg-green-700' : ''}`}
-            >
-              <Link to={`/modul/${module.id}/kuis`}>
-                Lanjut ke Kuis
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </motion.div>
       </motion.div>
     </ModuleLayout>
   );

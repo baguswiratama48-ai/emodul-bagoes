@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  HelpCircle, 
-  ArrowRight, 
+import {
+  HelpCircle,
+  ArrowRight,
   ArrowLeft,
   MessageCircle,
+  MessageSquare,
   Lightbulb,
   CheckCircle,
   Save
@@ -70,15 +71,17 @@ export default function TriggerQuestions() {
   const { user } = useAuth();
   const { toast } = useToast();
   const module = getModuleById(moduleId);
-  
+
   if (!module) {
     return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
   }
-  
+
   const isPKWU = isPKWUModule(moduleId);
   const triggerQuestions = isPKWU ? pkwuTriggerQuestions : ekonomiTriggerQuestions;
-  
+
   const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [answerIds, setAnswerIds] = useState<Record<number, string>>({});
+  const [feedbackMap, setFeedbackMap] = useState<Record<number, string>>({});
   const [revealedHints, setRevealedHints] = useState<Set<number>>(new Set());
   const [saving, setSaving] = useState<Record<number, boolean>>({});
   const [savedAnswers, setSavedAnswers] = useState<Record<number, boolean>>({});
@@ -96,23 +99,46 @@ export default function TriggerQuestions() {
 
   const checkSubmissionStatus = async () => {
     if (!user) return;
-    
+
+    // FETCH 'id' IS CRITICAL HERE
     const { data } = await supabase
       .from('trigger_answers')
-      .select('question_id, answer')
+      .select('id, question_id, answer')
       .eq('user_id', user.id)
       .eq('module_id', module.id);
 
     if (data && data.length > 0) {
       const loadedAnswers: Record<number, string> = {};
       const loadedSaved: Record<number, boolean> = {};
+      const loadedIds: Record<number, string> = {};
+
       data.forEach(item => {
         loadedAnswers[item.question_id] = item.answer;
         loadedSaved[item.question_id] = true;
+        loadedIds[item.question_id] = item.id;
       });
       setAnswers(loadedAnswers);
       setSavedAnswers(loadedSaved);
-      
+      setAnswerIds(loadedIds);
+
+      // Fetch feedback
+      const { data: feedbackData } = await supabase
+        .from('teacher_feedback')
+        .select('answer_id, feedback')
+        // We use 'trigger' as answer_type for trigger answers
+        .eq('answer_type', 'trigger')
+        .in('answer_id', Object.values(loadedIds));
+
+      if (feedbackData) {
+        const fbMap: Record<number, string> = {};
+        feedbackData.forEach((fb: any) => {
+          // Find question_id matching this answer_id
+          const qId = Object.keys(loadedIds).find(key => loadedIds[Number(key)] === fb.answer_id);
+          if (qId) fbMap[Number(qId)] = fb.feedback;
+        });
+        setFeedbackMap(fbMap);
+      }
+
       // Check if all questions are answered (meaning submitted)
       const allAnswered = triggerQuestions.every(q => loadedAnswers[q.id]?.trim());
       setHasSubmitted(allAnswered);
@@ -250,10 +276,25 @@ export default function TriggerQuestions() {
                 {hasSubmitted ? (
                   <div className="p-4 bg-muted/50 rounded-lg">
                     <p className="text-foreground whitespace-pre-wrap">{answers[q.id]}</p>
-                    <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                      <CheckCircle className="h-3 w-3" />
-                      Sudah dikumpulkan
-                    </p>
+                    <div className="mt-2 flex items-center gap-1">
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <CheckCircle className="h-3 w-3" />
+                        Sudah dikumpulkan
+                      </p>
+                    </div>
+
+                    {/* Feedback Display */}
+                    {feedbackMap[q.id] && (
+                      <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <div className="flex items-center gap-2 mb-1 text-blue-700 dark:text-blue-400">
+                          <MessageSquare className="h-4 w-4" />
+                          <span className="font-medium text-sm">Feedback Guru</span>
+                        </div>
+                        <p className="text-sm text-blue-800 dark:text-blue-300">
+                          {feedbackMap[q.id]}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <>
@@ -263,7 +304,7 @@ export default function TriggerQuestions() {
                       value={answers[q.id] || ''}
                       onChange={(e) => handleAnswerChange(q.id, e.target.value)}
                     />
-                    
+
                     <div className="flex items-center justify-between">
                       <Button
                         variant="ghost"
@@ -274,7 +315,7 @@ export default function TriggerQuestions() {
                         <Lightbulb className="h-4 w-4" />
                         {revealedHints.has(q.id) ? 'Sembunyikan Petunjuk' : 'Lihat Petunjuk'}
                       </Button>
-                      
+
                       <div className="flex items-center gap-2">
                         {savedAnswers[q.id] && (
                           <span className="flex items-center gap-1 text-success text-sm">
@@ -325,8 +366,8 @@ export default function TriggerQuestions() {
                 </p>
               ) : (
                 <p className="text-sm text-foreground">
-                  💡 <strong>Catatan:</strong> Tidak ada jawaban yang benar atau salah di sini. 
-                  Pertanyaan-pertanyaan ini bertujuan untuk membantu kamu berpikir tentang konsep 
+                  💡 <strong>Catatan:</strong> Tidak ada jawaban yang benar atau salah di sini.
+                  Pertanyaan-pertanyaan ini bertujuan untuk membantu kamu berpikir tentang konsep
                   permintaan sebelum mempelajari materi secara mendalam.
                 </p>
               )}
@@ -343,7 +384,7 @@ export default function TriggerQuestions() {
             </Button>
           </Link>
           <Link to={`/modul/${module.id}/materi`}>
-            <Button 
+            <Button
               onClick={handleComplete}
               className="gap-2 bg-gradient-primary hover:opacity-90"
             >

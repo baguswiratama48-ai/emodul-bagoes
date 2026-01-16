@@ -20,7 +20,9 @@ import {
   RefreshCw,
   Lock,
   Unlock,
-  Database
+  Database,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -88,6 +90,7 @@ interface FeedbackMap {
 // Kelas untuk mapel Ekonomi dan PKWU
 const EKONOMI_KELAS = ['X.9', 'X.10', 'X.11'];
 const PKWU_KELAS = ['XI.3', 'XI.5', 'XI.6', 'XI.7', 'XI.8', 'XI.9', 'XI.10', 'XI.11'];
+const ITEMS_PER_PAGE = 20;
 
 export default function TeacherDashboard() {
   const { user, signOut, isGuru } = useAuth();
@@ -103,6 +106,12 @@ export default function TeacherDashboard() {
   const [feedbackMap, setFeedbackMap] = useState<FeedbackMap>({});
   const [selectedMapel, setSelectedMapel] = useState<'ekonomi' | 'pkwu'>('ekonomi');
   const [quizSettings, setQuizSettings] = useState<Record<string, boolean>>({});
+
+  // Pagination States
+  const [currentPageTrigger, setCurrentPageTrigger] = useState(1);
+  const [currentPageReflection, setCurrentPageReflection] = useState(1);
+  const [currentPageLkpd, setCurrentPageLkpd] = useState(1);
+  const [currentPageQuiz, setCurrentPageQuiz] = useState(1);
 
   // Determine which classes to show based on selected mapel
   const mapelKelas = useMemo(() => {
@@ -120,9 +129,13 @@ export default function TeacherDashboard() {
     }
   }, [isGuru]);
 
-  // Reset kelas filter when mapel changes
+  // Reset kelas filter & pagination when mapel changes
   useEffect(() => {
     setSelectedKelas('all');
+    setCurrentPageTrigger(1);
+    setCurrentPageReflection(1);
+    setCurrentPageLkpd(1);
+    setCurrentPageQuiz(1);
   }, [selectedMapel]);
 
   const fetchStudentData = async () => {
@@ -251,8 +264,6 @@ export default function TeacherDashboard() {
       .like('module_id', '%-refleksi')
       .order('submitted_at', { ascending: false });
 
-
-
     if (reflectionData) {
       setReflectionAnswers(reflectionData.map((item: any) => {
         const profile = profilesMap[item.user_id];
@@ -289,35 +300,10 @@ export default function TeacherDashboard() {
   // Realtime Subscription
   useEffect(() => {
     const channels = supabase.channel('custom-all-channel')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'quiz_answers' },
-        (payload) => {
-          console.log('Change received!', payload);
-          fetchStudentData();
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'lkpd_answers' },
-        (payload) => {
-          fetchStudentData();
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'trigger_answers' },
-        (payload) => {
-          fetchStudentData();
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'student_notes' },
-        (payload) => {
-          fetchStudentData();
-        }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'quiz_answers' }, () => fetchStudentData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'lkpd_answers' }, () => fetchStudentData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'trigger_answers' }, () => fetchStudentData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'teacher_feedback' }, () => fetchStudentData())
       .subscribe();
 
     return () => {
@@ -337,16 +323,17 @@ export default function TeacherDashboard() {
 
       if (error) throw error;
 
-      setQuizSettings(prev => ({
-        ...prev,
-        [currentModuleId]: isActive
-      }));
-
+      setQuizSettings(prev => ({ ...prev, [currentModuleId]: isActive }));
       toast.success(`Kuis berhasil ${isActive ? 'dibuka' : 'ditutup'}`);
     } catch (error) {
       console.error('Error updating quiz status:', error);
       toast.error('Gagal mengubah status kuis');
     }
+  };
+
+  // Helper for sorting by name
+  const sortByName = (a: { full_name: string }, b: { full_name: string }) => {
+    return a.full_name.localeCompare(b.full_name);
   };
 
   // Filter functions based on mapel and kelas
@@ -361,7 +348,7 @@ export default function TeacherDashboard() {
     } else {
       results = results.filter(r => r.module_id === 'permintaan' || !r.module_id);
     }
-    return results;
+    return results.sort(sortByName);
   }, [quizResults, mapelKelas, selectedKelas, selectedMapel]);
 
   const filteredLkpdAnswers = useMemo(() => {
@@ -369,7 +356,7 @@ export default function TeacherDashboard() {
     if (selectedKelas !== 'all') {
       answers = answers.filter(a => a.kelas === selectedKelas);
     }
-    return answers;
+    return answers.sort(sortByName);
   }, [lkpdAnswers, mapelKelas, selectedKelas]);
 
   const filteredTriggerAnswers = useMemo(() => {
@@ -377,7 +364,7 @@ export default function TeacherDashboard() {
     if (selectedKelas !== 'all') {
       answers = answers.filter(a => a.kelas === selectedKelas);
     }
-    return answers;
+    return answers.sort(sortByName);
   }, [triggerAnswers, mapelKelas, selectedKelas]);
 
   const filteredReflectionAnswers = useMemo(() => {
@@ -385,7 +372,7 @@ export default function TeacherDashboard() {
     if (selectedKelas !== 'all') {
       answers = answers.filter(a => a.kelas === selectedKelas);
     }
-    return answers;
+    return answers.sort(sortByName);
   }, [reflectionAnswers, mapelKelas, selectedKelas]);
 
   // Questions based on mapel
@@ -394,9 +381,21 @@ export default function TeacherDashboard() {
     { id: 2, question: "Jika uang sakumu naik 2x lipat, apakah kamu akan membeli lebih banyak jajanan? Mengapa?" },
     { id: 3, question: "Ketika harga pulsa mahal, apa yang biasanya kamu lakukan? Apakah mencari alternatif lain?" },
   ] : [
-    { id: 1, question: "Pernahkah kamu melihat sampah plastik di sekitarmu? Menurutmu, apa yang bisa dilakukan agar sampah tersebut tidak mencemari lingkungan?" },
-    { id: 2, question: "Jika kamu memiliki banyak bungkus kopi sachet bekas, produk apa yang bisa kamu buat dari bahan tersebut?" },
-    { id: 3, question: "Mengapa menurut kamu produk kerajinan dari limbah bisa memiliki nilai jual tinggi?" },
+    { id: 1, question: "Pernahkah kamu melihat sampah plastik atau kardus di sekitarmu? Menurut kamu, bisakah sampah tersebut diubah menjadi sesuatu yang berguna?" },
+    { id: 2, question: "Jika kamu bisa membuat kerajinan dari barang bekas, produk apa yang akan kamu buat dan siapa yang akan membelinya?" },
+    { id: 3, question: "Menurutmu, mengapa produk dari bahan daur ulang semakin diminati orang-orang sekarang?" },
+  ];
+
+  const lkpdProblems = selectedMapel === 'ekonomi' ? [
+    { id: 1, title: "Soal 1: Penjualan Es Teh di Kantin" },
+    { id: 2, title: "Soal 2: Penjualan Pulpen di Koperasi" },
+    { id: 3, title: "Soal 3: Penjualan Bakso di Stadion" },
+    { id: 4, title: "Soal 4: Analisis Kasus" },
+  ] : [
+    { id: 1, title: "Soal 1: Identifikasi Limbah" },
+    { id: 2, title: "Soal 2: Analisis Peluang Usaha" },
+    { id: 3, title: "Soal 3: Desain Produk" },
+    { id: 4, title: "Soal 4: Analisis SWOT" },
   ];
 
   const reflectionQuestions = [
@@ -407,33 +406,14 @@ export default function TeacherDashboard() {
     { id: 5, question: "Apa yang kamu sukai dari Bapak Bagus Panca Wiratama, S.Pd., M.Pd.? (Boleh Kritik dan Saran)" },
   ];
 
-  // Get current module and answer keys based on mapel
   const currentModule = selectedMapel === 'ekonomi' ? demandModule : pkwuModule;
   const currentModuleId = selectedMapel === 'ekonomi' ? 'permintaan' : 'kerajinan-limbah';
   const currentLkpdAnswerKeys = selectedMapel === 'ekonomi' ? lkpdAnswerKeys : lkpdAnswerKeysPKWU;
 
-  // Filter students by mapel kelas AND selected kelas
-  const filteredStudents = useMemo(() => {
-    let students = allStudents.filter(s => s.kelas && mapelKelas.includes(s.kelas));
-    if (selectedKelas !== 'all') {
-      students = students.filter(s => s.kelas === selectedKelas);
-    }
-    return students;
-  }, [allStudents, mapelKelas, selectedKelas]);
+  const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
+  const itemVariants = { hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1 },
-  };
-
+  // Mapel & Filter Components
   const MapelSelector = () => (
     <div className="flex items-center gap-2 p-1 bg-muted rounded-lg">
       <Button
@@ -442,8 +422,7 @@ export default function TeacherDashboard() {
         onClick={() => setSelectedMapel('ekonomi')}
         className={`gap-2 ${selectedMapel === 'ekonomi' ? 'bg-gradient-to-r from-teal-500 to-cyan-500' : ''}`}
       >
-        <TrendingUp className="h-4 w-4" />
-        Ekonomi
+        <TrendingUp className="h-4 w-4" /> Ekonomi
       </Button>
       <Button
         variant={selectedMapel === 'pkwu' ? 'default' : 'ghost'}
@@ -451,8 +430,7 @@ export default function TeacherDashboard() {
         onClick={() => setSelectedMapel('pkwu')}
         className={`gap-2 ${selectedMapel === 'pkwu' ? 'bg-gradient-to-r from-green-500 to-emerald-500' : ''}`}
       >
-        <Recycle className="h-4 w-4" />
-        PKWU
+        <Recycle className="h-4 w-4" /> PKWU
       </Button>
     </div>
   );
@@ -476,7 +454,6 @@ export default function TeacherDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-4">
@@ -490,238 +467,172 @@ export default function TeacherDashboard() {
           </div>
           <div className="flex items-center gap-4">
             <Link to="/">
-              <Button variant="ghost" size="sm" className="gap-2">
-                <Home className="h-4 w-4" />
-                Beranda
-              </Button>
+              <Button variant="ghost" size="sm" className="gap-2"><Home className="h-4 w-4" /> Beranda</Button>
             </Link>
-            <Button variant="outline" size="sm" onClick={signOut} className="gap-2">
-              <LogOut className="h-4 w-4" />
-              Keluar
-            </Button>
+            <Button variant="outline" size="sm" onClick={signOut} className="gap-2"><LogOut className="h-4 w-4" /> Keluar</Button>
           </div>
         </div>
       </header>
 
       <main className="container py-8">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={containerVariants}
-          className="space-y-8"
-        >
-          {/* Page Header with Mapel Selector */}
+        <motion.div initial="hidden" animate="visible" variants={containerVariants} className="space-y-8">
           <motion.div variants={itemVariants} className="flex flex-col gap-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-display font-bold mb-2">
-                  Dashboard Guru - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}
+                  Dashboard Guru (v2) - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}
                 </h1>
                 <p className="text-muted-foreground">
-                  {selectedMapel === 'ekonomi'
-                    ? 'Kelola modul Ekonomi untuk Kelas X.9, X.10, X.11'
-                    : 'Kelola modul PKWU untuk Kelas XI.3 - XI.11'}
+                  {selectedMapel === 'ekonomi' ? 'Kelola modul Ekonomi untuk Kelas X.9 - X.11' : 'Kelola modul PKWU untuk Kelas XI.3 - XI.11'}
                 </p>
               </div>
               <div className="flex items-center gap-3">
                 <Link to="/backup">
                   <Button variant="outline" className="gap-2 border-primary/20 bg-primary/5 text-primary hover:bg-primary/10">
-                    <Database className="h-4 w-4" />
-                    Backup Data
+                    <Database className="h-4 w-4" /> Backup Data
                   </Button>
                 </Link>
                 <Link to="/guru/kelola-siswa">
-                  <Button variant="outline" className="gap-2">
-                    <Users className="h-4 w-4" />
-                    Kelola Siswa
-                  </Button>
+                  <Button variant="outline" className="gap-2"><Users className="h-4 w-4" /> Kelola Siswa</Button>
                 </Link>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <MapelSelector />
               <KelasFilter />
-
               <div className="ml-auto flex items-center gap-3 bg-card border rounded-lg p-2 shadow-sm">
                 <div className={`p-1.5 rounded-full ${quizSettings[currentModuleId] ? 'bg-success/20 text-success' : 'bg-destructive/10 text-destructive'}`}>
                   {quizSettings[currentModuleId] ? <Unlock className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium">Status Kuis</span>
-                  <span className="text-xs text-muted-foreground">{quizSettings[currentModuleId] ? 'Terbuka' : 'Tertutup'}</span>
-                </div>
-                <Switch
-                  checked={quizSettings[currentModuleId] || false}
-                  onCheckedChange={handleToggleQuiz}
-                />
+                <div className="flex flex-col"><span className="text-sm font-medium">Status Kuis</span><span className="text-xs text-muted-foreground">{quizSettings[currentModuleId] ? 'Terbuka' : 'Tertutup'}</span></div>
+                <Switch checked={quizSettings[currentModuleId] || false} onCheckedChange={handleToggleQuiz} />
               </div>
             </div>
           </motion.div>
 
-          {/* Stats */}
           <motion.div variants={itemVariants} className="grid sm:grid-cols-5 gap-4">
-            <Card className={selectedMapel === 'pkwu' ? 'border-green-200 dark:border-green-900' : ''}>
+            <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedMapel === 'ekonomi' ? 'bg-primary/10' : 'bg-green-500/10'}`}>
-                    <Users className={`h-6 w-6 ${selectedMapel === 'ekonomi' ? 'text-primary' : 'text-green-500'}`} />
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedMapel === 'ekonomi' ? 'bg-primary/10 text-primary' : 'bg-green-500/10 text-green-500'}`}>
+                    <Users className="h-6 w-6" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{filteredQuizResults.length}</p>
-                    <p className="text-sm text-muted-foreground">Mengerjakan Kuis</p>
+                    <p className="text-sm text-muted-foreground">Kuis</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className={selectedMapel === 'pkwu' ? 'border-green-200 dark:border-green-900' : ''}>
+            <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedMapel === 'ekonomi' ? 'bg-secondary/20' : 'bg-emerald-500/10'}`}>
-                    <ClipboardList className={`h-6 w-6 ${selectedMapel === 'ekonomi' ? 'text-secondary' : 'text-emerald-500'}`} />
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedMapel === 'ekonomi' ? 'bg-secondary/20 text-secondary' : 'bg-emerald-500/10 text-emerald-500'}`}>
+                    <ClipboardList className="h-6 w-6" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{new Set(filteredLkpdAnswers.map(a => a.user_id)).size}</p>
-                    <p className="text-sm text-muted-foreground">Mengerjakan LKPD</p>
+                    <p className="text-sm text-muted-foreground">LKPD</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className={selectedMapel === 'pkwu' ? 'border-green-200 dark:border-green-900' : ''}>
+            <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center">
-                    <MessageCircle className="h-6 w-6 text-warning" />
-                  </div>
+                  <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center"><MessageCircle className="h-6 w-6 text-warning" /></div>
                   <div>
                     <p className="text-2xl font-bold">{new Set(filteredTriggerAnswers.map(a => a.user_id)).size}</p>
-                    <p className="text-sm text-muted-foreground">Menjawab Pemantik</p>
+                    <p className="text-sm text-muted-foreground">Pemantik</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className={selectedMapel === 'pkwu' ? 'border-green-200 dark:border-green-900' : ''}>
+            <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                    <Lightbulb className="h-6 w-6 text-amber-500" />
-                  </div>
+                  <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center"><Lightbulb className="h-6 w-6 text-amber-500" /></div>
                   <div>
                     <p className="text-2xl font-bold">{new Set(filteredReflectionAnswers.map(a => a.user_id)).size}</p>
-                    <p className="text-sm text-muted-foreground">Mengisi Refleksi</p>
+                    <p className="text-sm text-muted-foreground">Refleksi</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className={selectedMapel === 'pkwu' ? 'border-green-200 dark:border-green-900' : ''}>
+            <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
-                    <CheckCircle2 className="h-6 w-6 text-success" />
-                  </div>
+                  <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center"><CheckCircle2 className="h-6 w-6 text-success" /></div>
                   <div>
                     <p className="text-2xl font-bold">
-                      {filteredQuizResults.length > 0
-                        ? Math.round(filteredQuizResults.reduce((acc, r) => acc + r.score, 0) / filteredQuizResults.length)
-                        : 0}%
+                      {filteredQuizResults.length > 0 ? Math.round(filteredQuizResults.reduce((acc, r) => acc + r.score, 0) / filteredQuizResults.length) : 0}%
                     </p>
-                    <p className="text-sm text-muted-foreground">Rata-rata Kuis</p>
+                    <p className="text-sm text-muted-foreground">Rata-rata</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
 
-          {/* Main Content */}
           <motion.div variants={itemVariants}>
             <Tabs defaultValue="trigger-answers" className="w-full">
-              <TabsList className="w-full grid grid-cols-6">
-                <TabsTrigger value="trigger-answers" className="gap-2">
-                  <MessageCircle className="h-4 w-4" />
-                  <span className="hidden sm:inline">Pemantik</span>
-                </TabsTrigger>
-                <TabsTrigger value="reflection-answers" className="gap-2">
-                  <Lightbulb className="h-4 w-4" />
-                  <span className="hidden sm:inline">Refleksi</span>
-                </TabsTrigger>
-                <TabsTrigger value="lkpd-answers" className="gap-2">
-                  <ClipboardList className="h-4 w-4" />
-                  <span className="hidden sm:inline">LKPD</span>
-                </TabsTrigger>
-                <TabsTrigger value="quiz-results" className="gap-2">
-                  <CheckCircle2 className="h-4 w-4" />
-                  <span className="hidden sm:inline">Kuis</span>
-                </TabsTrigger>
-                <TabsTrigger value="answer-keys" className="gap-2">
-                  <FileText className="h-4 w-4" />
-                  <span className="hidden sm:inline">Kunci</span>
-                </TabsTrigger>
-                <TabsTrigger value="reset" className="gap-2">
-                  <RefreshCw className="h-4 w-4" />
-                  <span className="hidden sm:inline">Reset</span>
-                </TabsTrigger>
+              <TabsList className="w-full grid grid-cols-6 mb-6">
+                <TabsTrigger value="trigger-answers" className="gap-2"><MessageCircle className="h-4 w-4" /> <span className="hidden sm:inline">Pemantik</span></TabsTrigger>
+                <TabsTrigger value="reflection-answers" className="gap-2"><Lightbulb className="h-4 w-4" /> <span className="hidden sm:inline">Refleksi</span></TabsTrigger>
+                <TabsTrigger value="lkpd-answers" className="gap-2"><ClipboardList className="h-4 w-4" /> <span className="hidden sm:inline">LKPD</span></TabsTrigger>
+                <TabsTrigger value="quiz-results" className="gap-2"><CheckCircle2 className="h-4 w-4" /> <span className="hidden sm:inline">Kuis</span></TabsTrigger>
+                <TabsTrigger value="answer-keys" className="gap-2"><FileText className="h-4 w-4" /> <span className="hidden sm:inline">Kunci</span></TabsTrigger>
+                <TabsTrigger value="reset" className="gap-2"><RefreshCw className="h-4 w-4" /> <span className="hidden sm:inline">Reset</span></TabsTrigger>
               </TabsList>
 
-              {/* Trigger Answers Tab */}
-              <TabsContent value="trigger-answers" className="mt-6">
+              <TabsContent value="trigger-answers">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Jawaban Pertanyaan Pemantik - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
-                    <CardDescription>Jawaban siswa untuk pertanyaan pemantik sebelum materi</CardDescription>
+                    <CardTitle>Jawaban Pertanyaan Pemantik</CardTitle>
+                    <CardDescription>Jawaban siswa sebelum materi</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {loading ? (
-                      <div className="text-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                      </div>
-                    ) : filteredTriggerAnswers.length === 0 ? (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                        <p>Belum ada siswa yang menjawab pertanyaan pemantik</p>
-                      </div>
+                    {filteredTriggerAnswers.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground"><p>Belum ada data.</p></div>
                     ) : (
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                         {triggerQuestions.map((q) => {
                           const answersForQuestion = filteredTriggerAnswers.filter(a => a.question_id === q.id);
+                          const totalAnswers = answersForQuestion.length;
+                          const startIndex = (currentPageTrigger - 1) * ITEMS_PER_PAGE;
+                          const paginated = answersForQuestion.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
                           return (
-                            <div key={q.id} className="border rounded-lg overflow-hidden">
-                              <div className={`p-4 ${selectedMapel === 'pkwu' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-muted/50'}`}>
+                            <div key={q.id} className="border rounded-xl overflow-hidden shadow-sm">
+                              <div className={`p-4 ${selectedMapel === 'pkwu' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-muted/50'} border-b`}>
                                 <div className="flex items-center gap-2 mb-2">
                                   <Badge variant="outline">Pertanyaan {q.id}</Badge>
-                                  <Badge variant="secondary">{answersForQuestion.length} jawaban</Badge>
+                                  <Badge variant="secondary">{totalAnswers} jawaban</Badge>
                                 </div>
-                                <p className="font-medium">{q.question}</p>
+                                <p className="font-medium text-lg">{q.question}</p>
                               </div>
-                              {answersForQuestion.length > 0 && (
-                                <div className="divide-y">
-                                  {answersForQuestion.map((answer, index) => (
-                                    <div key={`${answer.user_id}-${index}`} className="p-4">
-                                      <div className="flex items-center justify-between mb-2">
-                                        <div className="flex items-center gap-2">
-                                          <span className="font-medium">{answer.full_name}</span>
-                                          {answer.kelas !== '-' && (
-                                            <Badge variant="outline" className="text-xs">Kelas {answer.kelas}</Badge>
-                                          )}
+                              <div className="divide-y bg-card">
+                                {paginated.map((answer, i) => (
+                                  <div key={i} className="p-4 hover:bg-accent/5 transition-colors">
+                                    <div className="flex items-start justify-between mb-2">
+                                      <div>
+                                        <p className="font-semibold text-primary">{answer.full_name}</p>
+                                        <div className="flex gap-2 text-xs text-muted-foreground mt-1">
+                                          <Badge variant="outline" className="text-[10px] h-5">Kelas {answer.kelas}</Badge>
+                                          <span>{new Date(answer.submitted_at).toLocaleDateString()}</span>
                                         </div>
-                                        <span className="text-xs text-muted-foreground">
-                                          {new Date(answer.submitted_at).toLocaleDateString('id-ID', {
-                                            day: 'numeric',
-                                            month: 'short',
-                                            year: 'numeric',
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                          })}
-                                        </span>
                                       </div>
-                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap mb-2">{answer.answer}</p>
-                                      <FeedbackForm
-                                        studentId={answer.user_id}
-                                        answerId={answer.id}
-                                        answerType="trigger"
-                                        existingFeedback={answer.feedback}
-                                        onFeedbackSaved={fetchStudentData}
-                                      />
                                     </div>
-                                  ))}
+                                    <p className="text-sm bg-muted/30 p-3 rounded-lg border border-border/50">{answer.answer}</p>
+                                    <FeedbackForm studentId={answer.user_id} answerId={answer.id} answerType="trigger" existingFeedback={answer.feedback} onFeedbackSaved={fetchStudentData} />
+                                  </div>
+                                ))}
+                              </div>
+                              {totalAnswers > ITEMS_PER_PAGE && (
+                                <div className="p-4 border-t bg-muted/20 flex justify-center gap-2">
+                                  <Button size="sm" variant="ghost" disabled={currentPageTrigger === 1} onClick={() => setCurrentPageTrigger(p => p - 1)}>Prev</Button>
+                                  <span className="self-center text-sm">{currentPageTrigger}</span>
+                                  <Button size="sm" variant="ghost" disabled={paginated.length < ITEMS_PER_PAGE} onClick={() => setCurrentPageTrigger(p => p + 1)}>Next</Button>
                                 </div>
                               )}
                             </div>
@@ -733,67 +644,54 @@ export default function TeacherDashboard() {
                 </Card>
               </TabsContent>
 
-              {/* Reflection Answers Tab */}
-              <TabsContent value="reflection-answers" className="mt-6">
+              <TabsContent value="reflection-answers">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Jawaban Refleksi Pembelajaran - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
-                    <CardDescription>Refleksi siswa setelah menyelesaikan modul</CardDescription>
+                    <CardTitle>Jawaban Refleksi</CardTitle>
+                    <CardDescription>Refleksi pembelajaran siswa</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {loading ? (
-                      <div className="text-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                      </div>
-                    ) : filteredReflectionAnswers.length === 0 ? (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <Lightbulb className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                        <p>Belum ada siswa yang mengisi refleksi</p>
-                      </div>
+                    {filteredReflectionAnswers.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground"><p>Belum ada data.</p></div>
                     ) : (
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                         {reflectionQuestions.map((q) => {
                           const answersForQuestion = filteredReflectionAnswers.filter(a => a.question_id === q.id);
+                          const totalAnswers = answersForQuestion.length;
+                          const startIndex = (currentPageReflection - 1) * ITEMS_PER_PAGE;
+                          const paginated = answersForQuestion.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
                           return (
-                            <div key={q.id} className="border rounded-lg overflow-hidden">
-                              <div className="p-4 bg-amber-50 dark:bg-amber-900/20">
+                            <div key={q.id} className="border rounded-xl overflow-hidden shadow-sm">
+                              <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border-b">
                                 <div className="flex items-center gap-2 mb-2">
                                   <Badge variant="outline" className="border-amber-500 text-amber-700">Refleksi {q.id}</Badge>
-                                  <Badge variant="secondary">{answersForQuestion.length} jawaban</Badge>
+                                  <Badge variant="secondary">{totalAnswers} jawaban</Badge>
                                 </div>
                                 <p className="font-medium">{q.question}</p>
                               </div>
-                              {answersForQuestion.length > 0 && (
-                                <div className="divide-y">
-                                  {answersForQuestion.map((answer, index) => (
-                                    <div key={`${answer.user_id}-${index}`} className="p-4">
-                                      <div className="flex items-center justify-between mb-2">
-                                        <div className="flex items-center gap-2">
-                                          <span className="font-medium">{answer.full_name}</span>
-                                          {answer.kelas !== '-' && (
-                                            <Badge variant="outline" className="text-xs">Kelas {answer.kelas}</Badge>
-                                          )}
+                              <div className="divide-y bg-card">
+                                {paginated.map((answer, i) => (
+                                  <div key={i} className="p-4 hover:bg-accent/5 transition-colors">
+                                    <div className="flex items-start justify-between mb-2">
+                                      <div>
+                                        <p className="font-semibold text-primary">{answer.full_name}</p>
+                                        <div className="flex gap-2 text-xs text-muted-foreground mt-1">
+                                          <Badge variant="outline" className="text-[10px] h-5">Kelas {answer.kelas}</Badge>
+                                          <span>{new Date(answer.submitted_at).toLocaleDateString()}</span>
                                         </div>
-                                        <span className="text-xs text-muted-foreground">
-                                          {new Date(answer.submitted_at).toLocaleDateString('id-ID', {
-                                            day: 'numeric',
-                                            month: 'short',
-                                            year: 'numeric',
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                          })}
-                                        </span>
                                       </div>
-                                      <p className="text-sm text-muted-foreground whitespace-pre-wrap mb-2">{answer.answer}</p>
-                                      <FeedbackForm
-                                        studentId={answer.user_id}
-                                        answerId={answer.id}
-                                        answerType="reflection"
-                                        existingFeedback={answer.feedback}
-                                        onFeedbackSaved={fetchStudentData}
-                                      />
                                     </div>
-                                  ))}
+                                    <p className="text-sm bg-muted/30 p-3 rounded-lg border border-border/50">{answer.answer}</p>
+                                    <FeedbackForm studentId={answer.user_id} answerId={answer.id} answerType="reflection" existingFeedback={answer.feedback} onFeedbackSaved={fetchStudentData} />
+                                  </div>
+                                ))}
+                              </div>
+                              {totalAnswers > ITEMS_PER_PAGE && (
+                                <div className="p-4 border-t bg-muted/20 flex justify-center gap-2">
+                                  <Button size="sm" variant="ghost" disabled={currentPageReflection === 1} onClick={() => setCurrentPageReflection(p => p - 1)}>Prev</Button>
+                                  <span className="self-center text-sm">{currentPageReflection}</span>
+                                  <Button size="sm" variant="ghost" disabled={paginated.length < ITEMS_PER_PAGE} onClick={() => setCurrentPageReflection(p => p + 1)}>Next</Button>
                                 </div>
                               )}
                             </div>
@@ -805,220 +703,182 @@ export default function TeacherDashboard() {
                 </Card>
               </TabsContent>
 
-              {/* LKPD Answers Tab */}
-              <TabsContent value="lkpd-answers" className="mt-6">
+              <TabsContent value="lkpd-answers">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Jawaban LKPD Siswa - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
-                    <CardDescription>Jawaban yang dikumpulkan siswa untuk LKPD</CardDescription>
+                    <CardTitle>Jawaban LKPD</CardTitle>
+                    <CardDescription>Jawaban lembar kerja siswa</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {loading ? (
-                      <div className="text-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                      </div>
-                    ) : filteredLkpdAnswers.length === 0 ? (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <ClipboardList className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                        <p>Belum ada siswa yang mengerjakan LKPD</p>
-                      </div>
+                    {filteredLkpdAnswers.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground"><p>Belum ada data.</p></div>
                     ) : (
-                      <div className="space-y-4">
-                        {filteredLkpdAnswers.map((answer, index) => (
-                          <div key={`${answer.user_id}-${answer.problem_id}-${index}`} className="p-4 border rounded-lg">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center gap-2">
-                                <Badge variant="outline">Soal {answer.problem_id}</Badge>
-                                <span className="font-medium">{answer.full_name}</span>
-                                {answer.kelas !== '-' && (
-                                  <Badge variant="secondary" className="text-xs">Kelas {answer.kelas}</Badge>
-                                )}
+                      <div className="space-y-6">
+                        {lkpdProblems.map((q) => {
+                          const answersForQuestion = filteredLkpdAnswers.filter(a => a.problem_id === q.id);
+                          const totalAnswers = answersForQuestion.length;
+                          const startIndex = (currentPageLkpd - 1) * ITEMS_PER_PAGE;
+                          const paginated = answersForQuestion.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+                          return (
+                            <div key={q.id} className="border rounded-xl overflow-hidden shadow-sm">
+                              <div className={`p-4 ${selectedMapel === 'pkwu' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-muted/50'} border-b`}>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Badge variant="outline">Soal {q.id}</Badge>
+                                  <Badge variant="secondary">{totalAnswers} jawaban</Badge>
+                                </div>
+                                <p className="font-medium text-lg">{q.title}</p>
                               </div>
-                              <span className="text-xs text-muted-foreground">
-                                {new Date(answer.submitted_at).toLocaleDateString('id-ID', {
-                                  day: 'numeric',
-                                  month: 'short',
-                                  year: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </span>
+                              <div className="divide-y bg-card">
+                                {paginated.map((answer, i) => (
+                                  <div key={i} className="p-4 hover:bg-accent/5 transition-colors">
+                                    <div className="flex items-start justify-between mb-2">
+                                      <div>
+                                        <p className="font-semibold text-primary">{answer.full_name}</p>
+                                        <div className="flex gap-2 text-xs text-muted-foreground mt-1">
+                                          <Badge variant="outline" className="text-[10px] h-5">Kelas {answer.kelas}</Badge>
+                                          <span>{new Date(answer.submitted_at).toLocaleDateString()}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <p className="text-sm bg-muted/30 p-3 rounded-lg font-mono whitespace-pre-wrap border border-border/50">{answer.answer}</p>
+                                    <FeedbackForm studentId={answer.user_id} answerId={answer.id} answerType="lkpd" existingFeedback={answer.feedback} onFeedbackSaved={fetchStudentData} />
+                                  </div>
+                                ))}
+                              </div>
+                              {totalAnswers > ITEMS_PER_PAGE && (
+                                <div className="p-4 border-t bg-muted/20 flex justify-center gap-2">
+                                  <Button size="sm" variant="ghost" disabled={currentPageLkpd === 1} onClick={() => setCurrentPageLkpd(p => p - 1)}>Prev</Button>
+                                  <span className="self-center text-sm">{currentPageLkpd}</span>
+                                  <Button size="sm" variant="ghost" disabled={paginated.length < ITEMS_PER_PAGE} onClick={() => setCurrentPageLkpd(p => p + 1)}>Next</Button>
+                                </div>
+                              )}
                             </div>
-                            <p className="text-sm font-mono bg-muted/50 p-3 rounded whitespace-pre-wrap mb-2">{answer.answer}</p>
-                            <FeedbackForm
-                              studentId={answer.user_id}
-                              answerId={answer.id}
-                              answerType="lkpd"
-                              existingFeedback={answer.feedback}
-                              onFeedbackSaved={fetchStudentData}
-                            />
+                          );
+                        })}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="quiz-results">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Hasil Kuis</CardTitle>
+                    <CardDescription>Rekap nilai kuis siswa</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {filteredQuizResults.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground"><p>Belum ada data nilai.</p></div>
+                    ) : (
+                      <>
+                        <div className="border rounded-lg overflow-hidden">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>No</TableHead>
+                                <TableHead>Nama Siswa</TableHead>
+                                <TableHead>Kelas</TableHead>
+                                <TableHead>Skor</TableHead>
+                                <TableHead>Status</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {filteredQuizResults
+                                .slice((currentPageQuiz - 1) * ITEMS_PER_PAGE, currentPageQuiz * ITEMS_PER_PAGE)
+                                .map((result, i) => (
+                                  <TableRow key={i}>
+                                    <TableCell>{(currentPageQuiz - 1) * ITEMS_PER_PAGE + i + 1}</TableCell>
+                                    <TableCell className="font-medium">{result.full_name}</TableCell>
+                                    <TableCell>{result.kelas}</TableCell>
+                                    <TableCell>
+                                      <Badge variant={result.score >= 70 ? 'default' : 'destructive'} className={result.score >= 70 ? 'bg-success hover:bg-success/90' : ''}>
+                                        {result.score}
+                                      </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                      {result.score >= 70 ? <span className="text-success flex items-center gap-1"><CheckCircle2 className="h-4 w-4" /> Lulus</span> : <span className="text-destructive flex items-center gap-1"><XCircle className="h-4 w-4" /> Belum Lulus</span>}
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                        {filteredQuizResults.length > ITEMS_PER_PAGE && (
+                          <div className="flex justify-center gap-4 mt-6">
+                            <Button variant="outline" size="sm" onClick={() => setCurrentPageQuiz(p => Math.max(1, p - 1))} disabled={currentPageQuiz === 1}><ChevronLeft className="h-4 w-4 mr-1" /> Prev</Button>
+                            <span className="text-sm font-medium self-center">Halaman {currentPageQuiz} dari {Math.ceil(filteredQuizResults.length / ITEMS_PER_PAGE)}</span>
+                            <Button variant="outline" size="sm" onClick={() => setCurrentPageQuiz(p => Math.min(Math.ceil(filteredQuizResults.length / ITEMS_PER_PAGE), p + 1))} disabled={currentPageQuiz === Math.ceil(filteredQuizResults.length / ITEMS_PER_PAGE)}>Next <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="answer-keys">
+                <div className="grid gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Kunci Jawaban LKPD - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
+                      <CardDescription>Panduan penilaian untuk jawaban isian panjang (essay)</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {(selectedMapel === 'ekonomi' ? lkpdAnswerKeys : lkpdAnswerKeysPKWU)?.map((key: { id: number; title: string; verification?: string[]; steps?: string[] }) => (
+                          <div key={key.id} className="border rounded-lg p-4 bg-muted/30">
+                            <button onClick={() => setExpandedAnswerKey(expandedAnswerKey === key.id ? null : key.id)} className="flex items-center justify-between w-full font-medium text-left">
+                              <span>{key.title}</span>
+                              {expandedAnswerKey === key.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                            </button>
+                            {expandedAnswerKey === key.id && (
+                              <div className="mt-4 pl-4 border-l-2 border-primary/20 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <h4 className="text-sm font-semibold text-muted-foreground">Verifikasi / Kriteria Jawaban:</h4>
+                                <ul className="list-disc list-inside text-sm space-y-1">
+                                  {(key.verification || key.steps || []).map((step, i) => (
+                                    <li key={i}>{step}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
+                    </CardContent>
+                  </Card>
 
-              {/* Quiz Results Tab */}
-              <TabsContent value="quiz-results" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Hasil Kuis Siswa - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
-                    <CardDescription>Nilai dan progress siswa dalam mengerjakan kuis</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {loading ? (
-                      <div className="text-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                      </div>
-                    ) : filteredQuizResults.length === 0 ? (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                        <p>Belum ada siswa yang mengerjakan kuis</p>
-                      </div>
-                    ) : (
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>No</TableHead>
-                            <TableHead>Nama Siswa</TableHead>
-                            <TableHead>NIS</TableHead>
-                            <TableHead>Kelas</TableHead>
-                            <TableHead className="text-center">Soal Dijawab</TableHead>
-                            <TableHead className="text-center">Benar</TableHead>
-                            <TableHead className="text-center">Nilai</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {filteredQuizResults.map((result, index) => (
-                            <TableRow key={`${result.user_id}-${index}`}>
-                              <TableCell>{index + 1}</TableCell>
-                              <TableCell className="font-medium">{result.full_name}</TableCell>
-                              <TableCell className="font-mono text-sm">{result.nis}</TableCell>
-                              <TableCell>
-                                {result.kelas !== '-' && (
-                                  <Badge variant="outline">Kelas {result.kelas}</Badge>
-                                )}
-                              </TableCell>
-                              <TableCell className="text-center">{result.total_questions}</TableCell>
-                              <TableCell className="text-center">{result.correct_answers}</TableCell>
-                              <TableCell className="text-center">
-                                <Badge variant={result.score >= 70 ? 'default' : 'destructive'}>
-                                  {result.score}%
-                                </Badge>
-                              </TableCell>
-                            </TableRow>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Kunci Jawaban Kuis - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
+                      <CardDescription>Jawaban benar untuk soal pilihan ganda</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <ScrollArea className="h-[300px] w-full rounded-md border p-4">
+                        <div className="grid gap-4">
+                          {Object.values(selectedMapel === 'ekonomi' ? quizAnswerKeysEkonomi : quizAnswerKeysPKWU).map((key: any, index: number) => (
+                            <div key={index} className="pb-4 border-b last:border-0 last:pb-0">
+                              <p className="font-medium mb-1">Soal {index + 1}</p>
+                              <p className="text-sm text-green-600 font-bold mb-1">Jawaban: {(['A', 'B', 'C', 'D', 'E'] as const)[key.correctAnswer] || key.correctAnswer}</p>
+                              <p className="text-xs text-muted-foreground bg-muted p-2 rounded">💡 {key.explanation}</p>
+                            </div>
                           ))}
-                        </TableBody>
-                      </Table>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Answer Keys Tab */}
-              <TabsContent value="answer-keys" className="mt-6 space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Kunci Jawaban LKPD - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
-                    <CardDescription>Langkah-langkah penyelesaian untuk setiap soal</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {currentLkpdAnswerKeys.map((key) => (
-                      <div key={key.id} className="border rounded-lg overflow-hidden">
-                        <button
-                          className={`w-full p-4 flex items-center justify-between hover:bg-muted transition-colors text-left ${selectedMapel === 'pkwu' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-muted/50'}`}
-                          onClick={() => setExpandedAnswerKey(expandedAnswerKey === key.id ? null : key.id)}
-                        >
-                          <span className="font-medium">{key.title}</span>
-                          {expandedAnswerKey === key.id ? (
-                            <ChevronUp className="h-5 w-5" />
-                          ) : (
-                            <ChevronDown className="h-5 w-5" />
-                          )}
-                        </button>
-                        {expandedAnswerKey === key.id && (
-                          <div className="p-4 space-y-4 bg-card">
-                            <div>
-                              <h4 className="font-medium text-sm text-muted-foreground mb-2">Langkah Penyelesaian:</h4>
-                              <div className="bg-muted/50 rounded-lg p-4 font-mono text-sm space-y-1">
-                                {key.steps.map((step, i) => (
-                                  <p key={i} className={step === '' ? 'h-2' : ''}>{step}</p>
-                                ))}
-                              </div>
-                            </div>
-                            <div className={`p-4 rounded-lg ${selectedMapel === 'pkwu' ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-success/10 border border-success/30'}`}>
-                              <h4 className={`font-semibold mb-2 ${selectedMapel === 'pkwu' ? 'text-green-700 dark:text-green-400' : 'text-success'}`}>✅ Jawaban:</h4>
-                              <p className="font-mono text-lg whitespace-pre-line">{key.answer}</p>
-                            </div>
-                            <div>
-                              <h4 className="font-medium text-sm text-muted-foreground mb-2">Verifikasi:</h4>
-                              <div className="bg-accent/50 rounded-lg p-4 font-mono text-sm space-y-1">
-                                {key.verification.map((v, i) => (
-                                  <p key={i}>{v}</p>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Kunci Jawaban Kuis - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
-                    <CardDescription>Jawaban benar dan penjelasan untuk setiap soal</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {currentModule.quizQuestions.map((q, index) => (
-                        <div key={q.id} className="p-4 border rounded-lg">
-                          <div className="flex items-start gap-3 mb-3">
-                            <span className={`flex-shrink-0 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center ${selectedMapel === 'pkwu' ? 'bg-green-100 text-green-700' : 'bg-primary/10 text-primary'}`}>
-                              {index + 1}
-                            </span>
-                            <p className="font-medium">{q.question}</p>
-                          </div>
-                          <div className="ml-9 space-y-2">
-                            {q.options.map((opt, optIndex) => (
-                              <div
-                                key={optIndex}
-                                className={`p-2 rounded ${optIndex === q.correctAnswer ? (selectedMapel === 'pkwu' ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-success/10 border border-success/30') : 'bg-muted/50'}`}
-                              >
-                                <div className="flex items-center gap-2">
-                                  {optIndex === q.correctAnswer ? (
-                                    <CheckCircle2 className={`h-4 w-4 ${selectedMapel === 'pkwu' ? 'text-green-600' : 'text-success'}`} />
-                                  ) : (
-                                    <XCircle className="h-4 w-4 text-muted-foreground" />
-                                  )}
-                                  <span className={optIndex === q.correctAnswer ? 'font-medium' : 'text-muted-foreground'}>
-                                    {opt}
-                                  </span>
-                                </div>
-                              </div>
-                            ))}
-                            <div className={`mt-3 p-3 rounded-lg ${selectedMapel === 'pkwu' ? 'bg-green-50/50 dark:bg-green-900/10' : 'bg-accent/50'}`}>
-                              <p className="text-sm"><strong>Penjelasan:</strong> {q.explanation}</p>
-                            </div>
-                          </div>
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                      </ScrollArea>
+                    </CardContent>
+                  </Card>
+                </div>
               </TabsContent>
 
-              {/* Reset Tab */}
-              <TabsContent value="reset" className="mt-6">
+              <TabsContent value="reset">
                 <ResetStudentWork
-                  students={filteredStudents}
+                  students={allStudents}
                   moduleId={currentModuleId}
                   onReset={fetchStudentData}
                 />
               </TabsContent>
+
             </Tabs>
           </motion.div>
         </motion.div>
