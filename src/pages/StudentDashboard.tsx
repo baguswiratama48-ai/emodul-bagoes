@@ -10,7 +10,8 @@ import {
   Home,
   Trophy,
   FileText,
-  MessageSquare
+  MessageSquare,
+  Lightbulb
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -86,11 +87,20 @@ const pkwuLkpdProblems = [
   { id: 4, title: "Soal 4: Analisis SWOT" },
 ];
 
+const reflectionQuestions = [
+  { id: 1, question: 'Bagaimana perasaanmu belajar hari ini?' },
+  { id: 2, question: 'Apa yang kamu sukai dari pembelajaran hari ini?' },
+  { id: 3, question: 'Menurut Anda bagaimana belajar menggunakan media e-modul ini?' },
+  { id: 4, question: 'Apa yang perlu ditambahkan dari media pembelajaran e-modul ini?' },
+  { id: 5, question: 'Apa yang kamu sukai dari Bapak Bagus Panca Wiratama, S.Pd., M.Pd.? (Boleh Kritik dan Saran)' },
+];
+
 export default function StudentDashboard() {
   const { user, signOut } = useAuth();
   const [quizAnswers, setQuizAnswers] = useState<QuizAnswer[]>([]);
   const [lkpdAnswers, setLkpdAnswers] = useState<LkpdAnswer[]>([]);
   const [triggerAnswers, setTriggerAnswers] = useState<TriggerAnswer[]>([]);
+  const [reflectionAnswers, setReflectionAnswers] = useState<TriggerAnswer[]>([]);
   const [feedbackList, setFeedbackList] = useState<TeacherFeedback[]>([]);
   const [notesCount, setNotesCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -167,6 +177,18 @@ export default function StudentDashboard() {
 
     if (triggerData) {
       setTriggerAnswers(triggerData);
+    }
+
+    // Fetch reflection answers (stored in trigger_answers with special module_id)
+    const { data: reflectionData } = await supabase
+      .from('trigger_answers')
+      .select('id, question_id, answer, submitted_at')
+      .eq('user_id', user.id)
+      .eq('module_id', `${moduleId}-refleksi`)
+      .order('submitted_at', { ascending: false });
+
+    if (reflectionData) {
+      setReflectionAnswers(reflectionData);
     }
 
     // Fetch teacher feedback
@@ -334,6 +356,10 @@ export default function StudentDashboard() {
                 <TabsTrigger value="trigger" className="gap-2">
                   <MessageCircle className="h-4 w-4" />
                   Pemantik
+                </TabsTrigger>
+                <TabsTrigger value="reflection" className="gap-2">
+                  <Lightbulb className="h-4 w-4" />
+                  Refleksi
                 </TabsTrigger>
               </TabsList>
 
@@ -569,6 +595,83 @@ export default function StudentDashboard() {
                             </Link>
                           </div>
                         )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Reflection Answers Tab */}
+              <TabsContent value="reflection" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Lightbulb className="h-5 w-5" />
+                      Jawaban Refleksi
+                    </CardTitle>
+                    <CardDescription>Refleksi pembelajaran yang sudah kamu isi</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {loading ? (
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                      </div>
+                    ) : reflectionAnswers.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Lightbulb className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p className="mb-4">Kamu belum mengisi refleksi</p>
+                        <Link to={`/module/${currentModule.id}/refleksi`}>
+                          <Button>Isi Refleksi</Button>
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {reflectionQuestions.map((q) => {
+                          const answer = reflectionAnswers.find(a => a.question_id === q.id);
+                          return (
+                            <div key={q.id} className="border rounded-lg overflow-hidden">
+                              <div className="p-4 bg-muted/50">
+                                <div className="flex items-start gap-3">
+                                  <Badge variant="outline" className="flex-shrink-0">{q.id}</Badge>
+                                  <p className="font-medium">{q.question}</p>
+                                </div>
+                              </div>
+                              {answer ? (
+                                <div className="p-4">
+                                  <p className="text-xs text-muted-foreground mb-2">
+                                    Dijawab: {new Date(answer.submitted_at).toLocaleDateString('id-ID', {
+                                      day: 'numeric',
+                                      month: 'long',
+                                      year: 'numeric',
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </p>
+                                  <div className="bg-muted/30 rounded-lg p-4 text-sm">
+                                    {answer.answer}
+                                  </div>
+
+                                  {/* Teacher Feedback */}
+                                  {feedbackList.find(f => f.answer_type === 'reflection' && f.answer_id === answer.id) && (
+                                    <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                      <div className="flex items-center gap-2 mb-1 text-blue-700 dark:text-blue-400">
+                                        <MessageSquare className="h-4 w-4" />
+                                        <span className="font-medium text-sm">Feedback Guru</span>
+                                      </div>
+                                      <p className="text-sm text-blue-800 dark:text-blue-300">
+                                        {feedbackList.find(f => f.answer_type === 'reflection' && f.answer_id === answer.id)?.feedback}
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="p-4 text-center text-muted-foreground text-sm">
+                                  Belum dijawab
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </CardContent>
