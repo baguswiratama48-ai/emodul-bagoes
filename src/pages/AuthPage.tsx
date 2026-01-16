@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Lock, User, GraduationCap, Users, Loader2, CheckCircle2 } from 'lucide-react';
+import { Lock, User, GraduationCap, Users, Loader2, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,17 +21,21 @@ export default function AuthPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, loading, signIn } = useAuth();
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
+  // Visibility states
+  const [showSiswaPassword, setShowSiswaPassword] = useState(false);
+  const [showGuruPassword, setShowGuruPassword] = useState(false);
+
   // Siswa login form
   const [siswaId, setSiswaId] = useState('');
   const [siswaNis, setSiswaNis] = useState('');
-  
+
   // Auto-detected student info
   const [detectedStudent, setDetectedStudent] = useState<{ full_name: string; kelas: string } | null>(null);
   const [isDetecting, setIsDetecting] = useState(false);
-  
+
   // Guru login form
   const [guruEmail, setGuruEmail] = useState('');
   const [guruPassword, setGuruPassword] = useState('');
@@ -51,7 +55,7 @@ export default function AuthPage() {
         try {
           const { data, error } = await supabase
             .rpc('get_student_info_by_nis', { p_nis: siswaNis.trim() });
-          
+
           if (data && data.length > 0 && !error) {
             setDetectedStudent({ full_name: data[0].full_name, kelas: data[0].kelas });
           } else {
@@ -72,14 +76,14 @@ export default function AuthPage() {
 
   const handleSiswaLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate NISN
     const nisnResult = nisnSchema.safeParse(siswaId.trim());
     if (!nisnResult.success) {
       toast({ title: 'Error', description: 'NISN harus berupa angka', variant: 'destructive' });
       return;
     }
-    
+
     // Validate NIS (password)
     const passwordResult = passwordSchema.safeParse(siswaNis);
     if (!passwordResult.success) {
@@ -92,52 +96,52 @@ export default function AuthPage() {
       toast({ title: 'Error', description: 'Data siswa tidak ditemukan. Pastikan NIS benar.', variant: 'destructive' });
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     // Convert NISN to email format
     const emailToUse = `${siswaId.trim()}@siswa.local`;
-    
+
     const { error } = await signIn(emailToUse, siswaNis);
-    
+
     if (error) {
       toast({ title: 'Login Gagal', description: 'NISN atau NIS salah', variant: 'destructive' });
     } else {
       toast({ title: 'Berhasil', description: `Selamat datang, ${detectedStudent.full_name}!` });
       navigate('/');
     }
-    
+
     setIsSubmitting(false);
   };
 
   const handleGuruLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate email
     const emailResult = emailSchema.safeParse(guruEmail.trim());
     if (!emailResult.success) {
       toast({ title: 'Error', description: 'Email tidak valid', variant: 'destructive' });
       return;
     }
-    
+
     // Validate password
     const passwordResult = passwordSchema.safeParse(guruPassword);
     if (!passwordResult.success) {
       toast({ title: 'Error', description: passwordResult.error.errors[0].message, variant: 'destructive' });
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     const { error } = await signIn(guruEmail.trim(), guruPassword);
-    
+
     if (error) {
       toast({ title: 'Login Gagal', description: 'Email atau password salah', variant: 'destructive' });
     } else {
       toast({ title: 'Berhasil', description: 'Selamat datang, Bapak/Ibu Guru!' });
       navigate('/');
     }
-    
+
     setIsSubmitting(false);
   };
 
@@ -208,16 +212,27 @@ export default function AuthPage() {
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
                         id="siswa-nis"
-                        type="password"
+                        type={showSiswaPassword ? "text" : "password"}
                         placeholder="Masukkan NIS"
-                        className="pl-10"
+                        className="pl-10 pr-10"
                         value={siswaNis}
                         onChange={(e) => setSiswaNis(e.target.value)}
                         required
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowSiswaPassword(!showSiswaPassword)}
+                        className="absolute right-3 top-3 text-muted-foreground hover:text-foreground focus:outline-none"
+                      >
+                        {showSiswaPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
                     </div>
                   </div>
-                  
+
                   {/* Auto-detected student info */}
                   {isDetecting && (
                     <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
@@ -225,9 +240,9 @@ export default function AuthPage() {
                       <span className="text-sm text-muted-foreground">Mencari data siswa...</span>
                     </div>
                   )}
-                  
+
                   {detectedStudent && !isDetecting && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg"
@@ -248,7 +263,7 @@ export default function AuthPage() {
                       </div>
                     </motion.div>
                   )}
-                  
+
                   {siswaNis.length >= 5 && !detectedStudent && !isDetecting && (
                     <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                       <p className="text-sm text-red-600 dark:text-red-400">
@@ -256,9 +271,9 @@ export default function AuthPage() {
                       </p>
                     </div>
                   )}
-                  
-                  <Button 
-                    type="submit" 
+
+                  <Button
+                    type="submit"
                     className="w-full bg-gradient-primary"
                     disabled={isSubmitting || !detectedStudent}
                   >
@@ -301,17 +316,28 @@ export default function AuthPage() {
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
                         id="guru-password"
-                        type="password"
+                        type={showGuruPassword ? "text" : "password"}
                         placeholder="Masukkan password"
-                        className="pl-10"
+                        className="pl-10 pr-10"
                         value={guruPassword}
                         onChange={(e) => setGuruPassword(e.target.value)}
                         required
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowGuruPassword(!showGuruPassword)}
+                        className="absolute right-3 top-3 text-muted-foreground hover:text-foreground focus:outline-none"
+                      >
+                        {showGuruPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
                     </div>
                   </div>
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     className="w-full bg-gradient-primary"
                     disabled={isSubmitting}
                   >
