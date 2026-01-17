@@ -13,6 +13,7 @@ import {
   MessageSquare,
   Lightbulb
 } from 'lucide-react';
+import { StudentFeedbackResponse } from '@/components/student/StudentFeedbackResponse';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -50,6 +51,8 @@ interface TeacherFeedback {
   answer_type: 'trigger' | 'lkpd' | 'reflection';
   feedback: string;
   created_at: string;
+  student_reply?: string | null;
+  student_reply_at?: string | null;
 }
 
 // Kelas untuk mapel Ekonomi
@@ -492,17 +495,12 @@ export default function StudentDashboard() {
                                     {answer.answer}
                                   </div>
 
-                                  {/* Teacher Feedback */}
+                                  {/* Teacher Feedback & Reply */}
                                   {feedbackList.find(f => f.answer_type === 'lkpd' && f.answer_id === answer.id) && (
-                                    <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                                      <div className="flex items-center gap-2 mb-1 text-blue-700 dark:text-blue-400">
-                                        <MessageSquare className="h-4 w-4" />
-                                        <span className="font-medium text-sm">Feedback Guru</span>
-                                      </div>
-                                      <p className="text-sm text-blue-800 dark:text-blue-300">
-                                        {feedbackList.find(f => f.answer_type === 'lkpd' && f.answer_id === answer.id)?.feedback}
-                                      </p>
-                                    </div>
+                                    <StudentFeedbackResponse
+                                      feedbackData={feedbackList.find(f => f.answer_type === 'lkpd' && f.answer_id === answer.id)!}
+                                      onUpdate={fetchStudentData}
+                                    />
                                   )}
                                 </div>
                               )}
@@ -565,17 +563,12 @@ export default function StudentDashboard() {
                                     {answer.answer}
                                   </div>
 
-                                  {/* Teacher Feedback */}
+                                  {/* Teacher Feedback & Reply */}
                                   {feedbackList.find(f => f.answer_type === 'trigger' && f.answer_id === answer.id) && (
-                                    <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                                      <div className="flex items-center gap-2 mb-1 text-blue-700 dark:text-blue-400">
-                                        <MessageSquare className="h-4 w-4" />
-                                        <span className="font-medium text-sm">Feedback Guru</span>
-                                      </div>
-                                      <p className="text-sm text-blue-800 dark:text-blue-300">
-                                        {feedbackList.find(f => f.answer_type === 'trigger' && f.answer_id === answer.id)?.feedback}
-                                      </p>
-                                    </div>
+                                    <StudentFeedbackResponse
+                                      feedbackData={feedbackList.find(f => f.answer_type === 'trigger' && f.answer_id === answer.id)!}
+                                      onUpdate={fetchStudentData}
+                                    />
                                   )}
                                 </div>
                               ) : (
@@ -651,17 +644,12 @@ export default function StudentDashboard() {
                                     {answer.answer}
                                   </div>
 
-                                  {/* Teacher Feedback */}
+                                  {/* Teacher Feedback & Reply */}
                                   {feedbackList.find(f => f.answer_type === 'reflection' && f.answer_id === answer.id) && (
-                                    <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                                      <div className="flex items-center gap-2 mb-1 text-blue-700 dark:text-blue-400">
-                                        <MessageSquare className="h-4 w-4" />
-                                        <span className="font-medium text-sm">Feedback Guru</span>
-                                      </div>
-                                      <p className="text-sm text-blue-800 dark:text-blue-300">
-                                        {feedbackList.find(f => f.answer_type === 'reflection' && f.answer_id === answer.id)?.feedback}
-                                      </p>
-                                    </div>
+                                    <StudentFeedbackResponse
+                                      feedbackData={feedbackList.find(f => f.answer_type === 'reflection' && f.answer_id === answer.id)!}
+                                      onUpdate={fetchStudentData}
+                                    />
                                   )}
                                 </div>
                               ) : (

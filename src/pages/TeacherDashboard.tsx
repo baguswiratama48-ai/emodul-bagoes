@@ -68,6 +68,8 @@ interface StudentLkpdAnswer {
   answer: string;
   submitted_at: string;
   feedback?: string;
+  student_reply?: string;
+  student_reply_at?: string;
   module_id?: string;
 }
 
@@ -80,11 +82,19 @@ interface StudentTriggerAnswer {
   answer: string;
   submitted_at: string;
   feedback?: string;
+  student_reply?: string;
+  student_reply_at?: string;
   module_id?: string;
 }
 
+interface FeedbackMapItem {
+  feedback: string;
+  student_reply?: string;
+  student_reply_at?: string;
+}
+
 interface FeedbackMap {
-  [key: string]: string;
+  [key: string]: FeedbackMapItem;
 }
 
 // Kelas untuk mapel Ekonomi dan PKWU
@@ -167,11 +177,15 @@ export default function TeacherDashboard() {
     // Fetch all teacher feedback
     const { data: feedbackData } = await supabase
       .from('teacher_feedback')
-      .select('answer_id, answer_type, feedback');
+      .select('answer_id, answer_type, feedback, student_reply, student_reply_at');
 
     const fbMap: FeedbackMap = {};
     feedbackData?.forEach((fb: any) => {
-      fbMap[`${fb.answer_type}-${fb.answer_id}`] = fb.feedback;
+      fbMap[`${fb.answer_type}-${fb.answer_id}`] = {
+        feedback: fb.feedback,
+        student_reply: fb.student_reply,
+        student_reply_at: fb.student_reply_at
+      };
     });
     setFeedbackMap(fbMap);
 
@@ -219,6 +233,7 @@ export default function TeacherDashboard() {
     if (lkpdData) {
       setLkpdAnswers(lkpdData.map((item: any) => {
         const profile = profilesMap[item.user_id];
+        const fb = fbMap[`lkpd-${item.id}`];
         return {
           id: item.id,
           user_id: item.user_id,
@@ -227,7 +242,9 @@ export default function TeacherDashboard() {
           problem_id: item.problem_id,
           answer: item.answer,
           submitted_at: item.submitted_at,
-          feedback: fbMap[`lkpd-${item.id}`],
+          feedback: fb?.feedback,
+          student_reply: fb?.student_reply,
+          student_reply_at: fb?.student_reply_at,
           module_id: item.module_id
         };
       }));
@@ -243,6 +260,7 @@ export default function TeacherDashboard() {
     if (triggerData) {
       setTriggerAnswers(triggerData.map((item: any) => {
         const profile = profilesMap[item.user_id];
+        const fb = fbMap[`trigger-${item.id}`];
         return {
           id: item.id,
           user_id: item.user_id,
@@ -251,7 +269,9 @@ export default function TeacherDashboard() {
           question_id: item.question_id,
           answer: item.answer,
           submitted_at: item.submitted_at,
-          feedback: fbMap[`trigger-${item.id}`],
+          feedback: fb?.feedback,
+          student_reply: fb?.student_reply,
+          student_reply_at: fb?.student_reply_at,
           module_id: item.module_id
         };
       }));
@@ -267,6 +287,7 @@ export default function TeacherDashboard() {
     if (reflectionData) {
       setReflectionAnswers(reflectionData.map((item: any) => {
         const profile = profilesMap[item.user_id];
+        const fb = fbMap[`reflection-${item.id}`];
         return {
           id: item.id,
           user_id: item.user_id,
@@ -275,7 +296,9 @@ export default function TeacherDashboard() {
           question_id: item.question_id,
           answer: item.answer,
           submitted_at: item.submitted_at,
-          feedback: fbMap[`reflection-${item.id}`],
+          feedback: fb?.feedback,
+          student_reply: fb?.student_reply,
+          student_reply_at: fb?.student_reply_at,
           module_id: item.module_id
         };
       }));
@@ -624,7 +647,15 @@ export default function TeacherDashboard() {
                                       </div>
                                     </div>
                                     <p className="text-sm bg-muted/30 p-3 rounded-lg border border-border/50">{answer.answer}</p>
-                                    <FeedbackForm studentId={answer.user_id} answerId={answer.id} answerType="trigger" existingFeedback={answer.feedback} onFeedbackSaved={fetchStudentData} />
+                                    <FeedbackForm
+                                      studentId={answer.user_id}
+                                      answerId={answer.id}
+                                      answerType="trigger"
+                                      existingFeedback={answer.feedback}
+                                      studentReply={answer.student_reply}
+                                      studentReplyAt={answer.student_reply_at}
+                                      onFeedbackSaved={fetchStudentData}
+                                    />
                                   </div>
                                 ))}
                               </div>
@@ -683,7 +714,15 @@ export default function TeacherDashboard() {
                                       </div>
                                     </div>
                                     <p className="text-sm bg-muted/30 p-3 rounded-lg border border-border/50">{answer.answer}</p>
-                                    <FeedbackForm studentId={answer.user_id} answerId={answer.id} answerType="reflection" existingFeedback={answer.feedback} onFeedbackSaved={fetchStudentData} />
+                                    <FeedbackForm
+                                      studentId={answer.user_id}
+                                      answerId={answer.id}
+                                      answerType="reflection"
+                                      existingFeedback={answer.feedback}
+                                      studentReply={answer.student_reply}
+                                      studentReplyAt={answer.student_reply_at}
+                                      onFeedbackSaved={fetchStudentData}
+                                    />
                                   </div>
                                 ))}
                               </div>
@@ -742,7 +781,15 @@ export default function TeacherDashboard() {
                                       </div>
                                     </div>
                                     <p className="text-sm bg-muted/30 p-3 rounded-lg font-mono whitespace-pre-wrap border border-border/50">{answer.answer}</p>
-                                    <FeedbackForm studentId={answer.user_id} answerId={answer.id} answerType="lkpd" existingFeedback={answer.feedback} onFeedbackSaved={fetchStudentData} />
+                                    <FeedbackForm
+                                      studentId={answer.user_id}
+                                      answerId={answer.id}
+                                      answerType="lkpd"
+                                      existingFeedback={answer.feedback}
+                                      studentReply={answer.student_reply}
+                                      studentReplyAt={answer.student_reply_at}
+                                      onFeedbackSaved={fetchStudentData}
+                                    />
                                   </div>
                                 ))}
                               </div>

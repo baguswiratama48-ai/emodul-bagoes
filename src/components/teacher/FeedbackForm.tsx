@@ -11,15 +11,19 @@ interface FeedbackFormProps {
   answerId: string;
   answerType: 'trigger' | 'lkpd' | 'reflection';
   existingFeedback?: string;
+  studentReply?: string;
+  studentReplyAt?: string;
   onFeedbackSaved?: () => void;
 }
 
-export function FeedbackForm({ 
-  studentId, 
-  answerId, 
-  answerType, 
+export function FeedbackForm({
+  studentId,
+  answerId,
+  answerType,
   existingFeedback,
-  onFeedbackSaved 
+  studentReply,
+  studentReplyAt,
+  onFeedbackSaved
 }: FeedbackFormProps) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -36,7 +40,7 @@ export function FeedbackForm({
 
   const handleSave = async () => {
     if (!user || !feedback.trim()) return;
-    
+
     setSaving(true);
     try {
       // Check if feedback exists
@@ -87,20 +91,44 @@ export function FeedbackForm({
 
   if (!isExpanded) {
     return (
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        onClick={() => setIsExpanded(true)}
-        className="gap-2 text-muted-foreground hover:text-primary"
-      >
-        <MessageSquare className="h-4 w-4" />
-        {existingFeedback ? 'Edit Feedback' : 'Beri Feedback'}
-      </Button>
+      <div className="flex flex-col items-start gap-2">
+        {studentReply && (
+          <div className="w-full p-3 bg-muted/50 rounded-lg border text-sm">
+            <div className="flex items-center gap-2 font-medium text-xs text-muted-foreground mb-1">
+              <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded">Balasan Siswa</span>
+              {studentReplyAt && (
+                <span>{new Date(studentReplyAt).toLocaleDateString()}</span>
+              )}
+            </div>
+            <p>{studentReply}</p>
+          </div>
+        )}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsExpanded(true)}
+          className="gap-2 text-muted-foreground hover:text-primary"
+        >
+          <MessageSquare className="h-4 w-4" />
+          {existingFeedback ? 'Edit Feedback' : 'Beri Feedback'}
+        </Button>
+      </div>
     );
   }
 
   return (
     <div className="mt-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
+      {studentReply && (
+        <div className="mb-3 p-3 bg-background rounded-lg border text-sm">
+          <div className="flex items-center gap-2 font-medium text-xs text-muted-foreground mb-1">
+            <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded">Balasan Siswa</span>
+            {studentReplyAt && (
+              <span>{new Date(studentReplyAt).toLocaleDateString()}</span>
+            )}
+          </div>
+          <p>{studentReply}</p>
+        </div>
+      )}
       <div className="flex items-center gap-2 mb-2">
         <MessageSquare className="h-4 w-4 text-primary" />
         <span className="text-sm font-medium">Feedback Guru</span>
@@ -112,9 +140,9 @@ export function FeedbackForm({
         className="min-h-[80px] mb-2"
       />
       <div className="flex items-center gap-2">
-        <Button 
-          size="sm" 
-          onClick={handleSave} 
+        <Button
+          size="sm"
+          onClick={handleSave}
           disabled={saving || !feedback.trim()}
           className="gap-2"
         >
@@ -127,9 +155,9 @@ export function FeedbackForm({
           )}
           {saved ? 'Tersimpan' : 'Simpan'}
         </Button>
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => setIsExpanded(false)}
         >
           Tutup
