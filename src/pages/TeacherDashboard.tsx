@@ -136,6 +136,35 @@ export default function TeacherDashboard() {
   useEffect(() => {
     if (isGuru) {
       fetchStudentData();
+
+      // Subscribe to real-time updates for all relevant tables
+      const feedbackParams = { event: '*', schema: 'public', table: 'teacher_feedback' } as const;
+      const lkpdParams = { event: '*', schema: 'public', table: 'lkpd_answers' } as const;
+      const triggerParams = { event: '*', schema: 'public', table: 'trigger_answers' } as const;
+      const quizParams = { event: '*', schema: 'public', table: 'quiz_answers' } as const;
+
+      const channel = supabase.channel('teacher-dashboard-changes')
+        .on('postgres_changes', feedbackParams, () => {
+          console.log('Realtime update: teacher_feedback');
+          fetchStudentData();
+        })
+        .on('postgres_changes', lkpdParams, () => {
+          console.log('Realtime update: lkpd_answers');
+          fetchStudentData();
+        })
+        .on('postgres_changes', triggerParams, () => {
+          console.log('Realtime update: trigger_answers');
+          fetchStudentData();
+        })
+        .on('postgres_changes', quizParams, () => {
+          console.log('Realtime update: quiz_answers');
+          fetchStudentData();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [isGuru]);
 

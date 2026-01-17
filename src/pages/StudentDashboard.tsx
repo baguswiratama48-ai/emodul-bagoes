@@ -120,6 +120,30 @@ export default function StudentDashboard() {
   useEffect(() => {
     if (user) {
       fetchStudentData();
+
+      // Realtime subscription
+      // Note: We subscribe to all changes on teacher_feedback. 
+      // RLS policies on the server will ensure we only receive relevant events (or we filter on client).
+      // Ideally, filter by `student_id=eq.${user.id}`, but Supabase Realtime filters are limited.
+      // Re-fetching is a safe and simple strategy.
+
+      const channel = supabase.channel('student-dashboard-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'teacher_feedback' }, () => {
+          console.log('Realtime update (Student): teacher_feedback');
+          fetchStudentData();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'lkpd_answers', filter: `user_id=eq.${user.id}` }, () => {
+          // Auto-refresh if student updates (e.g. from another tab)
+          fetchStudentData();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'trigger_answers', filter: `user_id=eq.${user.id}` }, () => {
+          fetchStudentData();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      }
     }
   }, [user]);
 
