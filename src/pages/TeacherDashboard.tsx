@@ -133,13 +133,6 @@ export default function TeacherDashboard() {
   const [availableKelas, setAvailableKelas] = useState<string[]>([]);
   const [feedbackMap, setFeedbackMap] = useState<FeedbackMap>({});
   const [selectedMapel, setSelectedMapel] = useState<'ekonomi' | 'pkwu'>('ekonomi');
-  const [quizSettings, setQuizSettings] = useState<Record<string, boolean>>({});
-
-  // Pagination States
-  const [currentPageTrigger, setCurrentPageTrigger] = useState(1);
-  const [currentPageReflection, setCurrentPageReflection] = useState(1);
-  const [currentPageLkpd, setCurrentPageLkpd] = useState(1);
-  const [currentPageQuiz, setCurrentPageQuiz] = useState(1);
 
   // Determine which classes to show based on selected mapel
   const mapelKelas = useMemo(() => {
@@ -150,6 +143,18 @@ export default function TeacherDashboard() {
   const filteredAvailableKelas = useMemo(() => {
     return availableKelas.filter(k => mapelKelas.includes(k));
   }, [availableKelas, mapelKelas]);
+
+
+  // Pagination States
+  const [currentPageTrigger, setCurrentPageTrigger] = useState(1);
+  const [currentPageReflection, setCurrentPageReflection] = useState(1);
+  const [currentPageLkpd, setCurrentPageLkpd] = useState(1);
+  const [currentPageQuiz, setCurrentPageQuiz] = useState(1);
+
+  // Helper for sorting by name
+  const sortByName = (a: { full_name: string }, b: { full_name: string }) => {
+    return a.full_name.localeCompare(b.full_name);
+  };
 
   useEffect(() => {
     if (isGuru) {
@@ -356,19 +361,6 @@ export default function TeacherDashboard() {
       }));
     }
 
-    // Fetch quiz status
-    const { data: settingsData } = await supabase
-      .from('quiz_access_control' as any)
-      .select('*');
-
-    if (settingsData) {
-      const settingsMap: Record<string, boolean> = {};
-      (settingsData as any[]).forEach((s: any) => {
-        settingsMap[s.module_id] = s.is_active;
-      });
-      setQuizSettings(settingsMap);
-    }
-
     // Fetch student notes
     const { data: notesData } = await supabase
       .from('student_notes')
@@ -392,14 +384,6 @@ export default function TeacherDashboard() {
         };
       });
       setStudentNotes(notes);
-    }
-
-    if (settingsData) {
-      const settingsMap: Record<string, boolean> = {};
-      (settingsData as any[]).forEach((s: any) => {
-        settingsMap[s.module_id] = s.is_active;
-      });
-      setQuizSettings(settingsMap);
     }
 
     setLoading(false);
@@ -436,31 +420,6 @@ export default function TeacherDashboard() {
       supabase.removeChannel(channels);
     };
   }, []);
-
-  const handleToggleQuiz = async (isActive: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('quiz_access_control' as any)
-        .upsert({
-          module_id: currentModuleId,
-          is_active: isActive,
-          updated_at: new Date().toISOString()
-        } as any, { onConflict: 'module_id' });
-
-      if (error) throw error;
-
-      setQuizSettings(prev => ({ ...prev, [currentModuleId]: isActive }));
-      toast.success(`Kuis berhasil ${isActive ? 'dibuka' : 'ditutup'}`);
-    } catch (error: any) {
-      console.error('Error updating quiz status:', error);
-      toast.error(`Gagal mengubah status kuis: ${error.message || 'Unknown error'}`);
-    }
-  };
-
-  // Helper for sorting by name
-  const sortByName = (a: { full_name: string }, b: { full_name: string }) => {
-    return a.full_name.localeCompare(b.full_name);
-  };
 
   // Filter functions based on mapel and kelas
   const filteredQuizResults = useMemo(() => {

@@ -8,9 +8,7 @@ import {
   XCircle,
   Trophy,
   RotateCcw,
-  ChevronRight,
-  Lock,
-  Unlock
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -46,43 +44,20 @@ export default function QuizPage() {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [loadingCheck, setLoadingCheck] = useState(true);
 
-  // Quiz Control States
-  const [isQuizActive, setIsQuizActive] = useState(false);
-  const [checkingStatus, setCheckingStatus] = useState(true);
+
 
   const questions = module.quizQuestions;
   const totalQuestions = questions.length;
 
-  // Check if already submitted & Quiz Status
+  // Check if already submitted
   useEffect(() => {
     if (user) {
       checkSubmissionStatus();
-    } else {
-      setLoadingCheck(false);
-      setCheckingStatus(false);
     }
   }, [user]);
 
   const checkSubmissionStatus = async () => {
     if (!user) return;
-
-    // Check quiz setting/status first
-    try {
-      const { data: settingData } = await supabase
-        .from('quiz_access_control' as any)
-        .select('is_active')
-        .eq('module_id', module.id)
-        .single();
-
-      if (settingData) {
-        setIsQuizActive((settingData as any).is_active);
-      } else {
-        setIsQuizActive(false);
-      }
-    } catch (error) {
-      console.error("Error fetching settings", error);
-    }
-    setCheckingStatus(false);
 
     // Check submission status
     const { data } = await supabase
@@ -185,25 +160,6 @@ export default function QuizPage() {
     markSectionComplete(module.id, 'kuis');
   };
 
-  const handleToggleQuiz = async (checked: boolean) => {
-    if (!isGuru) return;
-
-    try {
-      const { error } = await supabase
-        .from('quiz_access_control' as any)
-        .upsert({
-          module_id: module.id,
-          is_active: checked,
-          updated_at: new Date().toISOString()
-        } as any, { onConflict: 'module_id' });
-
-      if (error) throw error;
-      setIsQuizActive(checked);
-    } catch (error) {
-      console.error('Error updating quiz status:', error);
-    }
-  };
-
   const currentQ = questions[currentQuestion];
   const answeredCount = Object.keys(selectedAnswers).length;
   const score = calculateScore();
@@ -219,61 +175,6 @@ export default function QuizPage() {
     visible: { y: 0, opacity: 1 },
   };
 
-  // 1. Teacher Control UI
-  const TeacherControl = () => (
-    <Card className="mb-6 border-primary/20 bg-primary/5">
-      <CardContent className="flex items-center justify-between p-4">
-        <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-full ${isQuizActive ? 'bg-success/20 text-success' : 'bg-muted text-muted-foreground'}`}>
-            {isQuizActive ? <Unlock className="h-5 w-5" /> : <Lock className="h-5 w-5" />}
-          </div>
-          <div>
-            <p className="font-medium">Status Kuis: {isQuizActive ? 'Dibuka' : 'Ditutup'}</p>
-            <p className="text-sm text-muted-foreground">
-              {isQuizActive ? 'Siswa dapat mengerjakan kuis' : 'Siswa tidak dapat mengakses kuis'}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Switch
-            checked={isQuizActive}
-            onCheckedChange={handleToggleQuiz}
-          />
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  // 2. Student Blocked View
-  if (!isGuru && !isQuizActive && !checkingStatus) {
-    return (
-      <ModuleLayout module={module} currentSection="kuis">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={containerVariants}
-          className="space-y-8"
-        >
-          <div className="text-center py-12">
-            <div className="w-24 h-24 mx-auto bg-muted rounded-full flex items-center justify-center mb-6">
-              <Lock className="h-10 w-10 text-muted-foreground" />
-            </div>
-            <h2 className="text-2xl font-bold mb-2">Kuis Belum Dibuka</h2>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Guru belum membuka akses untuk kuis ini. Silakan tunggu instruksi dari guru Anda.
-            </p>
-            <Link to={`/modul/${module.id}/materi`}>
-              <Button variant="outline" className="gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Kembali ke Materi
-              </Button>
-            </Link>
-          </div>
-        </motion.div>
-      </ModuleLayout>
-    );
-  }
-
   // 3. Results View
   if (showResults) {
     return (
@@ -284,7 +185,7 @@ export default function QuizPage() {
           variants={containerVariants}
           className="space-y-8"
         >
-          {isGuru && <TeacherControl />}
+
 
           <motion.div variants={itemVariants} className="text-center">
             <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6 ${score >= 70 ? 'bg-success/10' : 'bg-destructive/10'
@@ -411,7 +312,7 @@ export default function QuizPage() {
         variants={containerVariants}
         className="space-y-8"
       >
-        {isGuru && <TeacherControl />}
+
 
         {/* Header */}
         <motion.div variants={itemVariants}>
