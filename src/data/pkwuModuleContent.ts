@@ -568,6 +568,32 @@ Berawal dari ide kreatif dan unik, proses daur ulang tidak hanya dapat menambah 
 > Berdasarkan materi di atas, maka peluang yang dapat diambil adalah pemanfaatan limbah tidak terpakai berbentuk bangun datar yang keberadaannya melimpah di sekitar kita. Sebagai bentuk usaha, bisnis kerajinan limbah bahan kertas cukup menjanjikan karena bahan dasar banyak tersedia dan mudah diperoleh. Dengan mengambil ide dari benda-benda hias dan fungsional, limbah kertas dapat dibuat sebagai kerajinan. Dengan begitu, kita membantu mengurangi jumlah limbah kertas dan mendapatkan peluang usaha dengan memanfaatkan sumber daya material yang ada di sekitar lingkungan kita.
           `,
         },
+        {
+          id: 'tugas-analisis',
+          title: '5. Tugas Analisis Mandiri (OKU Timur)',
+          content: `
+# 5. Tugas Analisis Mandiri: Potensi OKU Timur
+
+Silakan tulis dan jawab 5 pertanyaan berikut di buku catatan Anda untuk menganalisis potensi kerajinan di daerah kita!
+
+### Soal 1: Identifikasi Limbah Lokal
+Kabupaten OKU Timur dikenal sebagai daerah pertanian dan perkebunan yang subur. Coba amati lingkungan sekitarmu, sebutkan **3 jenis limbah bangun datar** yang paling mudah ditemukan di OKU Timur dan jelaskan dari mana limbah tersebut berasal! (Contoh: Kulit jagung dari sisa panen).
+
+### Soal 2: Analisis Peluang Usaha
+Dari limbah-limbah yang sudah kamu sebutkan di nomor 1, pilih salah satu yang menurutmu paling berpotensi untuk dijadikan bisnis kerajinan di OKU Timur. Jelaskan **alasanmu memilih limbah tersebut** (misalnya: bahannya gratis, mudah dibentuk, atau belum banyak pesaing).
+
+### Soal 3: Ide Produk Inovatif
+Jika kamu harus membuat satu produk kerajinan tangan khas OKU Timur yang unik untuk dipamerkan di festival daerah, **produk apa yang akan kamu buat**? Gambarkan sedikit tentang bentuk dan fungsinya!
+
+### Soal 4: Strategi Pemasaran Lokal
+Bagaimana caramu mempromosikan produk kerajinanmu agar dikenal oleh masyarakat OKU Timur dan sekitarnya? Sebutkan strategi yang menurutmu paling efektif (misalnya lewat media sosial, titip di toko oleh-oleh, atau bazar).
+
+### Soal 5: Mengatasi Tantangan
+Menurut pendapatmu, apa **tantangan atau kesulitan terbesar** dalam memulai usaha kerajinan di daerah kita? Dan bagaimana solusi cerdas yang bisa kamu tawarkan untuk mengatasinya?
+
+> "Kesuksesan dimulai dari kepekaan melihat peluang di sekitar kita. Jadilah anak muda OKU Timur yang kreatif dan solutif!"
+          `,
+        },
       ],
     },
   ],
