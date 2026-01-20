@@ -1,16 +1,17 @@
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  BookOpen, 
-  HelpCircle, 
-  FileText, 
-  Video, 
-  ClipboardList, 
+import {
+  BookOpen,
+  HelpCircle,
+  FileText,
+  Video,
+  ClipboardList,
   CheckCircle2,
   BookMarked,
   FileCheck,
   Home,
   ChevronRight,
-  Lightbulb
+  Lightbulb,
+  FileEdit
 } from 'lucide-react';
 import {
   Sidebar,
@@ -40,6 +41,7 @@ const sectionIcons: Record<string, any> = {
   info: BookOpen,
   pemantik: HelpCircle,
   materi: FileText,
+  'tugas-catatan': FileEdit,
   video: Video,
   lkpd: ClipboardList,
   kuis: CheckCircle2,
@@ -57,6 +59,7 @@ export function ModuleSidebar({ module, currentSection, progress }: ModuleSideba
     { id: 'info', label: 'Informasi Modul', icon: BookOpen, path: `/modul/${module.id}` },
     { id: 'pemantik', label: 'Pertanyaan Pemantik', icon: HelpCircle, path: `/modul/${module.id}/pemantik` },
     { id: 'materi', label: 'Materi Pembelajaran', icon: FileText, path: `/modul/${module.id}/materi` },
+    { id: 'tugas-catatan', label: 'Tugas Catatan', icon: FileEdit, path: `/modul/${module.id}/tugas-catatan` },
     { id: 'video', label: 'Video Pembelajaran', icon: Video, path: `/modul/${module.id}/video` },
     { id: 'lkpd', label: 'LKPD', icon: ClipboardList, path: `/modul/${module.id}/lkpd` },
     { id: 'kuis', label: 'Kuis & Latihan', icon: CheckCircle2, path: `/modul/${module.id}/kuis` },
@@ -93,8 +96,8 @@ export function ModuleSidebar({ module, currentSection, progress }: ModuleSideba
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link 
-                    to="/" 
+                  <Link
+                    to="/"
                     className={cn(
                       "flex items-center gap-3 px-3 py-2 rounded-lg transition-all",
                       "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
@@ -127,8 +130,8 @@ export function ModuleSidebar({ module, currentSection, progress }: ModuleSideba
                         to={item.path}
                         className={cn(
                           "flex items-center gap-3 px-3 py-2 rounded-lg transition-all relative",
-                          active 
-                            ? "bg-primary text-primary-foreground shadow-md" 
+                          active
+                            ? "bg-primary text-primary-foreground shadow-md"
                             : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                           completed && !active && "text-success"
                         )}
@@ -160,10 +163,10 @@ export function ModuleSidebar({ module, currentSection, progress }: ModuleSideba
           <div className="space-y-2">
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>Progress</span>
-              <span>{progress.completedSections.length} / 9 bagian</span>
+              <span>{progress.completedSections.length} / 10 bagian</span>
             </div>
-            <Progress 
-              value={(progress.completedSections.length / 9) * 100} 
+            <Progress
+              value={(progress.completedSections.length / 10) * 100}
               className="h-2"
             />
           </div>
