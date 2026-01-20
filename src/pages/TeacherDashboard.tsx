@@ -585,12 +585,7 @@ export default function TeacherDashboard() {
             <div className="flex flex-wrap items-center gap-3">
               <MapelSelector />
               <KelasFilter />
-              <div className="ml-auto flex items-center gap-3 bg-card border rounded-lg p-2 shadow-sm">
-                <div className={`p-1.5 rounded-full ${quizSettings[currentModuleId] ? 'bg-success/20 text-success' : 'bg-destructive/10 text-destructive'}`}>
-                  {quizSettings[currentModuleId] ? <Unlock className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
-                </div>
-                <div className="flex flex-col"><span className="text-sm font-medium">Status Kuis</span><span className="text-xs text-muted-foreground">{quizSettings[currentModuleId] ? 'Terbuka' : 'Tertutup'}</span></div>
-                <Switch checked={quizSettings[currentModuleId] || false} onCheckedChange={handleToggleQuiz} />
+              <div className="ml-auto flex items-center gap-3">
               </div>
             </div>
           </motion.div>
