@@ -466,7 +466,11 @@ Ceritakan proses pembuatan dan dampak positif:
       id: 'tugas-catatan',
       title: 'Tugas Catatan',
       icon: '📝',
-      content: `
+      subsections: [
+        {
+          id: 'pengertian-kerajinan',
+          title: '1. Pengertian Kerajinan Limbah',
+          content: `
 # 1. Pengertian Kerajinan Limbah
 
 **Kerajinan** adalah hal yang berkaitan dengan buatan tangan atau kegiatan yang berkaitan dengan barang yang dihasilkan melalui keterampilan tangan (kerajinan tangan).
@@ -478,9 +482,12 @@ Ceritakan proses pembuatan dan dampak positif:
 • Kertas
 • Kain perca
 • Plastik
-
----
-
+          `,
+        },
+        {
+          id: 'manfaat-limbah',
+          title: '2. Pemanfaatan Limbah Bangun Datar',
+          content: `
 # 2. Kerajinan dengan Memanfaatkan Bahan dari Limbah Berbentuk Bangun Datar
 
 ### 1. Kerajinan dari Limbah Kulit Jagung
@@ -506,9 +513,12 @@ Sisik ikan pada umumnya hanya dibuang karena dianggap sebagai limbah yang tidak 
 
 ### 8. Kerajinan dari Pecahan Keramik
 Pecahan keramik ternyata dapat dimanfaatkan untuk kerajinan atau hiasan. Pecahan-pecahan keramik dapat dijadikan sebagai hiasan mozaik atau hiasan yang lainnya. Biasanya mozaik dari pecahan keramik disusun untuk membuat gambar bercorak abstrak atau background dari suatu gambar atau untuk melapisi dinding dan lantai agar terkesan unik.
-
----
-
+          `,
+        },
+        {
+          id: 'contoh-wilayah',
+          title: '3. Contoh Berdasarkan Wilayah',
+          content: `
 # 3. Contoh Limbah Berbentuk Bangun Datar Berdasarkan Kondisi Wilayah
 
 ### 1. Daerah pesisir pantai atau laut
@@ -524,9 +534,12 @@ Limbah berbentuk bangun datar yang didapat pada daerah ini seperti jerami padi, 
 Limbah berbentuk bangun datar yang dihasilkan di daerah perkotaan biasanya kertas, kardus, serbuk gergaji, serutan kayu, plastik, mika, dan lainnya.
 
 > Berbagai macam limbah berbentuk bangun datar sangat bermanfaat untuk bahan pembuatan produk kerajinan. Dengan demikian, kita sebagai manusia yang memiliki akal sehat seharusnya lebih peduli dengan lingkungan kita sendiri. Mulailah dengan kebiasaan tidak membuang sampah sembarangan dan teruslah berpikir untuk terus berinovasi dalam rangka pengurangan limbah dan memanfaatkannya menjadi barang yang bernilai ekonomi tinggi.
-
----
-
+          `,
+        },
+        {
+          id: 'ide-peluang',
+          title: '4. Ide dan Peluang Usaha',
+          content: `
 # 4. Ide dan Peluang Usaha
 
 Limbah terkumpul dan menumpuk di sekitar kita setiap hari, mulai dari yang sifatnya organik dan nonorganik. Salah satu penyumbang limbah terbesar adalah kertas yang sudah tak terpakai. Kertas koran menjadi salah satu limbah kertas rumah tangga yang mendominasi. Koran bekas yang sudah lewat dari tanggalnya sering ditelantarkan begitu saja oleh pemiliknya. Sebagian digunakan sebagai pembungkus makanan, pembungkus paket, dan beberapa hal lainnya yang nantinya akan berakhir di tempat sampah juga.
@@ -553,7 +566,9 @@ Berawal dari ide kreatif dan unik, proses daur ulang tidak hanya dapat menambah 
 5. Ketersediaan sumber daya dan keterampilan
 
 > Berdasarkan materi di atas, maka peluang yang dapat diambil adalah pemanfaatan limbah tidak terpakai berbentuk bangun datar yang keberadaannya melimpah di sekitar kita. Sebagai bentuk usaha, bisnis kerajinan limbah bahan kertas cukup menjanjikan karena bahan dasar banyak tersedia dan mudah diperoleh. Dengan mengambil ide dari benda-benda hias dan fungsional, limbah kertas dapat dibuat sebagai kerajinan. Dengan begitu, kita membantu mengurangi jumlah limbah kertas dan mendapatkan peluang usaha dengan memanfaatkan sumber daya material yang ada di sekitar lingkungan kita.
-      `,
+          `,
+        },
+      ],
     },
   ],
   videos: [
