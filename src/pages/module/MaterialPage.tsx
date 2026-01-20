@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  FileText, 
-  ArrowRight, 
+import {
+  FileText,
+  ArrowRight,
   ArrowLeft,
   ChevronDown,
   ChevronUp,
@@ -24,12 +24,21 @@ export default function MaterialPage() {
   const { moduleId } = useParams();
   const { markSectionComplete } = useProgress();
   const module = getModuleById(moduleId);
-  
+
+  const location = useLocation();
+
   if (!module) {
     return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
   }
-  
-  const [activeSection, setActiveSection] = useState(module.sections[0].id);
+
+  const getInitialSection = () => {
+    if (location.pathname.includes('/tugas-catatan')) {
+      return 'tugas-catatan';
+    }
+    return module.sections[0].id;
+  };
+
+  const [activeSection, setActiveSection] = useState(getInitialSection());
   const isPKWU = isPKWUModule(moduleId);
 
   const handleComplete = () => {
@@ -93,8 +102,8 @@ export default function MaterialPage() {
           <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
             <TabsList className="w-full flex-wrap h-auto gap-2 bg-muted/50 p-2 justify-start">
               {module.sections.map((section) => (
-                <TabsTrigger 
-                  key={section.id} 
+                <TabsTrigger
+                  key={section.id}
                   value={section.id}
                   className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2"
                 >
@@ -155,7 +164,7 @@ export default function MaterialPage() {
                         <DemandCurveChart />
                       </div>
                     )}
-                    
+
                     {!isPKWU && section.id === 'fungsi-permintaan' && (
                       <div className="mt-8 space-y-6">
                         <h3 className="text-lg font-semibold mb-4">🧮 Kalkulator Fungsi Permintaan</h3>
@@ -204,7 +213,7 @@ export default function MaterialPage() {
             </Button>
           </Link>
           <Link to={`/modul/${module.id}/video`}>
-            <Button 
+            <Button
               onClick={handleComplete}
               className="gap-2 bg-gradient-primary hover:opacity-90"
             >
