@@ -31,29 +31,33 @@ export default function MaterialPage() {
     return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
   }
 
-  const [activeSection, setActiveSection] = useState(module.sections[0].id);
+  const getInitialSection = () => {
+    if (location.pathname.includes('/tugas-catatan')) {
+      return 'tugas-catatan';
+    }
+    return module.sections[0].id;
+  };
+
+  const [activeSection, setActiveSection] = useState(getInitialSection());
   const isPKWU = isPKWUModule(moduleId);
 
   const handleComplete = () => {
     markSectionComplete(module.id, 'materi');
   };
 
-  // Filter out tugas-catatan from main material tabs as it has its own page
-  const displayedSections = module.sections.filter(s => s.id !== 'tugas-catatan');
-
-  const currentSectionIndex = displayedSections.findIndex(s => s.id === activeSection);
-  const currentSection = displayedSections[currentSectionIndex];
+  const currentSectionIndex = module.sections.findIndex(s => s.id === activeSection);
+  const currentSection = module.sections[currentSectionIndex];
 
   const goToNextSection = () => {
-    if (currentSectionIndex < displayedSections.length - 1) {
-      setActiveSection(displayedSections[currentSectionIndex + 1].id);
+    if (currentSectionIndex < module.sections.length - 1) {
+      setActiveSection(module.sections[currentSectionIndex + 1].id);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const goToPrevSection = () => {
     if (currentSectionIndex > 0) {
-      setActiveSection(displayedSections[currentSectionIndex - 1].id);
+      setActiveSection(module.sections[currentSectionIndex - 1].id);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -97,7 +101,7 @@ export default function MaterialPage() {
         <motion.div variants={itemVariants}>
           <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
             <TabsList className="w-full flex-wrap h-auto gap-2 bg-muted/50 p-2 justify-start">
-              {displayedSections.map((section) => (
+              {module.sections.map((section) => (
                 <TabsTrigger
                   key={section.id}
                   value={section.id}
@@ -109,7 +113,7 @@ export default function MaterialPage() {
               ))}
             </TabsList>
 
-            {displayedSections.map((section) => (
+            {module.sections.map((section) => (
               <TabsContent key={section.id} value={section.id} className="mt-6">
                 <Card>
                   <CardHeader>
@@ -183,12 +187,12 @@ export default function MaterialPage() {
                     Sebelumnya
                   </Button>
                   <span className="text-sm text-muted-foreground">
-                    {currentSectionIndex + 1} / {displayedSections.length}
+                    {currentSectionIndex + 1} / {module.sections.length}
                   </span>
                   <Button
                     variant="outline"
                     onClick={goToNextSection}
-                    disabled={currentSectionIndex === displayedSections.length - 1}
+                    disabled={currentSectionIndex === module.sections.length - 1}
                     className="gap-2"
                   >
                     Selanjutnya

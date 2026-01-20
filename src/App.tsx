@@ -11,6 +11,7 @@ import AuthPage from "./pages/AuthPage";
 import ModuleInfo from "./pages/module/ModuleInfo";
 import TriggerQuestions from "./pages/module/TriggerQuestions";
 import MaterialPage from "./pages/module/MaterialPage";
+import TaskNotesPage from "./pages/module/TaskNotesPage";
 import VideoPage from "./pages/module/VideoPage";
 import LKPDPage from "./pages/module/LKPDPage";
 import QuizPage from "./pages/module/QuizPage";
@@ -43,7 +44,7 @@ const App = () => (
             <Route path="/modul/:moduleId" element={<ProtectedRoute><ModuleInfo /></ProtectedRoute>} />
             <Route path="/modul/:moduleId/pemantik" element={<ProtectedRoute><TriggerQuestions /></ProtectedRoute>} />
             <Route path="/modul/:moduleId/materi" element={<ProtectedRoute><MaterialPage /></ProtectedRoute>} />
-            <Route path="/modul/:moduleId/tugas-catatan" element={<ProtectedRoute><MaterialPage /></ProtectedRoute>} />
+            <Route path="/modul/:moduleId/tugas-catatan" element={<ProtectedRoute><TaskNotesPage /></ProtectedRoute>} />
             <Route path="/modul/:moduleId/video" element={<ProtectedRoute><VideoPage /></ProtectedRoute>} />
             <Route path="/modul/:moduleId/lkpd" element={<ProtectedRoute><LKPDPage /></ProtectedRoute>} />
             <Route path="/modul/:moduleId/kuis" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
