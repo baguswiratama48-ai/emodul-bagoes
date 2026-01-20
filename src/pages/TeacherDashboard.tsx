@@ -451,9 +451,9 @@ export default function TeacherDashboard() {
 
       setQuizSettings(prev => ({ ...prev, [currentModuleId]: isActive }));
       toast.success(`Kuis berhasil ${isActive ? 'dibuka' : 'ditutup'}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating quiz status:', error);
-      toast.error('Gagal mengubah status kuis');
+      toast.error(`Gagal mengubah status kuis: ${error.message || 'Unknown error'}`);
     }
   };
 
