@@ -467,13 +467,7 @@ Ceritakan proses pembuatan dan dampak positif:
       title: 'Tugas Catatan',
       icon: '📝',
       content: `
-# Materi Tugas Catatan
-
-Silakan pelajari dan catat materi berikut ini di buku catatan Anda.
-
----
-
-## 1. Pengertian Kerajinan Limbah
+# 1. Pengertian Kerajinan Limbah
 
 **Kerajinan** adalah hal yang berkaitan dengan buatan tangan atau kegiatan yang berkaitan dengan barang yang dihasilkan melalui keterampilan tangan (kerajinan tangan).
 
@@ -487,7 +481,7 @@ Silakan pelajari dan catat materi berikut ini di buku catatan Anda.
 
 ---
 
-## 2. Kerajinan dengan Memanfaatkan Bahan dari Limbah Berbentuk Bangun Datar
+# 2. Kerajinan dengan Memanfaatkan Bahan dari Limbah Berbentuk Bangun Datar
 
 ### 1. Kerajinan dari Limbah Kulit Jagung
 Kulit jagung merupakan limbah pertanian dari tanaman jagung. Kulit jagung kerap kali tidak diperhatikan, bahkan dianggap sampah sehingga biasanya dibuang. Sampah kulit jagung bisa menjadi benda kerajinan yang sangat bernilai dan bisa mendatangkan keuntungan. Kerajinan dari limbah kulit jagung ini sangat unik dan menarik.
@@ -515,7 +509,7 @@ Pecahan keramik ternyata dapat dimanfaatkan untuk kerajinan atau hiasan. Pecahan
 
 ---
 
-## 3. Contoh Limbah Berbentuk Bangun Datar Berdasarkan Kondisi Wilayah
+# 3. Contoh Limbah Berbentuk Bangun Datar Berdasarkan Kondisi Wilayah
 
 ### 1. Daerah pesisir pantai atau laut
 Limbah berbentuk bangun datar yang banyak tersedia adalah sisik ikan, daun pandan, daun kelapa, dan lainnya.
@@ -533,7 +527,7 @@ Limbah berbentuk bangun datar yang dihasilkan di daerah perkotaan biasanya kerta
 
 ---
 
-## 4. Ide dan Peluang Usaha
+# 4. Ide dan Peluang Usaha
 
 Limbah terkumpul dan menumpuk di sekitar kita setiap hari, mulai dari yang sifatnya organik dan nonorganik. Salah satu penyumbang limbah terbesar adalah kertas yang sudah tak terpakai. Kertas koran menjadi salah satu limbah kertas rumah tangga yang mendominasi. Koran bekas yang sudah lewat dari tanggalnya sering ditelantarkan begitu saja oleh pemiliknya. Sebagian digunakan sebagai pembungkus makanan, pembungkus paket, dan beberapa hal lainnya yang nantinya akan berakhir di tempat sampah juga.
 
@@ -549,7 +543,7 @@ Berawal dari ide kreatif dan unik, proses daur ulang tidak hanya dapat menambah 
 3. Ide dalam pembuatan dan pendayagunaan sumber-sumber produk kerajinan
 4. Ide yang dapat mencegah kebosanan konsumen dalam penggunaan produk kerajinan
 
-**Peluang Usaha** adalah suatu ide yang menarik atau usulan usaha yang memberi kemungkinan untuk memberikan hasil bagi investor atau pihak yang mengambil risiko. Peluang usaha digambarkan oleh persyaratan dan mengarah ke penyediaan suatu usaha produk yang dibuat atau ditambahkan nilainya untuk keperluan pembeli.
+**Peluang Usaha** itu sendiri dapat diartikan sebagai suatu ide yang menarik atau usulan usaha yang memberi kemungkinan untuk memberikan hasil bagi investor atau pihak yang mengambil risiko. Peluang usaha digambarkan oleh persyaratan dan mengarah ke penyediaan suatu usaha produk yang dibuat atau ditambahkan nilainya untuk keperluan pembeli.
 
 **Suatu peluang usaha yang baik mampu memenuhi beberapa kriteria sebagai berikut:**
 1. Permintaan yang nyata
