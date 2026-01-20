@@ -137,9 +137,9 @@ export function StudentFeedbackResponse({ feedbackData, onUpdate }: StudentFeedb
                     </div>
                 ) : (
                     <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
-                        className="text-muted-foreground hover:text-primary gap-2"
+                        className="gap-2 text-primary border-primary/20 hover:bg-primary/10"
                         onClick={() => setIsReplying(true)}
                     >
                         <Reply className="h-4 w-4" />

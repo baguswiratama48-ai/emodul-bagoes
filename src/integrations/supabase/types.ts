@@ -117,6 +117,47 @@ export type Database = {
           },
         ]
       }
+      student_notes: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          file_path: string
+          file_size: number
+          created_at: string
+          score: number | null
+          feedback: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          file_path: string
+          file_size: number
+          created_at?: string
+          score?: number | null
+          feedback?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          file_path?: string
+          file_size?: number
+          created_at?: string
+          score?: number | null
+          feedback?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_notes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       teacher_feedback: {
         Row: {
           answer_id: string

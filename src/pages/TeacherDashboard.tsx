@@ -22,8 +22,11 @@ import {
   Unlock,
   Database,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Download
 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -87,6 +90,20 @@ interface StudentTriggerAnswer {
   module_id?: string;
 }
 
+interface StudentNote {
+  id: string;
+  user_id: string;
+  full_name: string;
+  kelas: string;
+  title: string;
+  file_path: string;
+  file_size: number;
+  created_at: string;
+  score?: number;
+  score_max?: number; // Optional, defaults to 100
+  feedback?: string;
+}
+
 interface FeedbackMapItem {
   feedback: string;
   student_reply?: string;
@@ -108,6 +125,7 @@ export default function TeacherDashboard() {
   const [lkpdAnswers, setLkpdAnswers] = useState<StudentLkpdAnswer[]>([]);
   const [triggerAnswers, setTriggerAnswers] = useState<StudentTriggerAnswer[]>([]);
   const [reflectionAnswers, setReflectionAnswers] = useState<StudentTriggerAnswer[]>([]);
+  const [studentNotes, setStudentNotes] = useState<StudentNote[]>([]);
   const [allStudents, setAllStudents] = useState<StudentProfile[]>([]);
   const [expandedAnswerKey, setExpandedAnswerKey] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -142,6 +160,7 @@ export default function TeacherDashboard() {
       const lkpdParams = { event: '*', schema: 'public', table: 'lkpd_answers' } as const;
       const triggerParams = { event: '*', schema: 'public', table: 'trigger_answers' } as const;
       const quizParams = { event: '*', schema: 'public', table: 'quiz_answers' } as const;
+      const notesParams = { event: '*', schema: 'public', table: 'student_notes' } as const;
 
       const channel = supabase.channel('teacher-dashboard-changes')
         .on('postgres_changes', feedbackParams, () => {
@@ -158,6 +177,10 @@ export default function TeacherDashboard() {
         })
         .on('postgres_changes', quizParams, () => {
           console.log('Realtime update: quiz_answers');
+          fetchStudentData();
+        })
+        .on('postgres_changes', notesParams, () => {
+          console.log('Realtime update: student_notes');
           fetchStudentData();
         })
         .subscribe();
@@ -346,7 +369,58 @@ export default function TeacherDashboard() {
       setQuizSettings(settingsMap);
     }
 
+    // Fetch student notes
+    const { data: notesData } = await supabase
+      .from('student_notes')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (notesData) {
+      const notes = notesData.map((item: any) => {
+        const profile = profilesMap[item.user_id];
+        return {
+          id: item.id,
+          user_id: item.user_id,
+          full_name: profile?.full_name || 'Unknown',
+          kelas: profile?.kelas || '-',
+          title: item.title,
+          file_path: item.file_path,
+          file_size: item.file_size,
+          created_at: item.created_at,
+          score: item.score,
+          feedback: item.feedback
+        };
+      });
+      setStudentNotes(notes);
+    }
+
+    if (settingsData) {
+      const settingsMap: Record<string, boolean> = {};
+      (settingsData as any[]).forEach((s: any) => {
+        settingsMap[s.module_id] = s.is_active;
+      });
+      setQuizSettings(settingsMap);
+    }
+
     setLoading(false);
+  };
+
+  const handleUpdateNote = async (noteId: string, score: string, feedback: string) => {
+    try {
+      const { error } = await supabase
+        .from('student_notes')
+        .update({
+          score: parseInt(score) || 0,
+          feedback: feedback
+        })
+        .eq('id', noteId);
+
+      if (error) throw error;
+      toast.success('Nilai catatan berhasil disimpan');
+    } catch (error) {
+      toast.error('Gagal menyimpan nilai');
+      console.error(error);
+    }
   };
 
   // Realtime Subscription
@@ -633,7 +707,8 @@ export default function TeacherDashboard() {
                 <TabsTrigger value="reflection-answers" className="gap-2"><Lightbulb className="h-4 w-4" /> <span className="hidden sm:inline">Refleksi</span></TabsTrigger>
                 <TabsTrigger value="lkpd-answers" className="gap-2"><ClipboardList className="h-4 w-4" /> <span className="hidden sm:inline">LKPD</span></TabsTrigger>
                 <TabsTrigger value="quiz-results" className="gap-2"><CheckCircle2 className="h-4 w-4" /> <span className="hidden sm:inline">Kuis</span></TabsTrigger>
-                <TabsTrigger value="answer-keys" className="gap-2"><FileText className="h-4 w-4" /> <span className="hidden sm:inline">Kunci</span></TabsTrigger>
+                <TabsTrigger value="student-notes" className="gap-2"><FileText className="h-4 w-4" /> <span className="hidden sm:inline">Catatan</span></TabsTrigger>
+                <TabsTrigger value="answer-keys" className="gap-2"><BookOpen className="h-4 w-4" /> <span className="hidden sm:inline">Kunci</span></TabsTrigger>
                 <TabsTrigger value="reset" className="gap-2"><RefreshCw className="h-4 w-4" /> <span className="hidden sm:inline">Reset</span></TabsTrigger>
               </TabsList>
 
@@ -889,6 +964,85 @@ export default function TeacherDashboard() {
                           </div>
                         )}
                       </>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="student-notes">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Catatan Siswa</CardTitle>
+                    <CardDescription>Periksa dan beri nilai catatan yang diupload siswa</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {studentNotes.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground"><p>Belum ada catatan yang diupload.</p></div>
+                    ) : (
+                      <div className="border rounded-lg overflow-hidden">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Tanggal</TableHead>
+                              <TableHead>Siswa</TableHead>
+                              <TableHead>Judul Catatan</TableHead>
+                              <TableHead>File</TableHead>
+                              <TableHead className="w-[100px]">Nilai (0-100)</TableHead>
+                              <TableHead>Feedback</TableHead>
+                              <TableHead></TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {studentNotes.filter(n => selectedKelas === 'all' || n.kelas === selectedKelas).map((note) => (
+                              <TableRow key={note.id}>
+                                <TableCell className="text-xs text-muted-foreground">
+                                  {new Date(note.created_at).toLocaleDateString('id-ID')}
+                                </TableCell>
+                                <TableCell>
+                                  <div>
+                                    <div className="font-medium">{note.full_name}</div>
+                                    <div className="text-xs text-muted-foreground">{note.kelas}</div>
+                                  </div>
+                                </TableCell>
+                                <TableCell>{note.title}</TableCell>
+                                <TableCell>
+                                  <Button variant="outline" size="sm" asChild>
+                                    <a href={`https://tqmycasowqhgfsgcucvy.supabase.co/storage/v1/object/public/notes/${note.file_path}`} target="_blank" rel="noreferrer" className="gap-2">
+                                      <Download className="h-3 w-3" /> PDF
+                                    </a>
+                                  </Button>
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    defaultValue={note.score || ''}
+                                    className="w-20"
+                                    id={`score-${note.id}`}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    defaultValue={note.feedback || ''}
+                                    placeholder="Beri masukan..."
+                                    id={`feedback-${note.id}`}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Button size="sm" onClick={() => {
+                                    const score = (document.getElementById(`score-${note.id}`) as HTMLInputElement).value;
+                                    const feedback = (document.getElementById(`feedback-${note.id}`) as HTMLInputElement).value;
+                                    handleUpdateNote(note.id, score, feedback);
+                                  }}>
+                                    Simpan
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
                     )}
                   </CardContent>
                 </Card>
