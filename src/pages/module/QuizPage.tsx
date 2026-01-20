@@ -69,7 +69,7 @@ export default function QuizPage() {
     // Check quiz setting/status first
     try {
       const { data: settingData } = await supabase
-        .from('quiz_settings' as any)
+        .from('quiz_access_control' as any)
         .select('is_active')
         .eq('module_id', module.id)
         .single();
@@ -190,7 +190,7 @@ export default function QuizPage() {
 
     try {
       const { error } = await supabase
-        .from('quiz_settings' as any)
+        .from('quiz_access_control' as any)
         .upsert({
           module_id: module.id,
           is_active: checked,
@@ -468,8 +468,8 @@ export default function QuizPage() {
                   <div
                     key={index}
                     className={`flex items-center space-x-3 p-4 rounded-lg border transition-all cursor-pointer ${selectedAnswers[currentQuestion] === index
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border hover:border-primary/50 hover:bg-muted/50'
                       }`}
                     onClick={() => handleAnswerSelect(currentQuestion, index)}
                   >
@@ -521,10 +521,10 @@ export default function QuizPage() {
                 key={index}
                 onClick={() => setCurrentQuestion(index)}
                 className={`w-10 h-10 rounded-lg font-medium transition-all ${currentQuestion === index
-                    ? 'bg-primary text-primary-foreground'
-                    : selectedAnswers[index] !== undefined
-                      ? 'bg-success/10 text-success border border-success/30'
-                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  ? 'bg-primary text-primary-foreground'
+                  : selectedAnswers[index] !== undefined
+                    ? 'bg-success/10 text-success border border-success/30'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
                   }`}
               >
                 {index + 1}

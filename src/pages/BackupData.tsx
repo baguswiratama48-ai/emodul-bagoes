@@ -69,9 +69,9 @@ export default function BackupData() {
 
             // 6. Quiz Settings
             addLog('Mengambil pengaturan Kuis...');
-            const { data: settings, error: errSettings } = await supabase.from('quiz_settings' as any).select('*');
+            const { data: settings, error: errSettings } = await supabase.from('quiz_access_control' as any).select('*');
             if (!errSettings) {
-                backupData.tables.quiz_settings = settings;
+                backupData.tables.quiz_access_control = settings;
                 addLog(`✅ ${settings?.length || 0} pengaturan kuis berhasil diambil.`);
             }
 

@@ -358,7 +358,7 @@ export default function TeacherDashboard() {
 
     // Fetch quiz status
     const { data: settingsData } = await supabase
-      .from('quiz_settings' as any)
+      .from('quiz_access_control' as any)
       .select('*');
 
     if (settingsData) {
@@ -440,7 +440,7 @@ export default function TeacherDashboard() {
   const handleToggleQuiz = async (isActive: boolean) => {
     try {
       const { error } = await supabase
-        .from('quiz_settings' as any)
+        .from('quiz_access_control' as any)
         .upsert({
           module_id: currentModuleId,
           is_active: isActive,

@@ -170,13 +170,14 @@ export default function RestoreData() {
             await restoreTable('student_notes', tables.student_notes);
 
             // Settings usually don't have user_id dependecy (except 'modified by')
-            // but our schema has simple quiz_settings.
-            if (tables.quiz_settings && tables.quiz_settings.length > 0) {
-                const cleanSettings = tables.quiz_settings.map((s: any) => {
+            // but our schema has simple quiz_settings / quiz_access_control.
+            const quizSettingsData = tables.quiz_access_control || tables.quiz_settings;
+            if (quizSettingsData && quizSettingsData.length > 0) {
+                const cleanSettings = quizSettingsData.map((s: any) => {
                     const { id, ...rest } = s;
                     return rest;
                 });
-                await supabase.from('quiz_settings' as any).upsert(cleanSettings as any, { onConflict: 'module_id' });
+                await supabase.from('quiz_access_control' as any).upsert(cleanSettings as any, { onConflict: 'module_id' });
                 addLog('✅ Pengaturan Kuis dipulihkan.');
             }
 
