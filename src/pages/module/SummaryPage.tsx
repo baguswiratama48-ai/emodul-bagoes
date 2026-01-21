@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  FileCheck, 
+import {
+  FileCheck,
   ArrowLeft,
   CheckCircle2,
   Home,
@@ -17,15 +17,11 @@ import { useProgress } from '@/hooks/useProgress';
 import { getModuleById, isPKWUModule } from '@/data/moduleUtils';
 import confetti from 'canvas-confetti';
 
-// Summary for Ekonomi
-const ekonomiSummaryPoints = [
+// Summary for Ekonomi (Permintaan)
+const permintaanSummaryPoints = [
   {
     title: "Pengertian Permintaan",
     content: "Permintaan adalah jumlah barang/jasa yang ingin dan mampu dibeli konsumen pada berbagai tingkat harga dalam periode waktu tertentu."
-  },
-  {
-    title: "Macam-Macam Permintaan",
-    content: "Berdasarkan daya beli: efektif, potensial, absolut. Berdasarkan jumlah: individu dan pasar."
   },
   {
     title: "Hukum Permintaan",
@@ -39,9 +35,29 @@ const ekonomiSummaryPoints = [
     title: "Fungsi Permintaan",
     content: "Qd = -aP + b, di mana Qd = jumlah diminta, P = harga, a = slope (negatif), b = konstanta."
   },
+];
+
+// Summary for Ekonomi (Penawaran) - NEW
+const penawaranSummaryPoints = [
   {
-    title: "Perubahan Permintaan",
-    content: "Pergerakan sepanjang kurva (karena harga) vs pergeseran kurva (karena faktor non-harga seperti pendapatan, selera, dll)."
+    title: "Pengertian Penawaran",
+    content: "Penawaran (Supply) adalah jumlah barang/jasa yang dijual/ditawarkan oleh produsen pada tingkat harga tertentu."
+  },
+  {
+    title: "Hukum Penawaran",
+    content: "Hubungan Positif: Jika harga naik → penawaran naik. Jika harga turun → penawaran turun (ceteris paribus)."
+  },
+  {
+    title: "Faktor Penawaran",
+    content: "Harga barang itu sendiri, biaya produksi, teknologi, pajak, subsidi, harga barang lain, dan prediksi harga masa depan."
+  },
+  {
+    title: "Kurva Penawaran",
+    content: "Kurva berslope positif (miring dari kiri bawah ke kanan atas), menunjukkan hubungan berbanding lurus antara P dan Q."
+  },
+  {
+    title: "Pergerakan vs Pergeseran",
+    content: "Pergerakan: akibat perubahan harga sendiri (sepanjang kurva). Pergeseran: akibat faktor lain seperti teknologi/biaya (kurva geser kiri/kanan)."
   }
 ];
 
@@ -56,14 +72,6 @@ const pkwuSummaryPoints = [
     content: "Proses mengubah limbah menjadi produk bernilai lebih tinggi dari bentuk aslinya, berbeda dengan recycling yang mengolah kembali menjadi bahan dasar."
   },
   {
-    title: "Sumber Ide Kreatif",
-    content: "Ide dapat berasal dari observasi lingkungan, tren pasar, kebutuhan konsumen, dan riset referensi."
-  },
-  {
-    title: "Analisis Peluang Usaha",
-    content: "Meliputi identifikasi produk, riset target pasar, analisis pesaing, dan penentuan USP (Unique Selling Point)."
-  },
-  {
     title: "Proses Produksi",
     content: "Tahapan: pengumpulan bahan → persiapan → desain → pengerjaan → quality control → packaging."
   },
@@ -75,32 +83,37 @@ const pkwuSummaryPoints = [
 
 // Reflection questions for Ekonomi
 const ekonomiReflectionQuestions = [
-  "Apa hal paling menarik yang kamu pelajari dari materi permintaan ini?",
-  "Bagaimana kamu akan menerapkan konsep permintaan dalam kehidupan sehari-hari?",
+  "Apa hal paling menarik yang kamu pelajari dari materi ini?",
+  "Bagaimana kamu akan menerapkan konsep ini dalam kehidupan sehari-hari?",
   "Adakah bagian materi yang masih belum kamu pahami? Tuliskan di sini!"
-];
-
-// Reflection questions for PKWU
-const pkwuReflectionQuestions = [
-  "Apa hal paling menarik yang kamu pelajari dari materi kerajinan limbah ini?",
-  "Bagaimana kamu akan menerapkan konsep upcycling dalam kehidupan sehari-hari?",
-  "Produk kerajinan limbah apa yang ingin kamu coba buat? Jelaskan!"
 ];
 
 export default function SummaryPage() {
   const { moduleId } = useParams();
   const { markSectionComplete, markModuleComplete, getModuleProgress } = useProgress();
   const module = getModuleById(moduleId);
-  
+
   if (!module) {
     return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
   }
-  
+
   const progress = getModuleProgress(module.id);
   const isPKWU = isPKWUModule(moduleId);
-  const summaryPoints = isPKWU ? pkwuSummaryPoints : ekonomiSummaryPoints;
-  const reflectionQuestions = isPKWU ? pkwuReflectionQuestions : ekonomiReflectionQuestions;
-  
+
+  let summaryPoints = permintaanSummaryPoints;
+  let keyFormulaTitle = "Fungsi Permintaan";
+  let keyFormulaContent = "Qd = -aP + b";
+
+  if (isPKWU) {
+    summaryPoints = pkwuSummaryPoints;
+  } else if (moduleId === 'penawaran') {
+    summaryPoints = penawaranSummaryPoints;
+    keyFormulaTitle = "Fungsi Penawaran";
+    keyFormulaContent = "Qs = aP + b";
+  }
+
+  const reflectionQuestions = ekonomiReflectionQuestions;
+
   const [reflections, setReflections] = useState<Record<number, string>>({});
   const [isCompleted, setIsCompleted] = useState(progress.isCompleted);
 
@@ -112,7 +125,7 @@ export default function SummaryPage() {
     markSectionComplete(module.id, 'rangkuman');
     markModuleComplete(module.id);
     setIsCompleted(true);
-    
+
     confetti({
       particleCount: 150,
       spread: 100,
@@ -199,8 +212,8 @@ export default function SummaryPage() {
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="p-4 bg-card rounded-lg border">
-                    <h4 className="font-medium mb-2">Fungsi Permintaan</h4>
-                    <p className="text-2xl font-mono text-primary">Qd = -aP + b</p>
+                    <h4 className="font-medium mb-2">{keyFormulaTitle}</h4>
+                    <p className="text-2xl font-mono text-primary">{keyFormulaContent}</p>
                   </div>
                   <div className="p-4 bg-card rounded-lg border">
                     <h4 className="font-medium mb-2">Menghitung Slope</h4>
@@ -270,7 +283,7 @@ export default function SummaryPage() {
                 <Trophy className={`h-12 w-12 mx-auto mb-4 ${isPKWU ? 'text-green-600' : 'text-success'}`} />
                 <h3 className="text-xl font-bold mb-2">Kamu Sudah di Akhir Modul!</h3>
                 <p className="text-muted-foreground mb-6">
-                  Selamat telah menyelesaikan semua materi tentang {isPKWU ? 'Kerajinan dari Limbah' : 'Permintaan'}. 
+                  Selamat telah menyelesaikan semua materi tentang {isPKWU ? 'Kerajinan dari Limbah' : 'Permintaan'}.
                   Klik tombol di bawah untuk menandai modul ini sebagai selesai.
                 </p>
                 <Button
@@ -293,7 +306,7 @@ export default function SummaryPage() {
                 </div>
                 <h3 className="text-2xl font-bold mb-2 text-gradient">Selamat! 🎉</h3>
                 <p className="text-muted-foreground mb-6">
-                  Kamu telah berhasil menyelesaikan modul <strong>{isPKWU ? 'Kerajinan dari Limbah' : 'Permintaan (Demand)'}</strong>. 
+                  Kamu telah berhasil menyelesaikan modul <strong>{isPKWU ? 'Kerajinan dari Limbah' : 'Permintaan (Demand)'}</strong>.
                   Lanjutkan perjalanan belajarmu dengan modul berikutnya!
                 </p>
                 <div className="flex justify-center gap-4">

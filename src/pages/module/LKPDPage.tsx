@@ -69,35 +69,35 @@ const ekonomiLkpdProblems = [
 const penawaranLkpdProblems = [
   {
     id: 1,
-    title: "Soal 1: Penawaran Durian",
-    story: "Pak Andi adalah petani durian. Saat harga durian Rp50.000 per buah, ia hanya mau menjual 20 buah. Namun saat harga durian naik menjadi Rp80.000 per buah, ia semangat menjual hingga 50 buah.",
-    question: "Tentukan fungsi penawaran durian Pak Andi!",
-    hint: "Identifikasi P1, Q1, P2, Q2. Ingat slope penawaran positif.",
-    rubrik: "Skor 25: Jawaban lengkap dengan langkah sistematis dan hasil benar"
+    title: "Soal 1: Analisis Tabel Penawaran",
+    story: "Diketahui data penawaran barang sebagai berikut:\n- Saat harga Rp10.000, jumlah barang yang ditawarkan 100 unit\n- Saat harga Rp15.000, jumlah barang yang ditawarkan 150 unit\n- Saat harga Rp20.000, jumlah barang yang ditawarkan 200 unit",
+    question: "Tentukan fungsi penawaran dari data tabel di atas!",
+    hint: "Ambil dua titik, misal A(10000, 100) dan B(15000, 150). Cari slope (a) lalu susun persamaan Qs.",
+    rubrik: "Skor 25: Jawaban benar Qs = 0.01P (atau Qs = 1/100 P)"
   },
   {
     id: 2,
-    title: "Soal 2: Pabrik Sepatu",
-    story: "Sebuah pabrik sepatu akan memproduksi 1000 pasang sepatu jika harga pasar Rp200.000. Jika harga naik menjadi Rp250.000, pabrik bersedia memproduksi 1500 pasang.",
-    question: "Tentukan fungsi penawaran pabrik sepatu tersebut!",
-    hint: "Gunakan rumus persamaan garis melalui dua titik.",
-    rubrik: "Skor 25: Jawaban lengkap dengan langkah sistematis dan hasil benar"
+    title: "Soal 2: Dampak Teknologi & Pajak",
+    story: "Sebuah pabrik tekstil baru saja membeli mesin otomatis canggih yang hemat energi. Di sisi lain, pemerintah menaikkan pajak ekspor tekstil.",
+    question: "Jelaskan dampak kedua kejadian tersebut terhadap kurva penawaran tekstil! Apakah kurva akan bergeser ke kiri atau ke kanan? Jelaskan alasannya!",
+    hint: "Mesin canggih = Teknologi (Geser Kanan). Pajak naik = Biaya naik (Geser Kiri). Analisis mana yang lebih kuat atau jelaskan keduanya terpisah.",
+    rubrik: "Skor 25: Analisis logis tentang dampak Teknologi dan Pajak secara terpisah."
   },
   {
     id: 3,
-    title: "Soal 3: Toko Kue Lebaran",
-    story: "Menjelang lebaran, harga kue nastar naik dari Rp60.000 menjadi Rp75.000 per toples. Akibatnya, toko kue 'Enak' menambah stok penjualan dari 100 toples menjadi 140 toples.",
-    question: "Tentukan fungsi penawarannya, dan hitung berapa toples yang akan ditawarkan jika harga naik lagi menjadi Rp90.000!",
-    hint: "Cari fungsi Qs dulu, lalu masukkan nilai P = 90.000",
-    rubrik: "Skor 25: Jawaban lengkap dengan fungsi benar dan prediksi tepat"
+    title: "Soal 3: Pergerakan vs Pergeseran",
+    story: "Harga 'Kopi Kekinian' naik dari Rp15.000 menjadi Rp20.000, sehingga kedai kopi menambah stok jualannya. Di tempat lain, harga 'Gula Aren' (bahan baku) naik drastis.",
+    question: "Peristiwa mana yang disebut 'Pergerakan Sepanjang Kurva' dan mana yang 'Pergeseran Kurva'? Jelaskan lho!",
+    hint: "Kopi naik = harga barang itu sendiri. Gula naik = biaya produksi.",
+    rubrik: "Skor 25: Mampu membedakan pergerakan (akibat harga kopi) dan pergeseran (akibat harga gula)."
   },
   {
     id: 4,
-    title: "Soal 4: Analisis Pajak",
-    story: "Awalnya fungsi penawaran suatu barang adalah Qs = 2P - 100. Kemudian pemerintah menetapkan pajak sebesar Rp10 per unit barang.",
-    question: "Bagaimana fungsi penawaran yang baru setelah pajak? (Petunjuk: Pajak menambah harga penawaran, P' = P - t atau sesuaikan fungsi P)",
-    hint: "Dalam fungsi Qs = f(P), pajak menggeser kurva ke kiri/atas.",
-    rubrik: "Skor 25: Analisis logis tentang dampak pajak terhadap fungsi",
+    title: "Soal 4: Fungsi Penawaran & Prediksi",
+    story: "Fungsi penawaran durian adalah Qs = 2P - 50.000.",
+    question: "a) Berapa jumlah durian yang ditawarkan jika harga Rp30.000?\nb) Berapa harga terendah agar produsen mau mulai menjual (saat Qs > 0)?",
+    hint: "a) Substitusi P=30000. b) Cari P saat Qs = 0.",
+    rubrik: "Skor 25: Hitungan benar untuk kedua pertanyaan."
   },
 ];
 
