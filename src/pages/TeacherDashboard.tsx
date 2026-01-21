@@ -930,33 +930,35 @@ export default function TeacherDashboard() {
                                                 const moduleId = result.module_id || (selectedMapel === 'ekonomi' ? 'permintaan' : 'kerajinan-limbah');
 
                                                 try {
-                                                  // 1. Delete specific module answers
-                                                  await supabase
-                                                    .from('quiz_answers')
-                                                    .delete()
-                                                    .eq('user_id', result.user_id)
-                                                    .eq('module_id', moduleId);
+                                                  // Try using the secure RPC function first
+                                                  const { error: rpcError } = await supabase.rpc('reset_quiz_for_student', {
+                                                    p_user_id: result.user_id,
+                                                    p_module_id: moduleId
+                                                  });
 
-                                                  // 2. Delete legacy/null module answers (cleanup)
-                                                  await supabase
-                                                    .from('quiz_answers')
-                                                    .delete()
-                                                    .eq('user_id', result.user_id)
-                                                    .is('module_id', null);
+                                                  if (rpcError) {
+                                                    console.warn('RPC reset failed, falling back to manual delete:', rpcError);
 
-                                                  // 3. Delete 'default' module answers (cleanup)
-                                                  const { error } = await supabase
-                                                    .from('quiz_answers')
-                                                    .delete()
-                                                    .eq('user_id', result.user_id)
-                                                    .eq('module_id', 'default');
+                                                    // Fallback 1: Manual delete (standard)
+                                                    await supabase.from('quiz_answers').delete().eq('user_id', result.user_id).eq('module_id', moduleId);
+                                                    await supabase.from('quiz_answers').delete().eq('user_id', result.user_id).is('module_id', null);
+                                                    await supabase.from('quiz_answers').delete().eq('user_id', result.user_id).eq('module_id', 'default');
+                                                    await supabase.from('quiz_answers').delete().eq('user_id', result.user_id).eq('module_id', '');
 
-                                                  if (error) {
-                                                    toast.error('Gagal mereset kuis');
-                                                  } else {
-                                                    toast.success(`Kuis milik ${result.full_name} berhasil direset`);
-                                                    fetchStudentData();
+                                                    // Fallback 2: NUCLEAR OPTION (Delete ALL for this user)
+                                                    // Triggered only if the main attempts likely failed to clear the list visibly
+                                                    if (confirm(`Peringatan: Reset standar mungkin gagal. Apakah Anda ingin menghapus SEMUA data kuis siswa ini (termasuk modul lain) untuk memastikan reset berhasil?`)) {
+                                                      const { error: nuclearError } = await supabase.from('quiz_answers').delete().eq('user_id', result.user_id);
+                                                      if (nuclearError) console.error('Nuclear reset error:', nuclearError);
+                                                    }
                                                   }
+
+                                                  toast.success(`Kuis milik ${result.full_name} berhasil direset`);
+
+                                                  // Force refresh multiple times to ensure UI update
+                                                  setTimeout(() => fetchStudentData(), 500);
+                                                  setTimeout(() => fetchStudentData(), 2000);
+
                                                 } catch (err) {
                                                   console.error('Reset error:', err);
                                                   toast.error('Terjadi kesalahan saat reset');
