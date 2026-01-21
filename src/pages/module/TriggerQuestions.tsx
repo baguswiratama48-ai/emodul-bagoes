@@ -21,8 +21,8 @@ import { useToast } from '@/hooks/use-toast';
 import { getModuleById, isPKWUModule } from '@/data/moduleUtils';
 import { supabase } from '@/integrations/supabase/client';
 
-// Trigger questions for Ekonomi
-const ekonomiTriggerQuestions = [
+// Trigger questions for Permintaan (Demand)
+const permintaanTriggerQuestions = [
   {
     id: 1,
     question: "Pernahkah kamu memperhatikan saat ada diskon besar-besaran, mengapa orang jadi lebih banyak membeli?",
@@ -40,6 +40,28 @@ const ekonomiTriggerQuestions = [
     question: "Ketika harga pulsa mahal, apa yang biasanya kamu lakukan? Apakah mencari alternatif lain?",
     hint: "Pikirkan tentang barang pengganti (substitusi).",
     icon: "📱",
+  },
+];
+
+// Trigger questions for Penawaran (Supply)
+const penawaranTriggerQuestions = [
+  {
+    id: 1,
+    question: "Apa yang biasanya kamu lakukan jika barang yang kamu jual laku keras dan harganya naik?",
+    hint: "Pikirkan tentang kesempatan untuk mendapatkan keuntungan lebih besar.",
+    icon: "📈",
+  },
+  {
+    id: 2,
+    question: "Mengapa penjual tidak selalu menjual jumlah barang yang sama setiap hari?",
+    hint: "Pikirkan tentang ketersediaan stok, biaya produksi, atau kondisi pasar.",
+    icon: "📦",
+  },
+  {
+    id: 3,
+    question: "Selain harga, hal apa saja yang bisa membuat penjual menambah atau mengurangi barang dagangannya?",
+    hint: "Ingat faktor-faktor seperti biaya produksi, teknologi, atau pajak/subsidi.",
+    icon: "🏭",
   },
 ];
 
@@ -77,7 +99,13 @@ export default function TriggerQuestions() {
   }
 
   const isPKWU = isPKWUModule(moduleId);
-  const triggerQuestions = isPKWU ? pkwuTriggerQuestions : ekonomiTriggerQuestions;
+
+  let triggerQuestions = permintaanTriggerQuestions;
+  if (isPKWU) {
+    triggerQuestions = pkwuTriggerQuestions;
+  } else if (moduleId === 'penawaran') {
+    triggerQuestions = penawaranTriggerQuestions;
+  }
 
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [answerIds, setAnswerIds] = useState<Record<number, string>>({});
