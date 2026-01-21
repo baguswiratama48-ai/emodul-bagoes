@@ -641,78 +641,6 @@ export const supplyModule: Module = {
   subtitle: 'dan Kurva Penawaran',
   description: 'Mempelajari konsep penawaran dalam ekonomi, faktor-faktor yang mempengaruhi penawaran, hukum penawaran, serta cara membuat dan menganalisis kurva penawaran.',
   objectives: [
-    'Menjelaskan pengertian penawaran dalam kegiatan ekonomi',
-    'Mengidentifikasi faktor-faktor yang mempengaruhi penawaran',
-    'Menjelaskan hukum penawaran dan konsep ceteris paribus',
-    'Membuat dan menganalisis tabel skedul penawaran',
-    'Menggambar dan menginterpretasikan kurva penawaran',
-    'Menghitung fungsi penawaran menggunakan rumus matematika',
-    'Membedakan pergerakan sepanjang kurva dan pergeseran kurva penawaran',
-  ],
-  prerequisites: [
-    'Memahami konsep dasar permintaan (demand)',
-    'Memahami konsep perilaku produsen',
-    'Kemampuan dasar matematika (grafik koordinat & fungsi linear)',
-  ],
-  duration: '3 JP (3 x 45 menit)',
-  sections: [
-    {
-      id: 'pengertian-penawaran',
-      title: 'Pengertian Penawaran',
-      icon: '📦',
-      content: `
-# Pengertian Penawaran (Supply)
-
-**Penawaran (Supply)** adalah jumlah barang atau jasa yang tersedia dan dapat dijual oleh produsen (penjual) pada berbagai tingkat harga dalam periode waktu tertentu.
-
-## Kata Kunci Penting:
-- **Tersedia**: Barang sudah siap untuk dijual
-- **Dapat dijual**: Produsen mau dan mampu menjualnya
-- **Berbagai tingkat harga**: Penawaran berubah sesuai harga
-- **Periode waktu tertentu**: Per hari, per bulan, dsb.
-
-## Sudut Pandang Produsen
-Jika dalam **Permintaan** kita melihat dari sisi *pembeli* (konsumen), maka dalam **Penawaran** kita melihat dari sisi *penjual* (produsen).
-
-> **Logika Penjual**:
-> "Kalau harga barang naik, saya ingin jual lebih banyak supaya untung lebih besar!"
-
-## Faktor-faktor yang Mempengaruhi Penawaran:
-
-1.  **Harga barang itu sendiri**
-    -   Jika harga naik, penawaran ikut naik (ingin untung).
-
-2.  **Biaya Produksi**
-    -   Biaya bahan baku, upah tenaga kerja, sewa gedung.
-    -   Jika biaya produksi naik, keuntungan menipis $\rightarrow$ produsen mengurangi penawaran.
-
-3.  **Teknologi**
-    -   Mesin canggih bisa produksi lebih cepat & murah $\rightarrow$ penawaran meningkat.
-
-4.  **Harga barang lain**
-    -   Jika harga barang lain (yang sejenis) naik, produsen mungkin beralih memproduksi barang tersebut.
-
-5.  **Perkiraan harga masa depan**
-    -   Jika diprediksi harga akan naik bulan depan, produsen mungkin menahan stok sekarang (penawaran turun) untuk dijual nanti.
-
-6.  **Jumlah Produsen**
-    -   Semakin banyak penjual, semakin banyak barang yang ditawarkan di pasar.
-
-7.  **Kebijakan Pemerintah**
-    -   Pajak (menambah biaya) $\rightarrow$ menurunkan penawaran.
-    -   Subsidi (mengurangi biaya) $\rightarrow$ menaikkan penawaran.
-      `,
-    },
-    {
-      id: 'hukum-penawaran',
-      title: 'Hukum Penawaran',
-      icon: '⚖️',
-      content: `export const supplyModule: Module = {
-  id: 'penawaran',
-  title: 'Penawaran (Supply)',
-  subtitle: 'Konsep, Hukum, dan Kurva',
-  description: 'Mempelajari konsep penawaran dari sudut pandang produsen, hukum penawaran, faktor-faktor yang mempengaruhinya, serta analisis kurva dan fungsi penawaran.',
-  objectives: [
     'Menjelaskan pengertian penawaran (supply)',
     'Mengidentifikasi faktor-faktor yang memengaruhi penawaran',
     'Menjelaskan hukum penawaran',
@@ -731,40 +659,37 @@ Jika dalam **Permintaan** kita melihat dari sisi *pembeli* (konsumen), maka dala
       title: 'Pengertian & Faktor Penawaran',
       icon: '📦',
       content: `
-# Pengertian & Faktor Penawaran
+# 1. Pengertian
+**Penawaran (supply)** adalah jumlah barang atau jasa yang akan dijual (ditawarkan) pada tingkat harga tertentu. Dari pengertian tersebut tampak bahwa penawaran ditinjau dari sudut **produsen/penjual**.
 
-## 1. Pengertian Penawaran(Supply)
-** Penawaran(supply) ** adalah jumlah barang atau jasa yang akan dijual(ditawarkan) pada tingkat harga tertentu. 
+# 2. Faktor-Faktor yang Memengaruhi Penawaran
+Penawaran datang dari pihak penjual sebagai pihak yang menyediakan barang dan jasa dalam perekonomian. Penawaran terhadap suatu barang dipengaruhi oleh berbagai hal, antara lain sebagai berikut.
 
-Dari pengertian tersebut tampak bahwa penawaran ditinjau dari ** sudut produsen / penjual **.
+### a. Harga Barang atau Jasa Lain
+Selain dapat memengaruhi permintaan, harga barang atau jasa lain juga dapat memengaruhi penawaran. **Barang substitusi** ataupun **komplementer** berhubungan satu sama lain dan akan saling memengaruhi.
 
-## 2. Faktor - Faktor yang Memengaruhi Penawaran
-Penawaran datang dari pihak penjual sebagai pihak yang menyediakan barang dan jasa dalam perekonomian.Penawaran terhadap suatu barang dipengaruhi oleh berbagai hal, antara lain:
-
-### a.Harga Barang atau Jasa Lain
-Selain dapat memengaruhi permintaan, harga barang atau jasa lain juga dapat memengaruhi penawaran. ** Barang substitusi ** ataupun ** komplementer ** berhubungan satu sama lain dan akan saling memengaruhi.
-
-### b.Biaya Produksi
+### b. Biaya Produksi
 Biaya produksi berkaitan dengan biaya yang harus dikeluarkan oleh produsen untuk memproduksi barang. 
-- Produsen memperhatikan ** efektivitas ** dan ** efisiensi **.
-- Semakin efektif dan efisien proses produksi, maka ** biaya produksi akan semakin sedikit **.
-- Hal ini tentu saja akan memengaruhi penawaran barang(biasanya meningkatkan penawaran).
+- Dalam memproduksi suatu barang, produsen akan memperhatikan **efektivitas** dan **efisiensi**. 
+- Semakin efektif dan efisien proses produksi, maka **biaya produksi akan semakin sedikit**. 
+- Hal ini tentu saja juga akan memengaruhi penawaran barang.
 
-### c.Teknologi
-Perkembangan teknologi juga memengaruhi penawaran.Perusahaan yang mampu memanfaatkan teknologi dengan baik dalam proses produksi akan menghasilkan barang ** lebih banyak ** dengan ** biaya yang lebih murah **.
+### c. Teknologi
+Perkembangan teknologi juga memengaruhi penawaran. Perusahaan yang mampu memanfaatkan teknologi dengan baik dalam proses produksi akan menghasilkan barang **lebih banyak** dengan **biaya yang lebih murah**.
 
-### d.Perkiraan Harga pada Masa Depan
-Pada situasi dan kondisi tertentu, perusahaan dapat memprediksi tingkat kebutuhan atas suatu barang atau jasa.Prediksi tersebut akan memudahkan suatu perusahaan menentukan perkiraan harga pada masa depan.
+### d. Perkiraan Harga pada Masa Depan
+Pada situasi dan kondisi tertentu perusahaan dapat memprediksi tingkat kebutuhan atas suatu barang atau jasa. Prediksi tersebut akan memudahkan suatu perusahaan menentukan perkiraan harga pada masa depan.
 
-### e.Pajak
-Pajak merupakan kontribusi atau pungutan yang wajib dibayarkan masyarakat kepada negara.
-- Pajak akan ** menambah harga ** barang atau jasa yang ditawarkan.
-- ** Beban pajak tinggi ** mengakibatkan harga barang naik, sehingga berpotensi kuantitas barang yang ditawarkan akan ** turun **.
+### e. Pajak
+Pajak merupakan kontribusi atau pungutan yang wajib dibayarkan masyarakat kepada negara dengan kriteria tertentu. 
+- Pajak yang dikenakan terhadap barang atau jasa akan **menambah harga** barang atau jasa yang ditawarkan. 
+- **Beban pajak tinggi** akan mengakibatkan harga barang naik sehingga berpotensi pada kuantitas barang yang ditawarkan akan **turun**. 
+- Meskipun demikian, produsen juga akan mengalihkan sebagian tanggungan pajaknya pada konsumen.
 
-### f.Subsidi
-Subsidi adalah bantuan yang diberikan pemerintah kepada produsen agar harga yang ditawarkan sesuai dengan harapan pemerintah.
-- Bantuan keuangan ini akan ** menurunkan harga ** barang atau jasa yang ditawarkan.
-- Pemberian subsidi berpotensi dapat ** meningkatkan penawaran **.
+### f. Subsidi
+Subsidi adalah bantuan yang diberikan pemerintah kepada produsen agar harga yang ditawarkan sesuai dengan harapan pemerintah. 
+- Bantuan keuangan yang diterima oleh produsen akan **menurunkan harga** barang atau jasa yang akan ditawarkan di pasar. 
+- Pemberian subsidi berpotensi dapat **meningkatkan penawaran**.
       `,
     },
     {
@@ -772,68 +697,56 @@ Subsidi adalah bantuan yang diberikan pemerintah kepada produsen agar harga yang
       title: 'Hukum & Kurva Penawaran',
       icon: '📈',
       content: `
-# Hukum & Kurva Penawaran
+# 3. Hukum Penawaran
+Hukum penawaran menjelaskan tentang hubungan antara harga barang dan jumlah barang yang ditawarkan penjual. **Jumlah barang berhubungan secara positif dengan harga barang tersebut.**
 
-## 3. Hukum Penawaran
-Hukum penawaran menjelaskan tentang hubungan antara harga barang dan jumlah barang yang ditawarkan penjual. 
+> **Bunyi Hukum Penawaran:**
+> "Semakin **tinggi** harga barang, semakin **banyak** barang yang akan dijual (ditawarkan) produsen. Sebaliknya, semakin **rendah** harga barang, jumlah barang yang dijual (ditawarkan) produsen semakin **sedikit**".
 
-> ** Bunyi Hukum Penawaran:**
-> "Semakin **tinggi** harga barang, semakin **banyak** barang yang akan dijual (ditawarkan) produsen. Sebaliknya, semakin **rendah** harga barang, jumlah barang yang dijual (ditawarkan) produsen semakin **sedikit**."
+# 4. Kurva dan Fungsi Penawaran
 
-Hubungan ini bersifat ** POSITIF ** (searah).
+### a. Kurva Penawaran
+Kurva penawaran berslop **positif** dan berbentuk miring dari **kiri bawah ke kanan atas**. 
 
-## 4. Kurva Penawaran
-Kurva penawaran berslop ** positif ** dan berbentuk miring dari ** kiri bawah ke kanan atas **.
+**Contoh Tabel Penawaran:**
 
-### Contoh Tabel Penawaran:
-
-| Titik | Harga Barang(P) | Kuantitas(Q) |
-| : --- | : --- | : --- |
+| Titik | Harga Barang (Rp) | Kuantitas (Unit) |
+| :--- | :--- | :--- |
 | A | 10.000 | 100 |
 | B | 15.000 | 150 |
 | C | 20.000 | 200 |
 | D | 25.000 | 250 |
 
-    Dari tabel di atas, kita bisa melihat bahwa saat harga naik(misal dari 10.000 ke 15.000), kuantitas yang ditawarkan juga naik(dari 100 ke 150).
+# 5. Fungsi Penawaran
+Fungsi penawaran merupakan bentuk matematis untuk menyusun daftar penawaran pada berbagai kemungkinan tingkat harga. 
 
-## 5. Fungsi Penawaran
-Fungsi penawaran merupakan bentuk matematis untuk menyusun daftar penawaran pada berbagai kemungkinan tingkat harga.
-
-** Bentuk Umum:**
-    $$ Qs = aP + b $$
-    * atau *
-    $$ P = aQ + b $$
-
-    * (Catatan: Dalam penerapannya, nilai konstanta atau koefisien bisa bernilai positif atau negatif tergantung data riil, namun hubungan P dan Q tetap positif)*
-    `,
+**Bentuk umum fungsi penawaran:**
+$$ Qs = aP + b $$
+*atau*
+$$ P = aQ + b $$
+      `,
     },
     {
       id: 'gerakan-pergeseran',
       title: 'Gerakan & Pergeseran Kurva',
       icon: '🔄',
       content: `
-# Gerakan vs Pergeseran Kurva
+# 6. Gerakan Sepanjang Kurva Penawaran dan Pergeseran Kurva Penawaran
 
-## 6. Gerakan Sepanjang Kurva vs Pergeseran Kurva
+### a. Gerakan Sepanjang Kurva Penawaran
+Penurunan atau kenaikan **harga suatu barang** dapat menimbulkan gerakan sepanjang kurva penawaran.
 
-### a.Gerakan Sepanjang Kurva Penawaran
-Disebabkan oleh ** perubahan harga barang itu sendiri **.
-- Jika harga ** naik ** ($P \\rightarrow P_1$): Titik bergerak ke ** atas / kanan ** (jumlah penawaran bertambah).
-- Jika harga ** turun ** ($P \\rightarrow P_2$): Titik bergerak ke ** bawah / kiri ** (jumlah penawaran berkurang).
-- Kurva penawaran ** TIDAK berindah **, hanya titiknya yang berpindah sepanjang garis kurva.
+- **Kurva penawaran adalah SS.**
+- Pada saat harga $P$, jumlah barang yang ditawarkan adalah $Q$ berada pada titik $L$.
+- Pada saat harga **naik** menjadi $P_1$, jumlah barang yang ditawarkan juga **bertambah** menjadi $Q_1$, serta hubungan antara $P_1$ dan $Q_1$ ditunjukkan pada titik $K$. Pada keadaan ini kurva penawaran akan bergerak ke **atas (ke kanan)**.
+- Pada saat harga **turun** menjadi $P_2$, jumlah barang yang ditawarkan juga **berkurang** menjadi $Q_2$, serta hubungan antara $P_2$ dan $Q_2$ ditunjukkan pada titik $M$. Pada keadaan ini kurva penawaran akan bergerak ke **bawah (ke kiri)**.
 
-### b.Pergeseran Kurva Penawaran
-Disebabkan oleh ** faktor - faktor lain selain harga ** (seperti pajak, subsidi, biaya produksi, teknologi).
+### b. Pergeseran Kurva Penawaran
+Perubahan **faktor-faktor lain selain harga**, misalnya adanya **pajak** atau **subsidi**, **biaya produksi**, dan **teknologi** dapat menimbulkan pergeseran kurva penawaran.
 
-1. ** Bergeser ke Kanan(Penawaran Bertambah) **
-    -   Contoh penyebab: Adanya ** Subsidi **, Teknologi makin canggih, Biaya produksi turun.
-    - Kurva bergeser dari $SS$ ke $S_1S_1$.
-    - Pada harga yang sama, jumlah barang yang ditawarkan lebih banyak.
-
-2. ** Bergeser ke Kiri(Penawaran Berkurang) **
-    -   Contoh penyebab: Adanya ** Pajak ** tinggi, Biaya produksi naik.
-    - Kurva bergeser dari $SS$ ke $S_2S_2$.
-    - Pada harga yang sama, jumlah barang yang ditawarkan lebih sedikit.
+- Perubahan pada jumlah barang yang ditawarkan merupakan salah satu akibat dari pergeseran kurva penawaran.
+- Kurva tersebut menunjukkan pergeseran kurva penawaran dari $SS$ ke $S_1 S_1$, disebabkan oleh jumlah barang yang ditawarkan **bertambah** dari $Q$ menjadi $Q_1$, walaupun harga tetap sebesar $P$.
+- Perubahan jumlah barang yang ditawarkan dari $Q$ ke $Q_2$ menyebabkan pergeseran kurva penawaran yang ditunjukkan oleh $SS$ ke $S_2 S_2$ (berkurang).
       `,
     },
   ],
@@ -915,7 +828,7 @@ Disebabkan oleh ** faktor - faktor lain selain harga ** (seperti pajak, subsidi,
     ];
     const q = questions[i % questions.length];
     return {
-      id: `q${ i + 1}`,
+      id: `q${i + 1}`,
       question: q.q,
       options: q.opts,
       correctAnswer: q.ans,
@@ -946,4 +859,3 @@ export const ekonomiModules: Module[] = [demandModule, supplyModule];
 
 // All modules (untuk backwards compatibility)
 export const modules: Module[] = [demandModule, supplyModule];
-
