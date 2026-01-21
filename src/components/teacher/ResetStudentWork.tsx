@@ -76,13 +76,12 @@ export function ResetStudentWork({ students, moduleId, onReset }: ResetStudentWo
           p_module_id: moduleId
         });
 
-        // 2. ALWAYS Trigger "Nuclear" cleanup for this student's quiz data 
-        // We do this to ensure no data is left behind due to module_id mismatches
-        console.log('Executing nuclear cleanup for user:', selectedStudent);
-        const { error: nuclearError } = await supabase
-          .from('quiz_answers')
-          .delete()
-          .eq('user_id', selectedStudent);
+        // 2. ALWAYS Trigger "Nuclear" cleanup using SECURITY DEFINER RPC
+        // This bypasses RLS and deletes ALL quiz answers for the user to guarantee removal
+        console.log('Executing server-side nuclear cleanup for user:', selectedStudent);
+        const { error: nuclearError } = await supabase.rpc('reset_all_quiz_data_for_student', {
+          p_user_id: selectedStudent
+        });
 
         if (nuclearError) {
           console.error('Nuclear reset error:', nuclearError);
