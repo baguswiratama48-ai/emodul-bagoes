@@ -25,6 +25,7 @@ import {
   ChevronRight,
   Download
 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -893,10 +894,7 @@ export default function TeacherDashboard() {
                               {filteredQuizResults
                                 .slice((currentPageQuiz - 1) * ITEMS_PER_PAGE, currentPageQuiz * ITEMS_PER_PAGE)
                                 .map((result, i) => (
-                                  {/* Import AlertDialog components if not already imported, usually near other imports */ }
-                  
-                  {/* ... somewhere inside TableBody ... */ }
-                                  < TableRow key = { i } >
+                                  <TableRow key={i}>
                                     <TableCell>{(currentPageQuiz - 1) * ITEMS_PER_PAGE + i + 1}</TableCell>
                                     <TableCell className="font-medium">{result.full_name}</TableCell>
                                     <TableCell>{result.kelas}</TableCell>
@@ -919,13 +917,13 @@ export default function TeacherDashboard() {
                                           <AlertDialogHeader>
                                             <AlertDialogTitle>Reset Nilai Kuis?</AlertDialogTitle>
                                             <AlertDialogDescription>
-                                              Apakah Anda yakin ingin menghapus data kuis milik <strong>{result.full_name}</strong>?<br/>
+                                              Apakah Anda yakin ingin menghapus data kuis milik <strong>{result.full_name}</strong>?<br />
                                               Siswa harus mengerjakan ulang kuis dari awal. Data yang dihapus tidak dapat dikembalikan.
                                             </AlertDialogDescription>
                                           </AlertDialogHeader>
                                           <AlertDialogFooter>
                                             <AlertDialogCancel>Batal</AlertDialogCancel>
-                                            <AlertDialogAction 
+                                            <AlertDialogAction
                                               className="bg-destructive hover:bg-destructive/90"
                                               onClick={async () => {
                                                 const { error } = await supabase
@@ -933,7 +931,7 @@ export default function TeacherDashboard() {
                                                   .delete()
                                                   .eq('user_id', result.user_id)
                                                   .eq('module_id', result.module_id || (selectedMapel === 'ekonomi' ? 'permintaan' : 'kerajinan-limbah'));
-                                                
+
                                                 if (error) {
                                                   toast.error('Gagal mereset kuis');
                                                 } else {
@@ -950,167 +948,167 @@ export default function TeacherDashboard() {
                                     </TableCell>
                                   </TableRow>
                                 ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                        {filteredQuizResults.length > ITEMS_PER_PAGE && (
+                          <div className="flex justify-center gap-4 mt-6">
+                            <Button variant="outline" size="sm" onClick={() => setCurrentPageQuiz(p => Math.max(1, p - 1))} disabled={currentPageQuiz === 1}><ChevronLeft className="h-4 w-4 mr-1" /> Prev</Button>
+                            <span className="text-sm font-medium self-center">Halaman {currentPageQuiz} dari {Math.ceil(filteredQuizResults.length / ITEMS_PER_PAGE)}</span>
+                            <Button variant="outline" size="sm" onClick={() => setCurrentPageQuiz(p => Math.min(Math.ceil(filteredQuizResults.length / ITEMS_PER_PAGE), p + 1))} disabled={currentPageQuiz === Math.ceil(filteredQuizResults.length / ITEMS_PER_PAGE)}>Next <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                          </div>
+
+                        )}
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="student-notes">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Catatan Siswa</CardTitle>
+                    <CardDescription>Periksa dan beri nilai catatan yang diupload siswa</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {studentNotes.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground"><p>Belum ada catatan yang diupload.</p></div>
+                    ) : (
+                      <div className="border rounded-lg overflow-hidden">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Tanggal</TableHead>
+                              <TableHead>Siswa</TableHead>
+                              <TableHead>Judul Catatan</TableHead>
+                              <TableHead>File</TableHead>
+                              <TableHead className="w-[100px]">Nilai (0-100)</TableHead>
+                              <TableHead>Feedback</TableHead>
+                              <TableHead></TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {studentNotes.filter(n => selectedKelas === 'all' || n.kelas === selectedKelas).map((note) => (
+                              <TableRow key={note.id}>
+                                <TableCell className="text-xs text-muted-foreground">
+                                  {new Date(note.created_at).toLocaleDateString('id-ID')}
+                                </TableCell>
+                                <TableCell>
+                                  <div>
+                                    <div className="font-medium">{note.full_name}</div>
+                                    <div className="text-xs text-muted-foreground">{note.kelas}</div>
+                                  </div>
+                                </TableCell>
+                                <TableCell>{note.title}</TableCell>
+                                <TableCell>
+                                  <Button variant="outline" size="sm" asChild>
+                                    <a href={`https://tqmycasowqhgfsgcucvy.supabase.co/storage/v1/object/public/notes/${note.file_path}`} target="_blank" rel="noreferrer" className="gap-2">
+                                      <Download className="h-3 w-3" /> PDF
+                                    </a>
+                                  </Button>
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    defaultValue={note.score || ''}
+                                    className="w-20"
+                                    id={`score-${note.id}`}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    defaultValue={note.feedback || ''}
+                                    placeholder="Beri masukan..."
+                                    id={`feedback-${note.id}`}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Button size="sm" onClick={() => {
+                                    const score = (document.getElementById(`score-${note.id}`) as HTMLInputElement).value;
+                                    const feedback = (document.getElementById(`feedback-${note.id}`) as HTMLInputElement).value;
+                                    handleUpdateNote(note.id, score, feedback);
+                                  }}>
+                                    Simpan
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
                           </TableBody>
                         </Table>
                       </div>
-                    {filteredQuizResults.length > ITEMS_PER_PAGE && (
-                      <div className="flex justify-center gap-4 mt-6">
-                        <Button variant="outline" size="sm" onClick={() => setCurrentPageQuiz(p => Math.max(1, p - 1))} disabled={currentPageQuiz === 1}><ChevronLeft className="h-4 w-4 mr-1" /> Prev</Button>
-                        <span className="text-sm font-medium self-center">Halaman {currentPageQuiz} dari {Math.ceil(filteredQuizResults.length / ITEMS_PER_PAGE)}</span>
-                        <Button variant="outline" size="sm" onClick={() => setCurrentPageQuiz(p => Math.min(Math.ceil(filteredQuizResults.length / ITEMS_PER_PAGE), p + 1))} disabled={currentPageQuiz === Math.ceil(filteredQuizResults.length / ITEMS_PER_PAGE)}>Next <ChevronRight className="h-4 w-4 ml-1" /></Button>
-                      </div>
-
                     )}
-                  </>
-                    )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="student-notes">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Catatan Siswa</CardTitle>
-                  <CardDescription>Periksa dan beri nilai catatan yang diupload siswa</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {studentNotes.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground"><p>Belum ada catatan yang diupload.</p></div>
-                  ) : (
-                    <div className="border rounded-lg overflow-hidden">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Tanggal</TableHead>
-                            <TableHead>Siswa</TableHead>
-                            <TableHead>Judul Catatan</TableHead>
-                            <TableHead>File</TableHead>
-                            <TableHead className="w-[100px]">Nilai (0-100)</TableHead>
-                            <TableHead>Feedback</TableHead>
-                            <TableHead></TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {studentNotes.filter(n => selectedKelas === 'all' || n.kelas === selectedKelas).map((note) => (
-                            <TableRow key={note.id}>
-                              <TableCell className="text-xs text-muted-foreground">
-                                {new Date(note.created_at).toLocaleDateString('id-ID')}
-                              </TableCell>
-                              <TableCell>
-                                <div>
-                                  <div className="font-medium">{note.full_name}</div>
-                                  <div className="text-xs text-muted-foreground">{note.kelas}</div>
-                                </div>
-                              </TableCell>
-                              <TableCell>{note.title}</TableCell>
-                              <TableCell>
-                                <Button variant="outline" size="sm" asChild>
-                                  <a href={`https://tqmycasowqhgfsgcucvy.supabase.co/storage/v1/object/public/notes/${note.file_path}`} target="_blank" rel="noreferrer" className="gap-2">
-                                    <Download className="h-3 w-3" /> PDF
-                                  </a>
-                                </Button>
-                              </TableCell>
-                              <TableCell>
-                                <Input
-                                  type="number"
-                                  min="0"
-                                  max="100"
-                                  defaultValue={note.score || ''}
-                                  className="w-20"
-                                  id={`score-${note.id}`}
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <Input
-                                  defaultValue={note.feedback || ''}
-                                  placeholder="Beri masukan..."
-                                  id={`feedback-${note.id}`}
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <Button size="sm" onClick={() => {
-                                  const score = (document.getElementById(`score-${note.id}`) as HTMLInputElement).value;
-                                  const feedback = (document.getElementById(`feedback-${note.id}`) as HTMLInputElement).value;
-                                  handleUpdateNote(note.id, score, feedback);
-                                }}>
-                                  Simpan
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="answer-keys">
-              <div className="grid gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Kunci Jawaban LKPD - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
-                    <CardDescription>Panduan penilaian untuk jawaban isian panjang (essay)</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {(selectedMapel === 'ekonomi' ? lkpdAnswerKeys : lkpdAnswerKeysPKWU)?.map((key: { id: number; title: string; verification?: string[]; steps?: string[] }) => (
-                        <div key={key.id} className="border rounded-lg p-4 bg-muted/30">
-                          <button onClick={() => setExpandedAnswerKey(expandedAnswerKey === key.id ? null : key.id)} className="flex items-center justify-between w-full font-medium text-left">
-                            <span>{key.title}</span>
-                            {expandedAnswerKey === key.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                          </button>
-                          {expandedAnswerKey === key.id && (
-                            <div className="mt-4 pl-4 border-l-2 border-primary/20 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                              <h4 className="text-sm font-semibold text-muted-foreground">Verifikasi / Kriteria Jawaban:</h4>
-                              <ul className="list-disc list-inside text-sm space-y-1">
-                                {(key.verification || key.steps || []).map((step, i) => (
-                                  <li key={i}>{step}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
                   </CardContent>
                 </Card>
+              </TabsContent>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Kunci Jawaban Kuis - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
-                    <CardDescription>Jawaban benar untuk soal pilihan ganda</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ScrollArea className="h-[300px] w-full rounded-md border p-4">
-                      <div className="grid gap-4">
-                        {Object.values(selectedMapel === 'ekonomi' ? quizAnswerKeysEkonomi : quizAnswerKeysPKWU).map((key: any, index: number) => (
-                          <div key={index} className="pb-4 border-b last:border-0 last:pb-0">
-                            <p className="font-medium mb-1">Soal {index + 1}</p>
-                            <p className="text-sm text-green-600 font-bold mb-1">Jawaban: {(['A', 'B', 'C', 'D', 'E'] as const)[key.correctAnswer] || key.correctAnswer}</p>
-                            <p className="text-xs text-muted-foreground bg-muted p-2 rounded">💡 {key.explanation}</p>
+              <TabsContent value="answer-keys">
+                <div className="grid gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Kunci Jawaban LKPD - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
+                      <CardDescription>Panduan penilaian untuk jawaban isian panjang (essay)</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {(selectedMapel === 'ekonomi' ? lkpdAnswerKeys : lkpdAnswerKeysPKWU)?.map((key: { id: number; title: string; verification?: string[]; steps?: string[] }) => (
+                          <div key={key.id} className="border rounded-lg p-4 bg-muted/30">
+                            <button onClick={() => setExpandedAnswerKey(expandedAnswerKey === key.id ? null : key.id)} className="flex items-center justify-between w-full font-medium text-left">
+                              <span>{key.title}</span>
+                              {expandedAnswerKey === key.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                            </button>
+                            {expandedAnswerKey === key.id && (
+                              <div className="mt-4 pl-4 border-l-2 border-primary/20 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <h4 className="text-sm font-semibold text-muted-foreground">Verifikasi / Kriteria Jawaban:</h4>
+                                <ul className="list-disc list-inside text-sm space-y-1">
+                                  {(key.verification || key.steps || []).map((step, i) => (
+                                    <li key={i}>{step}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
-                    </ScrollArea>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
+                    </CardContent>
+                  </Card>
 
-            <TabsContent value="reset">
-              <ResetStudentWork
-                students={allStudents}
-                moduleId={currentModuleId}
-                onReset={fetchStudentData}
-              />
-            </TabsContent>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Kunci Jawaban Kuis - {selectedMapel === 'ekonomi' ? 'Ekonomi' : 'PKWU'}</CardTitle>
+                      <CardDescription>Jawaban benar untuk soal pilihan ganda</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <ScrollArea className="h-[300px] w-full rounded-md border p-4">
+                        <div className="grid gap-4">
+                          {Object.values(selectedMapel === 'ekonomi' ? quizAnswerKeysEkonomi : quizAnswerKeysPKWU).map((key: any, index: number) => (
+                            <div key={index} className="pb-4 border-b last:border-0 last:pb-0">
+                              <p className="font-medium mb-1">Soal {index + 1}</p>
+                              <p className="text-sm text-green-600 font-bold mb-1">Jawaban: {(['A', 'B', 'C', 'D', 'E'] as const)[key.correctAnswer] || key.correctAnswer}</p>
+                              <p className="text-xs text-muted-foreground bg-muted p-2 rounded">💡 {key.explanation}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
 
-          </Tabs>
+              <TabsContent value="reset">
+                <ResetStudentWork
+                  students={allStudents}
+                  moduleId={currentModuleId}
+                  onReset={fetchStudentData}
+                />
+              </TabsContent>
+
+            </Tabs>
+          </motion.div>
         </motion.div>
-      </motion.div>
-    </main>
+      </main>
     </div >
   );
 }
