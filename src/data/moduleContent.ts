@@ -754,13 +754,13 @@ Perubahan **faktor-faktor lain selain harga**, misalnya adanya **pajak** atau **
     {
       id: 'video-s1',
       title: 'Konsep Dasar Penawaran',
-      url: 'https://www.youtube.com/embed/zO9hT8tD_9g',
+      url: 'https://www.youtube.com/embed/oBY7ST6GdpQ',
       description: 'Penjelasan tentang pengertian dan konsep dasar penawaran.',
     },
     {
       id: 'video-s2',
       title: 'Faktor Penawaran',
-      url: 'https://www.youtube.com/embed/uC64X_aT2_s',
+      url: 'https://www.youtube.com/embed/TC5Bko5SvWg',
       description: 'Video penjelasan faktor-faktor yang memengaruhi penawaran.',
     }
   ],
