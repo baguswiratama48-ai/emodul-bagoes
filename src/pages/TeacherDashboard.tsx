@@ -927,17 +927,39 @@ export default function TeacherDashboard() {
                                             <AlertDialogAction
                                               className="bg-destructive hover:bg-destructive/90"
                                               onClick={async () => {
-                                                const { error } = await supabase
-                                                  .from('quiz_answers')
-                                                  .delete()
-                                                  .eq('user_id', result.user_id)
-                                                  .eq('module_id', result.module_id || (selectedMapel === 'ekonomi' ? 'permintaan' : 'kerajinan-limbah'));
+                                                const moduleId = result.module_id || (selectedMapel === 'ekonomi' ? 'permintaan' : 'kerajinan-limbah');
 
-                                                if (error) {
-                                                  toast.error('Gagal mereset kuis');
-                                                } else {
-                                                  toast.success(`Kuis milik ${result.full_name} berhasil direset`);
-                                                  fetchStudentData();
+                                                try {
+                                                  // 1. Delete specific module answers
+                                                  await supabase
+                                                    .from('quiz_answers')
+                                                    .delete()
+                                                    .eq('user_id', result.user_id)
+                                                    .eq('module_id', moduleId);
+
+                                                  // 2. Delete legacy/null module answers (cleanup)
+                                                  await supabase
+                                                    .from('quiz_answers')
+                                                    .delete()
+                                                    .eq('user_id', result.user_id)
+                                                    .is('module_id', null);
+
+                                                  // 3. Delete 'default' module answers (cleanup)
+                                                  const { error } = await supabase
+                                                    .from('quiz_answers')
+                                                    .delete()
+                                                    .eq('user_id', result.user_id)
+                                                    .eq('module_id', 'default');
+
+                                                  if (error) {
+                                                    toast.error('Gagal mereset kuis');
+                                                  } else {
+                                                    toast.success(`Kuis milik ${result.full_name} berhasil direset`);
+                                                    fetchStudentData();
+                                                  }
+                                                } catch (err) {
+                                                  console.error('Reset error:', err);
+                                                  toast.error('Terjadi kesalahan saat reset');
                                                 }
                                               }}
                                             >
