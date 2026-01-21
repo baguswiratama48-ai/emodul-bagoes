@@ -888,7 +888,7 @@ export default function TeacherDashboard() {
                                 <TableHead>Kelas</TableHead>
                                 <TableHead>Skor</TableHead>
                                 <TableHead>Status</TableHead>
-                                <TableHead className="w-[100px] text-right">Aksi</TableHead>
+
                               </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -906,70 +906,6 @@ export default function TeacherDashboard() {
                                     </TableCell>
                                     <TableCell>
                                       {result.score >= 70 ? <span className="text-success flex items-center gap-1"><CheckCircle2 className="h-4 w-4" /> Lulus</span> : <span className="text-destructive flex items-center gap-1"><XCircle className="h-4 w-4" /> Belum Lulus</span>}
-                                    </TableCell>
-                                    <TableCell>
-                                      <AlertDialog>
-                                        <AlertDialogTrigger asChild>
-                                          <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
-                                            <RefreshCw className="h-4 w-4 mr-2" /> Reset
-                                          </Button>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                          <AlertDialogHeader>
-                                            <AlertDialogTitle>Reset Nilai Kuis?</AlertDialogTitle>
-                                            <AlertDialogDescription>
-                                              Apakah Anda yakin ingin menghapus data kuis milik <strong>{result.full_name}</strong>?<br />
-                                              Siswa harus mengerjakan ulang kuis dari awal. Data yang dihapus tidak dapat dikembalikan.
-                                            </AlertDialogDescription>
-                                          </AlertDialogHeader>
-                                          <AlertDialogFooter>
-                                            <AlertDialogCancel>Batal</AlertDialogCancel>
-                                            <AlertDialogAction
-                                              className="bg-destructive hover:bg-destructive/90"
-                                              onClick={async () => {
-                                                const moduleId = result.module_id || (selectedMapel === 'ekonomi' ? 'permintaan' : 'kerajinan-limbah');
-
-                                                try {
-                                                  // Try using the secure RPC function first
-                                                  const { error: rpcError } = await supabase.rpc('reset_quiz_for_student', {
-                                                    p_user_id: result.user_id,
-                                                    p_module_id: moduleId
-                                                  });
-
-                                                  if (rpcError) {
-                                                    console.warn('RPC reset failed, falling back to manual delete:', rpcError);
-
-                                                    // Fallback 1: Manual delete (standard)
-                                                    await supabase.from('quiz_answers').delete().eq('user_id', result.user_id).eq('module_id', moduleId);
-                                                    await supabase.from('quiz_answers').delete().eq('user_id', result.user_id).is('module_id', null);
-                                                    await supabase.from('quiz_answers').delete().eq('user_id', result.user_id).eq('module_id', 'default');
-                                                    await supabase.from('quiz_answers').delete().eq('user_id', result.user_id).eq('module_id', '');
-
-                                                    // Fallback 2: NUCLEAR OPTION (Delete ALL for this user)
-                                                    // Triggered only if the main attempts likely failed to clear the list visibly
-                                                    if (confirm(`Peringatan: Reset standar mungkin gagal. Apakah Anda ingin menghapus SEMUA data kuis siswa ini (termasuk modul lain) untuk memastikan reset berhasil?`)) {
-                                                      const { error: nuclearError } = await supabase.from('quiz_answers').delete().eq('user_id', result.user_id);
-                                                      if (nuclearError) console.error('Nuclear reset error:', nuclearError);
-                                                    }
-                                                  }
-
-                                                  toast.success(`Kuis milik ${result.full_name} berhasil direset`);
-
-                                                  // Force refresh multiple times to ensure UI update
-                                                  setTimeout(() => fetchStudentData(), 500);
-                                                  setTimeout(() => fetchStudentData(), 2000);
-
-                                                } catch (err) {
-                                                  console.error('Reset error:', err);
-                                                  toast.error('Terjadi kesalahan saat reset');
-                                                }
-                                              }}
-                                            >
-                                              Ya, Reset
-                                            </AlertDialogAction>
-                                          </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                      </AlertDialog>
                                     </TableCell>
                                   </TableRow>
                                 ))}
