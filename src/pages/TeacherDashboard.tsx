@@ -888,6 +888,7 @@ export default function TeacherDashboard() {
                                 <TableHead>Kelas</TableHead>
                                 <TableHead>Skor</TableHead>
                                 <TableHead>Status</TableHead>
+                                <TableHead className="w-[100px] text-right">Aksi</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
