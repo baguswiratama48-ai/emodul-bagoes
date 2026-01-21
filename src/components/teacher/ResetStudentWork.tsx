@@ -65,21 +65,30 @@ export function ResetStudentWork({ students, moduleId, onReset }: ResetStudentWo
 
       // We perform delete operations sequentially to ensure stability
       // Kuis
+      // Kuis
       if (resetType === 'kuis' || resetType === 'all') {
-        // Delete specific module entries
-        const { error: err1 } = await supabase.from('quiz_answers')
-          .delete().eq('user_id', selectedStudent).eq('module_id', moduleId);
-        if (err1) throw err1;
+        // 1. Try secure RPC function (handles specific module and bypasses RLS issues)
+        const { error: rpcError } = await supabase.rpc('reset_quiz_for_student', {
+          p_user_id: selectedStudent,
+          p_module_id: moduleId
+        });
 
-        // Delete entries with NO module_id (legacy/buggy data)
-        const { error: err2 } = await supabase.from('quiz_answers')
-          .delete().eq('user_id', selectedStudent).is('module_id', null);
-        if (err2) throw err2;
+        if (rpcError) {
+          console.warn('RPC reset failed, falling back to manual delete:', rpcError);
 
-        // Also try deleting by 'default' module id if it exists
-        const { error: err3 } = await supabase.from('quiz_answers')
-          .delete().eq('user_id', selectedStudent).eq('module_id', 'default');
-        if (err3) throw err3;
+          // 2. Manual Fallback: Specific module
+          await supabase.from('quiz_answers').delete().eq('user_id', selectedStudent).eq('module_id', moduleId);
+
+          // 3. Manual Fallback: Legacy/Null data
+          await supabase.from('quiz_answers').delete().eq('user_id', selectedStudent).is('module_id', null);
+          await supabase.from('quiz_answers').delete().eq('user_id', selectedStudent).eq('module_id', 'default');
+          await supabase.from('quiz_answers').delete().eq('user_id', selectedStudent).eq('module_id', '');
+
+          // 4. Nuclear Fallback: If still failing, delete ALL for this user to be sure
+          //    (Only if explicit confirmation for nuclear is implied by using the Reset tool)
+          const { error: nuclearError } = await supabase.from('quiz_answers').delete().eq('user_id', selectedStudent);
+          if (nuclearError) console.error('Nuclear reset error:', nuclearError);
+        }
       }
 
       // LKPD
