@@ -29,7 +29,7 @@ import { getModuleById, isPKWUModule } from '@/data/moduleUtils';
 import { supabase } from '@/integrations/supabase/client';
 import { Separator } from '@/components/ui/separator';
 
-// LKPD for Ekonomi
+// LKPD for Ekonomi (Permintaan)
 const ekonomiLkpdProblems = [
   {
     id: 1,
@@ -62,6 +62,42 @@ const ekonomiLkpdProblems = [
     question: "a) Tentukan fungsi permintaan novel tersebut!\nb) Jika toko ingin menjual 80 eksemplar per bulan, berapa harga yang harus ditetapkan?",
     hint: "Hitung dulu harga setelah diskon 20%. Untuk bagian b, substitusi Q = 80 lalu cari P",
     rubrik: "Skor 25: Jawaban lengkap bagian a dan b dengan langkah sistematis"
+  },
+];
+
+// LKPD for Ekonomi (Penawaran)
+const penawaranLkpdProblems = [
+  {
+    id: 1,
+    title: "Soal 1: Penawaran Durian",
+    story: "Pak Andi adalah petani durian. Saat harga durian Rp50.000 per buah, ia hanya mau menjual 20 buah. Namun saat harga durian naik menjadi Rp80.000 per buah, ia semangat menjual hingga 50 buah.",
+    question: "Tentukan fungsi penawaran durian Pak Andi!",
+    hint: "Identifikasi P1, Q1, P2, Q2. Ingat slope penawaran positif.",
+    rubrik: "Skor 25: Jawaban lengkap dengan langkah sistematis dan hasil benar"
+  },
+  {
+    id: 2,
+    title: "Soal 2: Pabrik Sepatu",
+    story: "Sebuah pabrik sepatu akan memproduksi 1000 pasang sepatu jika harga pasar Rp200.000. Jika harga naik menjadi Rp250.000, pabrik bersedia memproduksi 1500 pasang.",
+    question: "Tentukan fungsi penawaran pabrik sepatu tersebut!",
+    hint: "Gunakan rumus persamaan garis melalui dua titik.",
+    rubrik: "Skor 25: Jawaban lengkap dengan langkah sistematis dan hasil benar"
+  },
+  {
+    id: 3,
+    title: "Soal 3: Toko Kue Lebaran",
+    story: "Menjelang lebaran, harga kue nastar naik dari Rp60.000 menjadi Rp75.000 per toples. Akibatnya, toko kue 'Enak' menambah stok penjualan dari 100 toples menjadi 140 toples.",
+    question: "Tentukan fungsi penawarannya, dan hitung berapa toples yang akan ditawarkan jika harga naik lagi menjadi Rp90.000!",
+    hint: "Cari fungsi Qs dulu, lalu masukkan nilai P = 90.000",
+    rubrik: "Skor 25: Jawaban lengkap dengan fungsi benar dan prediksi tepat"
+  },
+  {
+    id: 4,
+    title: "Soal 4: Analisis Pajak",
+    story: "Awalnya fungsi penawaran suatu barang adalah Qs = 2P - 100. Kemudian pemerintah menetapkan pajak sebesar Rp10 per unit barang.",
+    question: "Bagaimana fungsi penawaran yang baru setelah pajak? (Petunjuk: Pajak menambah harga penawaran, P' = P - t atau sesuaikan fungsi P)",
+    hint: "Dalam fungsi Qs = f(P), pajak menggeser kurva ke kiri/atas.",
+    rubrik: "Skor 25: Analisis logis tentang dampak pajak terhadap fungsi",
   },
 ];
 
@@ -160,6 +196,30 @@ const ekonomiLkpdMeta = {
   ]
 };
 
+const penawaranLkpdMeta = {
+  title: "Lembar Kerja Peserta Didik (LKPD)",
+  subtitle: "Menentukan Fungsi Penawaran dari Soal Cerita",
+  mapel: "Ekonomi",
+  kelas: "X",
+  waktu: "45 menit",
+  tujuan: [
+    "Siswa mampu mengidentifikasi data harga dan jumlah dari soal cerita",
+    "Siswa mampu menghitung slope (gradien) fungsi penawaran",
+    "Siswa mampu menentukan fungsi penawaran dengan benar",
+  ],
+  kompetensi: "Menganalisis dan menghitung fungsi penawaran",
+  petunjuk: [
+    "Identifikasi P1, Q1, P2, Q2",
+    "Gunakan rumus persamaan garis",
+    "Pastikan slope positif",
+  ],
+  rumus: [
+    { nama: "Rumus Slope", formula: "a = (Q₂ - Q₁) / (P₂ - P₁)" },
+    { nama: "Fungsi Penawaran", formula: "Qs = aP - b" },
+    { nama: "Persamaan Garis", formula: "(Q - Q₁) / (Q₂ - Q₁) = (P - P₁) / (P₂ - P₁)" }
+  ]
+};
+
 const pkwuLkpdMeta = {
   title: "Lembar Kerja Peserta Didik (LKPD)",
   subtitle: "Lembar Analisis Peluang Usaha",
@@ -200,11 +260,19 @@ export default function LKPDPage() {
   }
 
   const isPKWU = isPKWUModule(moduleId);
-  const lkpdProblems = isPKWU ? pkwuLkpdProblems : ekonomiLkpdProblems;
-  const lkpdMeta = isPKWU ? pkwuLkpdMeta : ekonomiLkpdMeta;
+  let lkpdProblems = ekonomiLkpdProblems;
+  let lkpdMeta = ekonomiLkpdMeta;
+
+  if (isPKWU) {
+    lkpdProblems = pkwuLkpdProblems;
+    lkpdMeta = pkwuLkpdMeta;
+  } else if (moduleId === 'penawaran') {
+    lkpdProblems = penawaranLkpdProblems;
+    lkpdMeta = penawaranLkpdMeta;
+  }
 
   // PKWU only has main problems, no refleksi
-  const allProblems = isPKWU ? pkwuLkpdProblems : ekonomiLkpdProblems;
+  const allProblems = lkpdProblems;
   const totalQuestions = allProblems.length;
 
   const [answers, setAnswers] = useState<Record<number, string>>({});

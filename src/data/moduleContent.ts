@@ -635,8 +635,398 @@ Perubahan jumlah barang yang diminta pada **setiap tingkat harga** akibat peruba
   },
 };
 
+export const supplyModule: Module = {
+  id: 'penawaran',
+  title: 'Penawaran (Supply)',
+  subtitle: 'dan Kurva Penawaran',
+  description: 'Mempelajari konsep penawaran dalam ekonomi, faktor-faktor yang mempengaruhi penawaran, hukum penawaran, serta cara membuat dan menganalisis kurva penawaran.',
+  objectives: [
+    'Menjelaskan pengertian penawaran dalam kegiatan ekonomi',
+    'Mengidentifikasi faktor-faktor yang mempengaruhi penawaran',
+    'Menjelaskan hukum penawaran dan konsep ceteris paribus',
+    'Membuat dan menganalisis tabel skedul penawaran',
+    'Menggambar dan menginterpretasikan kurva penawaran',
+    'Menghitung fungsi penawaran menggunakan rumus matematika',
+    'Membedakan pergerakan sepanjang kurva dan pergeseran kurva penawaran',
+  ],
+  prerequisites: [
+    'Memahami konsep dasar permintaan (demand)',
+    'Memahami konsep perilaku produsen',
+    'Kemampuan dasar matematika (grafik koordinat & fungsi linear)',
+  ],
+  duration: '3 JP (3 x 45 menit)',
+  sections: [
+    {
+      id: 'pengertian-penawaran',
+      title: 'Pengertian Penawaran',
+      icon: '📦',
+      content: `
+# Pengertian Penawaran (Supply)
+
+**Penawaran (Supply)** adalah jumlah barang atau jasa yang tersedia dan dapat dijual oleh produsen (penjual) pada berbagai tingkat harga dalam periode waktu tertentu.
+
+## Kata Kunci Penting:
+- **Tersedia**: Barang sudah siap untuk dijual
+- **Dapat dijual**: Produsen mau dan mampu menjualnya
+- **Berbagai tingkat harga**: Penawaran berubah sesuai harga
+- **Periode waktu tertentu**: Per hari, per bulan, dsb.
+
+## Sudut Pandang Produsen
+Jika dalam **Permintaan** kita melihat dari sisi *pembeli* (konsumen), maka dalam **Penawaran** kita melihat dari sisi *penjual* (produsen).
+
+> **Logika Penjual**:
+> "Kalau harga barang naik, saya ingin jual lebih banyak supaya untung lebih besar!"
+
+## Faktor-faktor yang Mempengaruhi Penawaran:
+
+1.  **Harga barang itu sendiri**
+    -   Jika harga naik, penawaran ikut naik (ingin untung).
+
+2.  **Biaya Produksi**
+    -   Biaya bahan baku, upah tenaga kerja, sewa gedung.
+    -   Jika biaya produksi naik, keuntungan menipis $\rightarrow$ produsen mengurangi penawaran.
+
+3.  **Teknologi**
+    -   Mesin canggih bisa produksi lebih cepat & murah $\rightarrow$ penawaran meningkat.
+
+4.  **Harga barang lain**
+    -   Jika harga barang lain (yang sejenis) naik, produsen mungkin beralih memproduksi barang tersebut.
+
+5.  **Perkiraan harga masa depan**
+    -   Jika diprediksi harga akan naik bulan depan, produsen mungkin menahan stok sekarang (penawaran turun) untuk dijual nanti.
+
+6.  **Jumlah Produsen**
+    -   Semakin banyak penjual, semakin banyak barang yang ditawarkan di pasar.
+
+7.  **Kebijakan Pemerintah**
+    -   Pajak (menambah biaya) $\rightarrow$ menurunkan penawaran.
+    -   Subsidi (mengurangi biaya) $\rightarrow$ menaikkan penawaran.
+      `,
+    },
+    {
+      id: 'hukum-penawaran',
+      title: 'Hukum Penawaran',
+      icon: '⚖️',
+      content: `
+# Hukum Penawaran
+
+## Bunyi Hukum Penawaran:
+
+> **"Jika harga suatu barang naik, maka jumlah barang yang ditawarkan akan naik. Sebaliknya, jika harga barang turun, maka jumlah barang yang ditawarkan akan turun, dengan asumsi faktor lain tetap (ceteris paribus)."**
+
+## Dalam Notasi:
+- **P $\\uparrow$ $\\rightarrow$ Qs $\\uparrow$** (Harga naik, penawaran naik)
+- **P $\\downarrow$ $\\rightarrow$ Qs $\\downarrow$** (Harga turun, penawaran turun)
+
+> **Ingat!** Hubungannya adalah **SEARAH** (Berbanding Lurus/Positif).
+
+---
+
+## 🔑 Mengapa Hubungannya Positif?
+
+1.  **Motif Keuntungan (Profit Motive)**
+    -   Harga tinggi memberikan insentif bagi produsen untuk memproduksi lebih banyak agar laba meningkat.
+
+2.  **Kemampuan Menutupi Biaya**
+    -   Saat harga tinggi, produsen bisa menutupi biaya produksi marjinal yang mungkin meningkat saat menambah output.
+
+---
+
+## 📊 Contoh Penerapan Hukum Penawaran
+
+### Kasus: Petani Cabai
+
+| Harga Cabai (per kg) | Jumlah yang Ditawarkan (kg) |
+| :--- | :--- |
+| Rp 10.000 | 50 kg |
+| Rp 20.000 | 80 kg |
+| Rp 40.000 | 120 kg |
+| Rp 60.000 | 200 kg |
+
+**Analisis**:
+Saat harga murah (Rp 10.000), petani malas memanen atau menanam banyak karena untungnya tipis. Tapi saat harga melonjak (Rp 60.000), petani semangat memanen bahkan menanam lebih banyak agar untung besar.
+
+      `,
+    },
+    {
+      id: 'kurva-penawaran',
+      title: 'Tabel & Kurva Penawaran',
+      icon: '📈',
+      content: `
+# Tabel dan Kurva Penawaran
+
+## 📋 Tabel Skedul Penawaran
+
+Skedul penawaran adalah tabel yang menunjukkan hubungan antara harga dan jumlah barang yang ditawarkan.
+
+### Contoh: Penawaran Toko Roti
+
+| Titik | Harga Roti (Rp) | Jumlah Ditawarkan (buah) |
+| :--- | :--- | :--- |
+| A | 2.000 | 10 |
+| B | 4.000 | 30 |
+| C | 6.000 | 50 |
+| D | 8.000 | 70 |
+| E | 10.000 | 90 |
+
+---
+
+## 📈 Kurva Penawaran (Supply Curve)
+
+### Karakteristik Kurva Penawaran:
+1.  **Berslope Positif**: Miring dari **kiri bawah ke kanan atas**.
+2.  Menunjukkan hubungan **berbanding lurus** antara harga dan jumlah ditawarkan.
+3.  Diberi label **S** (Supply).
+
+*(Bayangkan garis menanjak seperti sedang mendaki gunung)*
+
+---
+
+## 🔄 Pergerakan vs Pergeseran Kurva
+
+Sama seperti permintaan, penawaran juga mengalami dua jenis perubahan:
+
+### 1. Pergerakan Sepanjang Kurva (Movement Along the Curve)
+-   Disebabkan oleh **perubahan HARGA barang itu sendiri**.
+-   Contoh: Harga naik dari Rp 2.000 ke Rp 4.000, maka titik pindah dari A ke B.
+
+### 2. Pergeseran Kurva (Shift of the Curve)
+-   Disebabkan oleh **faktor NON-HARGA** (Biaya produksi, teknologi, dll).
+-   **Geser Kanan (S $\\rightarrow$ S1)**: Penawaran bertambah.
+    -   Contoh: Ditemukan mesin baru yang efisien, subsidi pemerintah.
+-   **Geser Kiri (S $\\rightarrow$ S2)**: Penawaran berkurang.
+    -   Contoh: Gagal panen, kenaikan harga BBM (biaya produksi naik).
+
+      `,
+    },
+    {
+      id: 'fungsi-penawaran',
+      title: 'Fungsi Penawaran',
+      icon: '🔢',
+      content: `
+# Fungsi Penawaran
+
+## 📐 Rumus Umum Fungsi Penawaran
+
+Fungsi penawaran menunjukkan hubungan matematis antara harga (P) dan jumlah yang ditawarkan (Qs).
+
+### Rumus:
+
+**Qs = aP - b**
+atau
+**Qs = -b + aP**
+
+**Keterangan:**
+-   **Qs** = Jumlah barang yang ditawarkan (Quantity Supplied)
+-   **P** = Harga barang (Price)
+-   **a** = Koefisien arah (slope) $\\rightarrow$ bernilai **POSITIF** (+)
+-   **b** = Konstanta
+
+> **Tips Cepat**: Ciri fungsi penawaran adalah variabel P (Harga) bertanda **POSITIF**.
+> Contoh: Qs = 2P - 10 (Benar, Penawaran)
+> Contoh: Qd = -2P + 10 (Salah, ini Permintaan karena minus)
+
+---
+
+## 📝 Contoh Soal Mencari Fungsi
+
+Diketahui:
+-   Saat harga (P1) **Rp 2.000**, jumlah (Q1) **10 unit**.
+-   Saat harga (P2) **Rp 4.000**, jumlah (Q2) **30 unit**.
+
+**Tentukan fungsi penawarannya!**
+
+### Penyelesaian:
+Gunakan rumus persamaan garis melalui dua titik:
+
+$$ \\frac{Q - Q_1}{Q_2 - Q_1} = \\frac{P - P_1}{P_2 - P_1} $$
+
+1.  Masukkan angka:
+$$ \\frac{Q - 10}{30 - 10} = \\frac{P - 2000}{4000 - 2000} $$
+
+2.  Sederhanakan penyebut:
+$$ \\frac{Q - 10}{20} = \\frac{P - 2000}{2000} $$
+
+3.  Kali silang:
+$$ 2000(Q - 10) = 20(P - 2000) $$
+$$ 2000Q - 20000 = 20P - 40000 $$
+
+4.  Cari Q:
+$$ 2000Q = 20P - 40000 + 20000 $$
+$$ 2000Q = 20P - 20000 $$
+$$ Q = \\frac{20}{2000}P - \\frac{20000}{2000} $$
+**Qs = 0,01P - 10**
+
+### ✅ Cek Jawaban:
+Jika P = 2000 $\\rightarrow$ Q = 0,01(2000) - 10 = 20 - 10 = 10 (Benar!) 
+      `,
+    },
+  ],
+  videos: [
+    {
+      id: 'video-s1',
+      title: 'Konsep Dasar Penawaran',
+      url: 'https://www.youtube.com/embed/zO9hT8tD_9g',
+      description: 'Penjelasan mudah tentang apa itu penawaran dan hukum penawaran.',
+    },
+    {
+      id: 'video-s2',
+      title: 'Faktor yang Mempengaruhi Penawaran',
+      url: 'https://www.youtube.com/embed/uC64X_aT2_s',
+      description: 'Mengapa jumlah barang yang dijual bisa berubah-ubah? Simak faktornya.',
+    },
+    {
+      id: 'video-s3',
+      title: 'Cara Membuat Kurva Penawaran',
+      url: 'https://www.youtube.com/embed/3D9KgQ5i_3Y',
+      description: 'Tutorial menggambar kurva penawaran dari tabel skedul.',
+    },
+    {
+      id: 'video-s4',
+      title: 'Menghitung Fungsi Penawaran',
+      url: 'https://www.youtube.com/embed/example4',
+      description: 'Latihan soal matematika menghitung fungsi penawaran.',
+    },
+  ],
+  quizQuestions: [
+    {
+      id: 'qs1',
+      question: 'Apa definisi yang tepat untuk Penawaran (Supply)?',
+      options: [
+        'Jumlah barang yang ingin dibeli konsumen',
+        'Jumlah barang yang diproduksi dan dijual oleh produsen pada berbagai tingkat harga',
+        'Jumlah stok barang di gudang',
+        'Keinginan produsen untuk mendapatkan laba',
+      ],
+      correctAnswer: 1,
+      explanation: 'Penawaran adalah jumlah barang yang tersedia dan dapat dijual oleh produsen pada berbagai tingkat harga dalam waktu tertentu.',
+    },
+    {
+      id: 'qs2',
+      question: 'Bagaimana bunyi Hukum Penawaran?',
+      options: [
+        'Jika harga naik, penawaran turun',
+        'Jika harga turun, penawaran naik',
+        'Jika harga naik, penawaran naik (ceteris paribus)',
+        'Harga tidak mempengaruhi penawaran',
+      ],
+      correctAnswer: 2,
+      explanation: 'Hukum penawaran berbanding lurus: Harga naik $\rightarrow$ Penawaran naik. Produsen ingin jual lebih banyak saat harga mahal.',
+    },
+    {
+      id: 'qs3',
+      question: 'Manakah faktor yang menyebabkan kurva penawaran bergeser ke KANAN?',
+      options: [
+        'Kenaikan biaya produksi',
+        'Teknologi semakin canggih dan efisien',
+        'Kenaikan pajak',
+        'Penurunan jumlah produsen',
+      ],
+      correctAnswer: 1,
+      explanation: 'Teknologi yang canggih membuat produksi lebih murah dan cepat, sehingga produsen bisa menawarkan lebih banyak barang. Ini menggeser kurva ke kanan.',
+    },
+    {
+      id: 'qs4',
+      question: 'Jika fungsi penawaran adalah Qs = 2P - 500, berapa jumlah barang yang ditawarkan saat harga (P) = 1.000?',
+      options: [
+        '1000',
+        '1500',
+        '2000',
+        '2500',
+      ],
+      correctAnswer: 1,
+      explanation: 'Qs = 2(1000) - 500 = 2000 - 500 = 1500 unit.',
+    },
+    {
+      id: 'qs5',
+      question: 'Pergerakan dari titik A ke titik B pada kurva penawaran yang sama disebabkan oleh...',
+      options: [
+        'Perubahan teknologi',
+        'Perubahan harga barang itu sendiri',
+        'Perubahan harga bahan baku',
+        'Perubahan musim',
+      ],
+      correctAnswer: 1,
+      explanation: 'Pergerakan SEPANJANG kurva (movement along the curve) hanya disebabkan oleh perubahan harga barang itu sendiri.',
+    },
+    {
+      id: 'qs6',
+      question: 'Apa yang terjadi pada kurva penawaran roti jika harga tepung terigu (bahan baku) naik drastis?',
+      options: [
+        'Kurva bergeser ke kanan',
+        'Kurva bergeser ke kiri',
+        'Hanya bergerak sepanjang kurva ke atas',
+        'Kurva menjadi vertikal',
+      ],
+      correctAnswer: 1,
+      explanation: 'Kenaikan harga bahan baku = biaya produksi naik. Jika biaya naik, produsen mengurangi produksi. Kurva penawaran bergeser ke KIRI.',
+    },
+    {
+      id: 'qs7',
+      question: 'Manakah fungsi di bawah ini yang merupakan fungsi Penawaran?',
+      options: [
+        'Q = -5P + 100',
+        'Q = 100 - 2P',
+        'Q = 3P - 20',
+        'P = -2Q + 50',
+      ],
+      correctAnswer: 2,
+      explanation: 'Fungsi penawaran memiliki slope positif (koefisien P positif). Pilihan C (Q = 3P - 20) adalah satu-satunya yang P-nya positif.',
+    },
+    {
+      id: 'qs8',
+      question: 'Kurva penawaran bergerak dari kiri bawah ke...',
+      options: [
+        'Kanan bawah',
+        'Kiri atas',
+        'Kanan atas',
+        'Tegak lurus',
+      ],
+      correctAnswer: 2,
+      explanation: 'Kurva penawaran memiliki slope positif, artinya bergerak miring naik dari kiri bawah ke kanan atas.',
+    },
+    {
+      id: 'qs9',
+      question: 'Penerapan pajak oleh pemerintah akan mengakibatkan...',
+      options: [
+        'Penawaran bertambah',
+        'Penawaran berkurang',
+        'Permintaan bertambah',
+        'Harga barang turun',
+      ],
+      correctAnswer: 1,
+      explanation: 'Pajak dianggap sebagai tambahan biaya bagi produsen. Jika biaya naik, penawaran berkurang (kurva geser kiri).',
+    },
+    {
+      id: 'qs10',
+      question: 'Dalam fungsi Qs = aP - b, nilai "a" disebut...',
+      options: [
+        'Konstanta',
+        'Intersep',
+        'Slope / Kemiringan',
+        'Variabel',
+      ],
+      correctAnswer: 2,
+      explanation: 'Nilai "a" yang melekat pada P adalah gradien/slope/kemiringan kurva.',
+    },
+  ],
+  glossary: {
+    'Penawaran (Supply)': 'Jumlah barang yang ditawarkan produsen pada berbagai tingkat harga.',
+    'Hukum Penawaran': 'Harga naik, penawaran naik; Harga turun, penawaran turun (ceteris paribus).',
+    'Biaya Produksi': 'Semua pengeluaran yang dilakukan perusahaan untuk menghasilkan barang/jasa.',
+    'Profit Motive': 'Dorongan/motivasi produsen untuk mendapatkan keuntungan sebesar-besarnya.',
+    'Kurva Penawaran': 'Grafik yang menghubungkan harga dan jumlah penawaran (slope positif).',
+    'Slope Positif': 'Kemiringan garis naik ke kanan atas (berbanding lurus).',
+    'Pergeseran Kurva S': 'Perubahan posisi kurva S akibat faktor non-harga.',
+    'Pajak': 'Iuran wajib yang meningkatkan biaya produksi dan menurunkan penawaran.',
+    'Subsidi': 'Bantuan pemerintah yang menurunkan biaya produksi dan menaikkan penawaran.',
+    'Teknologi': 'Metode produksi yang jika semakin canggih akan meningkatkan penawaran.',
+  },
+};
+
 // Ekonomi module for Kelas X
-export const ekonomiModules: Module[] = [demandModule];
+export const ekonomiModules: Module[] = [demandModule, supplyModule];
 
 // All modules (untuk backwards compatibility)
-export const modules: Module[] = [demandModule];
+export const modules: Module[] = [demandModule, supplyModule];
+

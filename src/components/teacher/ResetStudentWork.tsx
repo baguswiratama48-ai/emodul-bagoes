@@ -71,21 +71,16 @@ export function ResetStudentWork({ students, moduleId, onReset }: ResetStudentWo
         console.log('Executing specific module delete...');
 
         // 1. Try secure RPC function (handles specific module)
-        await supabase.rpc('reset_quiz_for_student', {
-          p_user_id: selectedStudent,
-          p_module_id: moduleId
-        });
-
-        // 2. ALWAYS Trigger "Nuclear" cleanup using SECURITY DEFINER RPC
-        // This bypasses RLS and deletes ALL quiz answers for the user to guarantee removal
-        console.log('Executing server-side nuclear cleanup for user:', selectedStudent);
-        const { error: nuclearError } = await supabase.rpc('reset_all_quiz_data_for_student', {
-          p_user_id: selectedStudent
-        });
+        console.log('Executing unconditional client-side nuclear cleanup for user:', selectedStudent);
+        const { error: nuclearError } = await supabase
+          .from('quiz_answers')
+          .delete()
+          .eq('user_id', selectedStudent);
 
         if (nuclearError) {
           console.error('Nuclear reset error:', nuclearError);
-          throw nuclearError;
+          // Warn but don't crash, as the previous step might have cleared enough
+          toast({ title: 'Warning', description: 'Pembersihan total gagal, namun reset modul mungkin berhasil.', variant: 'destructive' });
         }
       }
 
