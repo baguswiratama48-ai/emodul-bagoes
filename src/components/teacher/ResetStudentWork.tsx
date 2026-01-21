@@ -66,28 +66,27 @@ export function ResetStudentWork({ students, moduleId, onReset }: ResetStudentWo
       // We perform delete operations sequentially to ensure stability
       // Kuis
       // Kuis
+      // Kuis
       if (resetType === 'kuis' || resetType === 'all') {
-        // 1. Try secure RPC function (handles specific module and bypasses RLS issues)
-        const { error: rpcError } = await supabase.rpc('reset_quiz_for_student', {
+        console.log('Executing specific module delete...');
+
+        // 1. Try secure RPC function (handles specific module)
+        await supabase.rpc('reset_quiz_for_student', {
           p_user_id: selectedStudent,
           p_module_id: moduleId
         });
 
-        if (rpcError) {
-          console.warn('RPC reset failed, falling back to manual delete:', rpcError);
+        // 2. ALWAYS Trigger "Nuclear" cleanup for this student's quiz data 
+        // We do this to ensure no data is left behind due to module_id mismatches
+        console.log('Executing nuclear cleanup for user:', selectedStudent);
+        const { error: nuclearError } = await supabase
+          .from('quiz_answers')
+          .delete()
+          .eq('user_id', selectedStudent);
 
-          // 2. Manual Fallback: Specific module
-          await supabase.from('quiz_answers').delete().eq('user_id', selectedStudent).eq('module_id', moduleId);
-
-          // 3. Manual Fallback: Legacy/Null data
-          await supabase.from('quiz_answers').delete().eq('user_id', selectedStudent).is('module_id', null);
-          await supabase.from('quiz_answers').delete().eq('user_id', selectedStudent).eq('module_id', 'default');
-          await supabase.from('quiz_answers').delete().eq('user_id', selectedStudent).eq('module_id', '');
-
-          // 4. Nuclear Fallback: If still failing, delete ALL for this user to be sure
-          //    (Only if explicit confirmation for nuclear is implied by using the Reset tool)
-          const { error: nuclearError } = await supabase.from('quiz_answers').delete().eq('user_id', selectedStudent);
-          if (nuclearError) console.error('Nuclear reset error:', nuclearError);
+        if (nuclearError) {
+          console.error('Nuclear reset error:', nuclearError);
+          throw nuclearError;
         }
       }
 
