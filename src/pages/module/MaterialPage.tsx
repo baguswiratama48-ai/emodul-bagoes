@@ -208,17 +208,17 @@ export default function MaterialPage() {
               Pertanyaan Pemantik
             </Button>
           </Link>
-          <Link to={`/modul/${module.id}/video`}>
+          <Link to={`/modul/${module.id}/${isPKWU ? 'tugas-catatan' : 'video'}`}>
             <Button
               onClick={handleComplete}
               className="gap-2 bg-gradient-primary hover:opacity-90"
             >
-              Lanjut ke Video
+              {isPKWU ? 'Lanjut ke Tugas Catatan' : 'Lanjut ke Video'}
               <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
         </motion.div>
       </motion.div>
-    </ModuleLayout>
+    </ModuleLayout >
   );
 }
