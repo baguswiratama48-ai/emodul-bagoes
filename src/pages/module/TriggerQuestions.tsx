@@ -191,7 +191,7 @@ export default function TriggerQuestions() {
             <span>Pertanyaan Pemantik</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
-            Mari Berpikir! 🤔
+            Mari Berpikir! 🤔 v2
           </h1>
           <p className="text-muted-foreground">
             Sebelum masuk ke materi, coba jawab pertanyaan-pertanyaan berikut untuk memancing rasa ingin tahumu!
