@@ -282,28 +282,30 @@ export default function SummaryPage() {
         )}
 
         {/* Reflection */}
-        <motion.div variants={itemVariants}>
-          <Card>
-            <CardHeader>
-              <CardTitle>Refleksi Pembelajaran</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {reflectionQuestions.map((question, index) => (
-                <div key={index}>
-                  <label className="block text-foreground font-medium mb-2">
-                    {index + 1}. {question}
-                  </label>
-                  <Textarea
-                    placeholder="Tuliskan jawabanmu..."
-                    className="resize-none"
-                    value={reflections[index] || ''}
-                    onChange={(e) => handleReflectionChange(index, e.target.value)}
-                  />
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </motion.div>
+        {moduleId !== 'pkwu-sumber-daya' && (
+          <motion.div variants={itemVariants}>
+            <Card>
+              <CardHeader>
+                <CardTitle>Refleksi Pembelajaran</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {reflectionQuestions.map((question, index) => (
+                  <div key={index}>
+                    <label className="block text-foreground font-medium mb-2">
+                      {index + 1}. {question}
+                    </label>
+                    <Textarea
+                      placeholder="Tuliskan jawabanmu..."
+                      className="resize-none"
+                      value={reflections[index] || ''}
+                      onChange={(e) => handleReflectionChange(index, e.target.value)}
+                    />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {/* Completion */}
         {!isCompleted ? (
