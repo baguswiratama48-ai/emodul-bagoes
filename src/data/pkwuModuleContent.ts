@@ -1232,6 +1232,13 @@ export const sumberDayaModule: Module = {
   title: 'SUMBER DAYA USAHA, ADMINISTRASI DAN PEMASARAN',
   subtitle: 'KERAJINAN USAHA DARI BAHAN LIMBAH',
   description: 'Mempelajari Sumber Daya Usaha, Administrasi dan Pemasaran Kerajinan Usaha dari Bahan Limbah.',
+  level: 'XI',
+  phase: 'F',
+  lessonNumber: 2,
+  model: 'Project Based Learning (PBL)',
+  activity: 'Perencanaan usaha kerajinan berbasis limbah',
+  product: 'Proposal perencanaan usaha kerajinan dari bahan limbah',
+  meaningfulUnderstanding: 'Memahami bahwa perencanaan usaha yang matang—mulai dari analisis 6M, administrasi yang rapi, hingga strategi pemasaran yang jitu—adalah fondasi utama untuk mengubah limbah menjadi produk bernilai ekonomi tinggi yang berkelanjutan.',
   objectives: [
     'Menjelaskan sumber daya usaha kerajinan dari bahan limbah.',
     'Mengidentifikasi sumber daya usaha kerajinan dari bahan limbah dilingkungan sekitar tempat tinggal.',
@@ -1239,7 +1246,7 @@ export const sumberDayaModule: Module = {
     'Menentukan strategi pemasaran yang cocok untuk kegiatan usaha kerajinan dari bahan limbah.',
   ],
   prerequisites: [],
-  duration: '2 JP (2 x 45 menit)',
+  duration: '4 JP (2 Pertemuan)',
   sections: [
     {
       id: 'sumber-daya-usaha',

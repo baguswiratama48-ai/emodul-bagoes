@@ -1,9 +1,9 @@
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Target, 
-  Clock, 
-  BookOpen, 
+import {
+  Target,
+  Clock,
+  BookOpen,
   CheckCircle2,
   ArrowRight,
   Lightbulb
@@ -19,11 +19,11 @@ export default function ModuleInfo() {
   const { moduleId } = useParams();
   const { markSectionComplete, getModuleProgress } = useProgress();
   const module = getModuleById(moduleId);
-  
+
   if (!module) {
     return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
   }
-  
+
   const progress = getModuleProgress(module.id);
   const isPKWU = isPKWUModule(moduleId);
 
@@ -78,28 +78,85 @@ export default function ModuleInfo() {
         {/* Quick Info */}
         <motion.div variants={itemVariants} className="grid sm:grid-cols-2 gap-4">
           <Card className="bg-primary/5 border-primary/20">
-            <CardContent className="pt-6 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Clock className="h-6 w-6 text-primary" />
+            <CardContent className="pt-6 space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Clock className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Alokasi Waktu</p>
+                  <p className="font-semibold text-foreground">{module.duration}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Alokasi Waktu</p>
-                <p className="font-semibold text-foreground">{module.duration}</p>
-              </div>
+
+              {module.model && (
+                <div className="flex items-center gap-4 pt-2 border-t border-primary/10">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Target className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Model Pembelajaran</p>
+                    <p className="font-semibold text-foreground">{module.model}</p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
+
           <Card className="bg-secondary/20 border-secondary/30">
-            <CardContent className="pt-6 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center">
-                <Target className="h-6 w-6 text-secondary" />
+            <CardContent className="pt-6 space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center">
+                  <Target className="h-6 w-6 text-secondary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Tujuan Pembelajaran</p>
+                  <p className="font-semibold text-foreground">{module.objectives.length} Tujuan</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Tujuan Pembelajaran</p>
-                <p className="font-semibold text-foreground">{module.objectives.length} Tujuan</p>
-              </div>
+
+              {module.product && (
+                <div className="flex items-center gap-4 pt-2 border-t border-secondary/20">
+                  <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center">
+                    <CheckCircle2 className="h-6 w-6 text-secondary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Produk Akhir</p>
+                    <p className="font-semibold text-foreground">{module.product}</p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Detailed Metadata (if available) */}
+        {(module.level || module.phase || module.lessonNumber || module.activity) && (
+          <motion.div variants={itemVariants}>
+            <Card className="bg-muted/30">
+              <CardContent className="pt-6 grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+                {module.level && (
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Kelas/Fase</p>
+                    <p className="font-medium">{module.level} {module.phase ? `/ ${module.phase}` : ''}</p>
+                  </div>
+                )}
+                {module.lessonNumber && (
+                  <div>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Materi Ke</p>
+                    <p className="font-medium">{module.lessonNumber}</p>
+                  </div>
+                )}
+                {module.activity && (
+                  <div className="sm:col-span-2">
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Bentuk Kegiatan</p>
+                    <p className="font-medium">{module.activity}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {/* Prerequisites */}
         <motion.div variants={itemVariants}>
@@ -161,9 +218,9 @@ export default function ModuleInfo() {
             </CardHeader>
             <CardContent>
               <p className="text-foreground leading-relaxed">
-                {isPKWU 
+                {module.meaningfulUnderstanding || (isPKWU
                   ? 'Limbah bukanlah akhir dari sebuah materi, melainkan awal dari peluang ekonomi yang berkelanjutan. Kreativitas dan analisis pasar yang tajam memungkinkan kita mengubah sampah yang tidak bernilai menjadi sumber penghasilan yang berharga (green economy) melalui inovasi kerajinan.'
-                  : 'Memahami konsep permintaan sangat penting karena permintaan adalah salah satu kekuatan utama yang menggerakkan pasar. Dengan memahami bagaimana permintaan bekerja, kamu dapat menganalisis perilaku konsumen, memprediksi perubahan harga, dan membuat keputusan ekonomi yang lebih baik dalam kehidupan sehari-hari.'}
+                  : 'Memahami konsep permintaan sangat penting karena permintaan adalah salah satu kekuatan utama yang menggerakkan pasar. Dengan memahami bagaimana permintaan bekerja, kamu dapat menganalisis perilaku konsumen, memprediksi perubahan harga, dan membuat keputusan ekonomi yang lebih baik dalam kehidupan sehari-hari.')}
               </p>
             </CardContent>
           </Card>
@@ -173,7 +230,7 @@ export default function ModuleInfo() {
         <motion.div variants={itemVariants} className="flex justify-between items-center pt-8 border-t border-border">
           <div />
           <Link to={`/modul/${module.id}/pemantik`}>
-            <Button 
+            <Button
               onClick={handleComplete}
               className="gap-2 bg-gradient-primary hover:opacity-90"
             >

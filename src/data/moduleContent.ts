@@ -39,6 +39,14 @@ export interface Module {
   videos: Video[];
   quizQuestions: QuizQuestion[];
   glossary: Record<string, string>;
+  // New optional metadata fields
+  level?: string;
+  phase?: string;
+  lessonNumber?: number;
+  model?: string;
+  activity?: string;
+  product?: string;
+  meaningfulUnderstanding?: string;
 }
 
 export const demandModule: Module = {
