@@ -41,7 +41,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { lkpdAnswerKeys, lkpdAnswerKeysPKWU, quizAnswerKeysEkonomi, quizAnswerKeysPKWU } from '@/data/answerKeys';
 import { demandModule } from '@/data/moduleContent';
-import { pkwuModule } from '@/data/pkwuModuleContent';
+import { kerajinanLimbahModule as pkwuModule } from '@/data/pkwuModuleContent';
 import { FeedbackForm } from '@/components/teacher/FeedbackForm';
 import { ResetStudentWork } from '@/components/teacher/ResetStudentWork';
 

@@ -22,7 +22,7 @@ import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { demandModule } from '@/data/moduleContent';
-import { pkwuModule } from '@/data/pkwuModuleContent';
+import { kerajinanLimbahModule as pkwuModule } from '@/data/pkwuModuleContent';
 
 interface QuizAnswer {
   question_id: string;

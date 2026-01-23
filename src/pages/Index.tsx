@@ -23,7 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { useProgress } from '@/hooks/useProgress';
 import { useAuth } from '@/hooks/useAuth';
 import { ekonomiModules } from '@/data/moduleContent';
-import { pkwuModule } from '@/data/pkwuModuleContent';
+import { pkwuModules } from '@/data/pkwuModuleContent';
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import logo from '@/assets/logo.png';
@@ -53,15 +53,15 @@ const Index = () => {
     const isKelasXI = userKelas?.startsWith('XI.');
 
     if (isGuru) {
-      return { availableModules: [...ekonomiModules, pkwuModule], mapelName: 'Semua Mapel', mapelKelas: 'Guru' };
+      return { availableModules: [...ekonomiModules, ...pkwuModules], mapelName: 'Semua Mapel', mapelKelas: 'Guru' };
     }
     if (isKelasX) {
       return { availableModules: ekonomiModules, mapelName: 'Ekonomi', mapelKelas: `Kelas ${userKelas}` };
     }
     if (isKelasXI) {
-      return { availableModules: [pkwuModule], mapelName: 'PKWU', mapelKelas: `Kelas ${userKelas}` };
+      return { availableModules: pkwuModules, mapelName: 'PKWU', mapelKelas: `Kelas ${userKelas}` };
     }
-    return { availableModules: [...ekonomiModules, pkwuModule], mapelName: 'E-Modul', mapelKelas: '' };
+    return { availableModules: [...ekonomiModules, ...pkwuModules], mapelName: 'E-Modul', mapelKelas: '' };
   }, [userKelas, isGuru]);
 
   // Fetch real progress from database
