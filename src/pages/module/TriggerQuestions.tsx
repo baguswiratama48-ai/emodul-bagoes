@@ -21,93 +21,9 @@ import { useToast } from '@/hooks/use-toast';
 import { getModuleById, isPKWUModule } from '@/data/moduleUtils';
 import { supabase } from '@/integrations/supabase/client';
 
-// Trigger questions for Permintaan (Demand)
-const permintaanTriggerQuestions = [
-  {
-    id: 1,
-    question: "Pernahkah kamu memperhatikan saat ada diskon besar-besaran, mengapa orang jadi lebih banyak membeli?",
-    hint: "Pikirkan hubungan antara harga dan keinginan membeli.",
-    icon: "🛒",
-  },
-  {
-    id: 2,
-    question: "Jika uang sakumu naik 2x lipat, apakah kamu akan membeli lebih banyak jajanan? Mengapa?",
-    hint: "Pertimbangkan pengaruh pendapatan terhadap keputusan belanja.",
-    icon: "💰",
-  },
-  {
-    id: 3,
-    question: "Ketika harga pulsa mahal, apa yang biasanya kamu lakukan? Apakah mencari alternatif lain?",
-    hint: "Pikirkan tentang barang pengganti (substitusi).",
-    icon: "📱",
-  },
-];
-
-// Trigger questions for Penawaran (Supply)
-const penawaranTriggerQuestions = [
-  {
-    id: 1,
-    question: "Apa yang biasanya kamu lakukan jika barang yang kamu jual laku keras dan harganya naik?",
-    hint: "Pikirkan tentang kesempatan untuk mendapatkan keuntungan lebih besar.",
-    icon: "📈",
-  },
-  {
-    id: 2,
-    question: "Mengapa penjual tidak selalu menjual jumlah barang yang sama setiap hari?",
-    hint: "Pikirkan tentang ketersediaan stok, biaya produksi, atau kondisi pasar.",
-    icon: "📦",
-  },
-  {
-    id: 3,
-    question: "Selain harga, hal apa saja yang bisa membuat penjual menambah atau mengurangi barang dagangannya?",
-    hint: "Ingat faktor-faktor seperti biaya produksi, teknologi, atau pajak/subsidi.",
-    icon: "🏭",
-  },
-];
-
-// Trigger questions for PKWU
-const pkwuTriggerQuestions = [
-  {
-    id: 1,
-    question: "Pernahkah kamu melihat sampah plastik atau kardus di sekitarmu? Menurut kamu, bisakah sampah tersebut diubah menjadi sesuatu yang berguna?",
-    hint: "Pikirkan tentang kreativitas dan nilai tambah dari limbah.",
-    icon: "♻️",
-  },
-  {
-    id: 2,
-    question: "Jika kamu bisa membuat kerajinan dari bahan bekas, produk apa yang ingin kamu buat dan siapa yang akan membelinya?",
-    hint: "Pertimbangkan target pasar dan kebutuhan konsumen.",
-    icon: "🎨",
-  },
-  {
-    id: 3,
-    question: "Mengapa menurut kamu produk ramah lingkungan (eco-friendly) semakin diminati oleh masyarakat?",
-    hint: "Pikirkan tentang tren kesadaran lingkungan dan green economy.",
-    icon: "🌿",
-  },
-];
-
-// Trigger questions for PKWU (Sumber Daya Usaha)
-const sumberDayaTriggerQuestions = [
-  {
-    id: 1,
-    question: "Sebuah usaha kerajinan dari bahan limbah memiliki tenaga kerja terampil dan bahan baku yang mudah diperoleh, tetapi usaha tersebut tetap mengalami kerugian. Menurut analisismu, faktor apa yang paling mungkin menjadi penyebab utama masalah tersebut? Jelaskan alasan dan solusi yang dapat dilakukan.",
-    hint: "Pikirkan tentang aspek 6M selain Man dan Material, seperti pengelolaan keuangan atau metode kerja.",
-    icon: "📉",
-  },
-  {
-    id: 2,
-    question: "Banyak usaha kerajinan kecil berjalan tanpa pencatatan keuangan dan administrasi yang rapi. Menurut pendapatmu, apa risiko terbesar dari kondisi tersebut bagi kelangsungan usaha, dan bagaimana dampaknya terhadap pengambilan keputusan usaha di masa depan?",
-    hint: "Pertimbangkan sulitnya mengetahui untung/rugi dan merencanakan pengembangan usaha tanpa data.",
-    icon: "📝",
-  },
-  {
-    id: 3,
-    question: "Jika kamu ingin memulai usaha kerajinan dari bahan limbah dengan modal terbatas, bagaimana cara menentukan sasaran pasar dan strategi pemasaran yang tepat agar produk tetap diminati konsumen? Jelaskan pertimbangan yang kamu gunakan.",
-    hint: "Pikirkan tentang segmentasi pasar yang spesifik dan pemasaran biaya rendah (low budget marketing).",
-    icon: "🎯",
-  },
-];
+import {
+  getTriggerQuestionsByModuleId
+} from '@/data/triggerQuestionsData';
 
 export default function TriggerQuestions() {
   const { moduleId } = useParams();
@@ -121,15 +37,7 @@ export default function TriggerQuestions() {
   }
 
   const isPKWU = isPKWUModule(moduleId);
-
-  let triggerQuestions = permintaanTriggerQuestions;
-  if (moduleId === 'kerajinan-limbah') {
-    triggerQuestions = pkwuTriggerQuestions;
-  } else if (moduleId === 'pkwu-sumber-daya') {
-    triggerQuestions = sumberDayaTriggerQuestions;
-  } else if (moduleId === 'penawaran') {
-    triggerQuestions = penawaranTriggerQuestions;
-  }
+  const triggerQuestions = getTriggerQuestionsByModuleId(moduleId);
 
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [answerIds, setAnswerIds] = useState<Record<number, string>>({});

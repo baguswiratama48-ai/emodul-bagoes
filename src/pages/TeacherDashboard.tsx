@@ -40,11 +40,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { lkpdAnswerKeys, lkpdAnswerKeysPKWU, quizAnswerKeysEkonomi, quizAnswerKeysPKWU } from '@/data/answerKeys';
-import { demandModule } from '@/data/moduleContent';
-import { kerajinanLimbahModule as pkwuModule } from '@/data/pkwuModuleContent';
+import { ekonomiModules } from '@/data/moduleContent';
+import { pkwuModules } from '@/data/pkwuModuleContent';
+import { getTriggerQuestionsByModuleId } from '@/data/triggerQuestionsData';
+
 import { FeedbackForm } from '@/components/teacher/FeedbackForm';
 import { ResetStudentWork } from '@/components/teacher/ResetStudentWork';
 
+// ... (interfaces remain same)
 interface StudentProfile {
   id: string;
   full_name: string;
@@ -101,7 +104,7 @@ interface StudentNote {
   file_size: number;
   created_at: string;
   score?: number;
-  score_max?: number; // Optional, defaults to 100
+  score_max?: number;
   feedback?: string;
 }
 
@@ -134,6 +137,19 @@ export default function TeacherDashboard() {
   const [availableKelas, setAvailableKelas] = useState<string[]>([]);
   const [feedbackMap, setFeedbackMap] = useState<FeedbackMap>({});
   const [selectedMapel, setSelectedMapel] = useState<'ekonomi' | 'pkwu'>('ekonomi');
+  const [selectedModuleId, setSelectedModuleId] = useState<string>(''); // Initialize empty, set in useEffect
+
+  // Get available modules based on mapel
+  const availableModules = useMemo(() => {
+    return selectedMapel === 'ekonomi' ? ekonomiModules : pkwuModules;
+  }, [selectedMapel]);
+
+  // Set default module when mapel changes
+  useEffect(() => {
+    if (availableModules.length > 0) {
+      setSelectedModuleId(availableModules[0].id);
+    }
+  }, [availableModules]);
 
   // Determine which classes to show based on selected mapel
   const mapelKelas = useMemo(() => {
@@ -423,66 +439,78 @@ export default function TeacherDashboard() {
   }, []);
 
   // Filter functions based on mapel and kelas
+  // Filter functions based on mapel and kelas
   const filteredQuizResults = useMemo(() => {
     let results = quizResults.filter(r => mapelKelas.includes(r.kelas));
     if (selectedKelas !== 'all') {
       results = results.filter(r => r.kelas === selectedKelas);
     }
     // Filter by module type
-    if (selectedMapel === 'pkwu') {
-      results = results.filter(r => r.module_id === 'kerajinan-limbah' || !r.module_id);
-    } else {
-      results = results.filter(r => r.module_id === 'permintaan' || !r.module_id);
+    if (selectedModuleId) {
+      results = results.filter(r => r.module_id === selectedModuleId || (!r.module_id && selectedMapel === 'ekonomi' && selectedModuleId === 'permintaan'));
     }
     return results.sort(sortByName);
-  }, [quizResults, mapelKelas, selectedKelas, selectedMapel]);
+  }, [quizResults, mapelKelas, selectedKelas, selectedMapel, selectedModuleId]);
 
   const filteredLkpdAnswers = useMemo(() => {
     let answers = lkpdAnswers.filter(a => mapelKelas.includes(a.kelas));
     if (selectedKelas !== 'all') {
       answers = answers.filter(a => a.kelas === selectedKelas);
     }
+    if (selectedModuleId) {
+      answers = answers.filter(a => a.module_id === selectedModuleId);
+    }
     return answers.sort(sortByName);
-  }, [lkpdAnswers, mapelKelas, selectedKelas]);
+  }, [lkpdAnswers, mapelKelas, selectedKelas, selectedModuleId]);
 
   const filteredTriggerAnswers = useMemo(() => {
     let answers = triggerAnswers.filter(a => mapelKelas.includes(a.kelas));
     if (selectedKelas !== 'all') {
       answers = answers.filter(a => a.kelas === selectedKelas);
     }
+    if (selectedModuleId) {
+      answers = answers.filter(a => a.module_id === selectedModuleId);
+    }
     return answers.sort(sortByName);
-  }, [triggerAnswers, mapelKelas, selectedKelas]);
+  }, [triggerAnswers, mapelKelas, selectedKelas, selectedModuleId]);
 
   const filteredReflectionAnswers = useMemo(() => {
     let answers = reflectionAnswers.filter(a => mapelKelas.includes(a.kelas));
     if (selectedKelas !== 'all') {
       answers = answers.filter(a => a.kelas === selectedKelas);
     }
+    if (selectedModuleId) {
+      answers = answers.filter(a => a.module_id === `${selectedModuleId}-refleksi`);
+    }
     return answers.sort(sortByName);
-  }, [reflectionAnswers, mapelKelas, selectedKelas]);
+  }, [reflectionAnswers, mapelKelas, selectedKelas, selectedModuleId]);
 
-  // Questions based on mapel
-  const triggerQuestions = selectedMapel === 'ekonomi' ? [
-    { id: 1, question: "Pernahkah kamu memperhatikan saat ada diskon besar-besaran, mengapa orang jadi lebih banyak membeli?" },
-    { id: 2, question: "Jika uang sakumu naik 2x lipat, apakah kamu akan membeli lebih banyak jajanan? Mengapa?" },
-    { id: 3, question: "Ketika harga pulsa mahal, apa yang biasanya kamu lakukan? Apakah mencari alternatif lain?" },
-  ] : [
-    { id: 1, question: "Pernahkah kamu melihat sampah plastik atau kardus di sekitarmu? Menurut kamu, bisakah sampah tersebut diubah menjadi sesuatu yang berguna?" },
-    { id: 2, question: "Jika kamu bisa membuat kerajinan dari barang bekas, produk apa yang akan kamu buat dan siapa yang akan membelinya?" },
-    { id: 3, question: "Menurutmu, mengapa produk dari bahan daur ulang semakin diminati orang-orang sekarang?" },
-  ];
+  // Questions based on mapel and module
+  const triggerQuestions = useMemo(() => {
+    return getTriggerQuestionsByModuleId(selectedModuleId);
+  }, [selectedModuleId]);
 
-  const lkpdProblems = selectedMapel === 'ekonomi' ? [
-    { id: 1, title: "Soal 1: Penjualan Es Teh di Kantin" },
-    { id: 2, title: "Soal 2: Penjualan Pulpen di Koperasi" },
-    { id: 3, title: "Soal 3: Penjualan Bakso di Stadion" },
-    { id: 4, title: "Soal 4: Analisis Kasus" },
-  ] : [
-    { id: 1, title: "Soal 1: Identifikasi Limbah" },
-    { id: 2, title: "Soal 2: Analisis Peluang Usaha" },
-    { id: 3, title: "Soal 3: Desain Produk" },
-    { id: 4, title: "Soal 4: Analisis SWOT" },
-  ];
+  const lkpdProblems = useMemo(() => {
+    if (selectedModuleId === 'kerajinan-limbah') {
+      return [
+        { id: 1, title: "Soal 1: Identifikasi Limbah" },
+        { id: 2, title: "Soal 2: Analisis Peluang Usaha" },
+        { id: 3, title: "Soal 3: Desain Produk" },
+        { id: 4, title: "Soal 4: Analisis SWOT" },
+      ];
+    } else if (selectedModuleId === 'pkwu-sumber-daya') {
+      return [
+        { id: 1, title: "Tugas Analisis Mandiri" }
+      ];
+    } else {
+      return [
+        { id: 1, title: "Soal 1: Penjualan Es Teh di Kantin" },
+        { id: 2, title: "Soal 2: Penjualan Pulpen di Koperasi" },
+        { id: 3, title: "Soal 3: Penjualan Bakso di Stadion" },
+        { id: 4, title: "Soal 4: Analisis Kasus" },
+      ];
+    }
+  }, [selectedModuleId]);
 
   const reflectionQuestions = [
     { id: 1, question: "Bagaimana perasaanmu belajar hari ini?" },
@@ -492,8 +520,6 @@ export default function TeacherDashboard() {
     { id: 5, question: "Apa yang kamu sukai dari Bapak Bagus Panca Wiratama, S.Pd., M.Pd.? (Boleh Kritik dan Saran)" },
   ];
 
-  const currentModule = selectedMapel === 'ekonomi' ? demandModule : pkwuModule;
-  const currentModuleId = selectedMapel === 'ekonomi' ? 'permintaan' : 'kerajinan-limbah';
   const currentLkpdAnswerKeys = selectedMapel === 'ekonomi' ? lkpdAnswerKeys : lkpdAnswerKeysPKWU;
 
   const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
@@ -501,23 +527,39 @@ export default function TeacherDashboard() {
 
   // Mapel & Filter Components
   const MapelSelector = () => (
-    <div className="flex items-center gap-2 p-1 bg-muted rounded-lg">
-      <Button
-        variant={selectedMapel === 'ekonomi' ? 'default' : 'ghost'}
-        size="sm"
-        onClick={() => setSelectedMapel('ekonomi')}
-        className={`gap-2 ${selectedMapel === 'ekonomi' ? 'bg-gradient-to-r from-teal-500 to-cyan-500' : ''}`}
-      >
-        <TrendingUp className="h-4 w-4" /> Ekonomi
-      </Button>
-      <Button
-        variant={selectedMapel === 'pkwu' ? 'default' : 'ghost'}
-        size="sm"
-        onClick={() => setSelectedMapel('pkwu')}
-        className={`gap-2 ${selectedMapel === 'pkwu' ? 'bg-gradient-to-r from-green-500 to-emerald-500' : ''}`}
-      >
-        <Recycle className="h-4 w-4" /> PKWU
-      </Button>
+    <div className="flex flex-wrap items-center gap-2">
+      <div className="flex items-center gap-2 p-1 bg-muted rounded-lg">
+        <Button
+          variant={selectedMapel === 'ekonomi' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setSelectedMapel('ekonomi')}
+          className={`gap-2 ${selectedMapel === 'ekonomi' ? 'bg-gradient-to-r from-teal-500 to-cyan-500' : ''}`}
+        >
+          <TrendingUp className="h-4 w-4" /> Ekonomi
+        </Button>
+        <Button
+          variant={selectedMapel === 'pkwu' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setSelectedMapel('pkwu')}
+          className={`gap-2 ${selectedMapel === 'pkwu' ? 'bg-gradient-to-r from-green-500 to-emerald-500' : ''}`}
+        >
+          <Recycle className="h-4 w-4" /> PKWU
+        </Button>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <BookOpen className="h-4 w-4 text-muted-foreground" />
+        <Select value={selectedModuleId} onValueChange={setSelectedModuleId}>
+          <SelectTrigger className="w-[240px]">
+            <SelectValue placeholder="Pilih Materi/Modul" />
+          </SelectTrigger>
+          <SelectContent>
+            {availableModules.map(m => (
+              <SelectItem key={m.id} value={m.id}>{m.title}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 
