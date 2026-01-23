@@ -245,42 +245,42 @@ const Index = () => {
             {isGuru && !selectedSubject ? (
               /* Teacher View: Subject Selection (Folders) */
               <div className="grid md:grid-cols-2 gap-6">
-                <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Card
-                    className="h-full cursor-pointer border-2 hover:border-teal-500/50 bg-gradient-to-br from-teal-500/5 to-cyan-600/5"
+                    className="h-full cursor-pointer border-2 hover:border-teal-500/50 bg-gradient-to-br from-teal-500/10 to-cyan-600/10"
                     onClick={() => setSelectedSubject('Ekonomi')}
                   >
                     <CardHeader className="text-center pt-10 pb-6">
-                      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-teal-500/20">
-                        <TrendingUp className="h-10 w-10 text-white" />
+                      <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-teal-500/20">
+                        <TrendingUp className="h-12 w-12 text-white" />
                       </div>
                       <CardTitle className="text-3xl font-bold mb-2">Ekonomi</CardTitle>
                       <CardDescription className="text-lg">Modul Pembelajaran Kelas X</CardDescription>
                     </CardHeader>
                     <CardContent className="text-center pb-10">
                       <p className="text-muted-foreground mb-6">Materi Ekonomi meliputi Konsep Dasar, Permintaan, Penawaran, dan Pasar.</p>
-                      <Button className="bg-gradient-to-r from-teal-500 to-cyan-600 border-0">
+                      <Button className="bg-gradient-to-r from-teal-500 to-cyan-600 border-0 w-full md:w-auto">
                         Buka Folder <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </CardContent>
                   </Card>
                 </motion.div>
 
-                <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Card
-                    className="h-full cursor-pointer border-2 hover:border-emerald-500/50 bg-gradient-to-br from-emerald-500/5 to-green-600/5"
+                    className="h-full cursor-pointer border-2 hover:border-emerald-500/50 bg-gradient-to-br from-emerald-500/10 to-green-600/10"
                     onClick={() => setSelectedSubject('PKWU')}
                   >
                     <CardHeader className="text-center pt-10 pb-6">
-                      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/20">
-                        <Recycle className="h-10 w-10 text-white" />
+                      <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/20">
+                        <Recycle className="h-12 w-12 text-white" />
                       </div>
                       <CardTitle className="text-3xl font-bold mb-2">PKWU</CardTitle>
                       <CardDescription className="text-lg">Modul Pembelajaran Kelas XI</CardDescription>
                     </CardHeader>
                     <CardContent className="text-center pb-10">
                       <p className="text-muted-foreground mb-6">Materi PKWU meliputi Kerajinan Limbah, Sumber Daya, dan Kewirausahaan.</p>
-                      <Button className="bg-gradient-to-r from-emerald-500 to-green-600 border-0">
+                      <Button className="bg-gradient-to-r from-emerald-500 to-green-600 border-0 w-full md:w-auto">
                         Buka Folder <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </CardContent>
