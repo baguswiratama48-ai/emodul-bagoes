@@ -42,7 +42,7 @@ export default function TriggerQuestions() {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [answerIds, setAnswerIds] = useState<Record<number, string>>({});
   const [feedbackMap, setFeedbackMap] = useState<Record<number, string>>({});
-  const [revealedHints, setRevealedHints] = useState<Set<number>>(new Set());
+
   const [saving, setSaving] = useState<Record<number, boolean>>({});
   const [savedAnswers, setSavedAnswers] = useState<Record<number, boolean>>({});
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -145,17 +145,7 @@ export default function TriggerQuestions() {
     }
   };
 
-  const toggleHint = (id: number) => {
-    setRevealedHints(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
-    });
-  };
+
 
   const handleComplete = () => {
     markSectionComplete(module.id, 'pemantik');
@@ -288,19 +278,7 @@ export default function TriggerQuestions() {
                       </div>
                     </div>
 
-                    {revealedHints.has(q.id) && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="p-4 rounded-lg bg-warning/10 border border-warning/20"
-                      >
-                        <div className="flex items-start gap-2">
-                          <Lightbulb className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
-                          <p className="text-sm text-foreground">{q.hint}</p>
-                        </div>
-                      </motion.div>
-                    )}
+
                   </>
                 )}
               </CardContent>
