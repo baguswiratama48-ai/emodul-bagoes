@@ -85,6 +85,9 @@ const pkwuTriggerQuestions = [
     hint: "Pikirkan tentang tren kesadaran lingkungan dan green economy.",
     icon: "🌿",
   },
+];
+
+// Trigger questions for PKWU (Sumber Daya Usaha)
 const sumberDayaTriggerQuestions = [
   {
     id: 1,
