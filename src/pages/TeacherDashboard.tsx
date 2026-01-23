@@ -1103,7 +1103,7 @@ export default function TeacherDashboard() {
               <TabsContent value="reset">
                 <ResetStudentWork
                   students={allStudents}
-                  moduleId={currentModuleId}
+                  moduleId={selectedModuleId}
                   onReset={fetchStudentData}
                 />
               </TabsContent>
