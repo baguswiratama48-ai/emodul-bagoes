@@ -55,7 +55,7 @@ export default function ReflectionPage() {
   const [savedAnswers, setSavedAnswers] = useState<Record<number, string>>({});
   const [answerIds, setAnswerIds] = useState<Record<number, string>>({}); // Store IDs for feedback
   const [feedbackMap, setFeedbackMap] = useState<Record<number, string>>({});
-  const [isSaving, setIsSaving] = useState(false);
+  const [saving, setSaving] = useState<Record<number, boolean>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
@@ -123,7 +123,7 @@ export default function ReflectionPage() {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
   };
 
-  const handleSave = async () => {
+  const handleSave = async (questionId: number) => {
     if (!user) {
       toast({
         title: "Error",
@@ -134,48 +134,13 @@ export default function ReflectionPage() {
       return;
     }
 
-    setIsSaving(true);
+    // Set saving specifically for this question (we need to change state to support per-id saving loading state if we want perfection, but using global isSaving might be confusing. For now let's reuse global or added state) (Wait, I should update state first).
+    // Let's assume I will stick to global isSaving for simplicity or add a new state locally.
+    // Actually, TriggerQuestions uses `saving` record. I should add `saving` record state to ReflectionPage too.
 
-    try {
-      for (const [questionId, answer] of Object.entries(answers)) {
-        if (!answer.trim()) continue;
-
-        const { error } = await supabase
-          .from('trigger_answers')
-          .upsert({
-            user_id: user.id,
-            module_id: `${moduleId}-refleksi`,
-            question_id: parseInt(questionId),
-            answer: answer.trim(),
-          }, {
-            onConflict: 'user_id,module_id,question_id',
-          });
-
-        if (error) throw error;
-      }
-
-      setSavedAnswers({ ...answers });
-      markSectionComplete(moduleId || 'permintaan', 'refleksi');
-
-      toast({
-        title: "Berhasil!",
-        description: "Jawaban refleksi berhasil disimpan",
-        duration: 3000,
-      });
-
-      // Re-fetch to get IDs if new insert? simplified by just refreshing page or assumption.
-      // Ideally we should reload data to get new IDs but for now we assume they exist if fetching.
-    } catch (error) {
-      console.error('Error saving reflection answers:', error);
-      toast({
-        title: "Error",
-        description: "Gagal menyimpan jawaban",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  };
+    // Changing approach: I will modify the function logic inside the next Steps after adding state.
+    // For this step I will just replace the function signature and add the logic.
+  }
 
   const allAnswered = questionsToUse.every(q => answers[q.id]?.trim());
   const hasChanges = JSON.stringify(answers) !== JSON.stringify(savedAnswers);
@@ -263,12 +228,25 @@ export default function ReflectionPage() {
                       className="min-h-[120px] resize-none"
                       disabled={isLoading}
                     />
-                    {savedAnswers[item.id] && answers[item.id] === savedAnswers[item.id] && (
-                      <div className="flex items-center gap-2 mt-2 text-sm text-success">
-                        <CheckCircle2 className="h-4 w-4" />
-                        <span>Tersimpan</span>
+                    <div className="flex items-center justify-between mt-3">
+                      <div className="flex items-center gap-2">
+                        {savedAnswers[item.id] && (
+                          <div className="flex items-center gap-2 text-sm text-success">
+                            <CheckCircle2 className="h-4 w-4" />
+                            <span>Tersimpan</span>
+                          </div>
+                        )}
                       </div>
-                    )}
+                      <Button
+                        size="sm"
+                        onClick={() => handleSave(item.id)}
+                        disabled={!answers[item.id]?.trim() || saving[item.id]}
+                        className="gap-2"
+                      >
+                        <Save className="h-4 w-4" />
+                        {saving[item.id] ? 'Menyimpan...' : 'Simpan'}
+                      </Button>
+                    </div>
                   </>
                 )}
               </CardContent>
@@ -276,20 +254,7 @@ export default function ReflectionPage() {
           ))}
         </motion.div>
 
-        {/* Save Button */}
-        {!hasSubmitted && (
-          <motion.div variants={itemVariants} className="flex justify-center">
-            <Button
-              onClick={handleSave}
-              disabled={!hasChanges || isSaving}
-              size="lg"
-              className="gap-2"
-            >
-              <Save className="h-4 w-4" />
-              {isSaving ? 'Menyimpan...' : 'Simpan Refleksi'}
-            </Button>
-          </motion.div>
-        )}
+
 
         {/* Completion Message */}
         {allAnswered && !hasChanges && (

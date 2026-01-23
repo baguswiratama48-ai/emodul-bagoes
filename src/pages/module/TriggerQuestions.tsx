@@ -266,15 +266,8 @@ export default function TriggerQuestions() {
                     />
 
                     <div className="flex items-center justify-between">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleHint(q.id)}
-                        className="text-muted-foreground hover:text-foreground gap-2"
-                      >
-                        <Lightbulb className="h-4 w-4" />
-                        {revealedHints.has(q.id) ? 'Sembunyikan Petunjuk' : 'Lihat Petunjuk'}
-                      </Button>
+                      <div /> {/* Spacer to keep layout if needed, or just remove flex justify-between if preferred, but spacer is safer for now */}
+
 
                       <div className="flex items-center gap-2">
                         {savedAnswers[q.id] && (
