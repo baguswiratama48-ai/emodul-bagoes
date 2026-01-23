@@ -134,13 +134,44 @@ export default function ReflectionPage() {
       return;
     }
 
-    // Set saving specifically for this question (we need to change state to support per-id saving loading state if we want perfection, but using global isSaving might be confusing. For now let's reuse global or added state) (Wait, I should update state first).
-    // Let's assume I will stick to global isSaving for simplicity or add a new state locally.
-    // Actually, TriggerQuestions uses `saving` record. I should add `saving` record state to ReflectionPage too.
+    setSaving(prev => ({ ...prev, [questionId]: true }));
 
-    // Changing approach: I will modify the function logic inside the next Steps after adding state.
-    // For this step I will just replace the function signature and add the logic.
-  }
+    try {
+      const answer = answers[questionId];
+      if (!answer?.trim()) return;
+
+      const { error } = await supabase
+        .from('trigger_answers')
+        .upsert({
+          user_id: user.id,
+          module_id: `${moduleId}-refleksi`,
+          question_id: questionId,
+          answer: answer.trim(),
+        }, {
+          onConflict: 'user_id,module_id,question_id',
+        });
+
+      if (error) throw error;
+
+      setSavedAnswers(prev => ({ ...prev, [questionId]: answer }));
+
+      toast({
+        title: "Tersimpan",
+        description: "Jawaban berhasil disimpan",
+        duration: 2000,
+      });
+
+    } catch (error) {
+      console.error('Error saving reflection answer:', error);
+      toast({
+        title: "Error",
+        description: "Gagal menyimpan jawaban",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(prev => ({ ...prev, [questionId]: false }));
+    }
+  };
 
   const allAnswered = questionsToUse.every(q => answers[q.id]?.trim());
   const hasChanges = JSON.stringify(answers) !== JSON.stringify(savedAnswers);
