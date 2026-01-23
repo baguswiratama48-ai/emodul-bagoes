@@ -304,6 +304,9 @@ const Index = () => {
                   </div>
                 )}
 
+                <div className="mb-4 text-xs text-muted-foreground hidden">
+                  Debug: {availableModules.length} Modules Found
+                </div>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {availableModules.map((module) => {
                     const progress = getModuleProgress(module.id);
@@ -311,7 +314,7 @@ const Index = () => {
                     const isPKWU = module.id.startsWith('pkwu-') || module.id === 'kerajinan-limbah';
 
                     return (
-                      <motion.div key={module.id} variants={itemVariants}>
+                      <div key={module.id}>
                         <Link to={`/modul/${module.id}`}>
                           <Card className="h-full card-hover cursor-pointer border-2 hover:border-primary/50">
                             <CardHeader>
@@ -342,7 +345,7 @@ const Index = () => {
                             </CardContent>
                           </Card>
                         </Link>
-                      </motion.div>
+                      </div>
                     );
                   })}
                 </div>
