@@ -81,6 +81,34 @@ const pkwuSummaryPoints = [
   }
 ];
 
+// Summary for SDM (Sumber Daya Usaha)
+const sdmSummaryPoints = [
+  {
+    title: "6M Sumber Daya Usaha",
+    content: "Sumber daya usaha meliputi Man (Manusia), Money (Uang), Material (Fisik), Machine (Teknologi), Method (Metode), dan Market (Pasar)."
+  },
+  {
+    title: "Man & Money",
+    content: "Man: Unsur manajemen penting untuk mencapai tujuan. Money: Alat tukar dan pengukur nilai untuk membiayai kegiatan usaha."
+  },
+  {
+    title: "Material, Machine, Method",
+    content: "Material: Bahan baku. Machine: Teknologi/alat produksi. Method: Cara kerja efektif dan efisien."
+  },
+  {
+    title: "Market (Pasar)",
+    content: "Strategi pemasaran untuk menyebarkan hasil produksi agar sampai ke tangan konsumen."
+  },
+  {
+    title: "Administrasi Usaha",
+    content: "Kegiatan catat-mencatat, surat-menyurat, dsb untuk menunjang kelancaran usaha dan pengambilan keputusan."
+  },
+  {
+    title: "Pemasaran yang Berhasil",
+    content: "Ditandai dengan jangkauan pasar yang luas dan masa produksi yang bertahan lama. Perlu mempertimbangkan sasaran pasar, selera konsumen, dan harga."
+  }
+];
+
 // Reflection questions for Ekonomi
 const ekonomiReflectionQuestions = [
   "Apa hal paling menarik yang kamu pelajari dari materi ini?",
@@ -107,7 +135,7 @@ export default function SummaryPage() {
   if (moduleId === 'kerajinan-limbah') {
     summaryPoints = pkwuSummaryPoints;
   } else if (moduleId === 'pkwu-sumber-daya') {
-    summaryPoints = [];
+    summaryPoints = sdmSummaryPoints;
   } else if (moduleId === 'penawaran') {
     summaryPoints = penawaranSummaryPoints;
     keyFormulaTitle = "Fungsi Penawaran";
