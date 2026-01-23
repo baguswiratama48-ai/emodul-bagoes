@@ -1242,92 +1242,107 @@ export const sumberDayaModule: Module = {
   duration: '2 JP (2 x 45 menit)',
   sections: [
     {
-      id: 'tujuan-pembelajaran',
-      title: 'Tujuan Pembelajaran',
-      icon: '🎯',
-      content: `
-# A. Tujuan Pembelajaran 🎯
-
-Setelah kegiatan pembelajaran 2 ini diharapkan, kalian dapat:
-
-1.  **Menjelaskan** sumber daya usaha kerajinan dari bahan limbah.
-2.  **Mengidentifikasi** sumber daya usaha kerajinan dari bahan limbah dilingkungan sekitar tempat tinggal.
-3.  **Mengidentifikasi** administrasi yang harus dipersiapkan dalam usaha kerajinan dari bahan limbah.
-4.  **Menentukan** strategi pemasaran yang cocok untuk kegiatan usaha kerajinan dari bahan limbah.
-`
-    },
-    {
       id: 'sumber-daya-usaha',
       title: 'Sumber Daya Usaha (6M)',
       icon: '💪',
       content: `
-# B. Uraian Materi
+# SUMBER DAYA USAHA
 
-## 1. SUMBER DAYA USAHA
-
-Apabila kalian sudah menentukan produk kerajinan berdasarkan analisis peluang usaha, kalian dapat menentukan sumber daya yang dibutuhkan dalam menjalankan usaha tersebut.
-
-Sumber daya yang dimiliki oleh perusahaan dapat dikategorikan atas **enam tipe sumber daya (6M)**, sebagai berikut:
+Apabila kalian sudah menentukan produk kerajinan berdasarkan analisis peluang usaha, kalian dapat menentukan sumber daya yang dibutuhkan dalam menjalankan usaha tersebut. Dalam perencanaan proses produksi diperlukan pengelolaan yang baik untuk mencapai tujuan perusahaan. Sumber daya yang dimiliki oleh perusahaan dapat dikategorikan atas enam tipe sumber daya (6M), sebagai berikut:
 
 ### 1. Man (Manusia) 🧑‍🤝‍🧑
-Manusia merupakan unsur manajemen yang penting dalam mencapai tujuan perusahaan.
+Dalam pendekatan ekonomi, sumber daya manusia adalah salah satu faktor produksi selain tanah, modal, dan keterampilan. Pandangan yang menyamakan manusia dengan faktor-faktor produksi lainnya dianggap tidak tepat, baik dilihat dari konsepsi, filsafat, maupun moral. Manusia merupakan unsur manajemen yang penting dalam mencapai tujuan perusahaan.
 
 ### 2. Money (Uang) 💰
-Uang merupakan unsur yang penting untuk mencapai tujuan perusahaan, karena segala sesuatu harus diperhitungkan secara rasional (biaya gaji, alat, bahan, dll).
+Money atau uang merupakan salah satu unsur yang tidak dapat diabaikan. Besar kecilnya hasil kegiatan dapat diukur dari jumlah uang yang beredar dalam perusahaan. Oleh karena itu, uang merupakan unsur yang penting untuk mencapai tujuan perusahaan, karena segala sesuatu harus diperhitungkan secara rasional. Hal ini akan berhubungan dengan berapa uang yang harus disediakan untuk membiayai gaji tenaga kerja, alat-alat yang dibutuhkan dan harus dibeli, serta berapa hasil yang akan dicapai oleh perusahaan.
 
 ### 3. Material (Fisik) 🧱
-Perusahaan berusaha untuk memperoleh bahan mentah dengan harga paling murah dan bahan bagus, dengan menggunakan cara pengangkutan yang murah dan membuat proses pengolahan menjadi seefisien mungkin.
+Perusahaan umumnya tidak menghasilkan sendiri bahan mentah yang dibutuhkan, tetapi membeli dari pihak lain. Untuk itu manajer perusahaan berusaha untuk memperoleh bahan mentah dengan harga paling murah dan bahan bagus, dengan menggunakan cara pengangkutan yang murah dan membuat proses pengolahan menjadi seefisien mungkin.
 
 ### 4. Machine (Teknologi) ⚙️
-Mesin memiliki peranan penting dalam proses produksi. Perkembangan teknologi yang begitu pesat menyebabkan penggunaan mesin semakin meningkat.
+Mesin memiliki peranan penting dalam proses produksi. Setelah revolusi industri, banyak pekerjaan manusia yang digantikan oleh mesin. Perkembangan teknologi yang begitu pesat menyebabkan penggunaan mesin semakin meningkat.
 
 ### 5. Method (Metode) 📋
-Metode sangat dibutuhkan agar mekanisme kerja berjalan efektif dan efisien, baik yang menyangkut proses produksi maupun administrasi.
+Metode sangat dibutuhkan agar mekanisme kerja berjalan efektif dan efisien. Metode kerja yang sesuai dengan kebutuhan perusahaan, baik yang menyangkut proses produksi maupun administrasi tidak terjadi begitu saja melainkan memerlukan waktu yang lama.
 
 ### 6. Market (Pasar) 🛒
-Penguasaan pasar dalam menyebarkan hasil produksi merupakan faktor penentuan dalam perusahaan. Pasar dapat dikuasai dengan cara kualitas barang harus sesuai dengan selera konsumen dan harga terjangkau.
+Jika barang yang diproduksi tidak laku, proses produksi barang akan berhenti. Penguasaan pasar dalam menyebarkan hasil produksi merupakan faktor penentuan dalam perusahaan. Pasar dapat dikuasai dengan cara kualitas barang harus sesuai dengan selera konsumen dan harga terjangkau oleh daya beli konsumen.
 `
     },
     {
-      id: 'administrasi-usaha',
-      title: 'Administrasi Usaha',
+      id: 'administrasi-usaha-1',
+      title: 'Pengertian & Tujuan Administrasi',
       icon: '📝',
       content: `
-## 2. ADMINISTRASI USAHA KERAJINAN DARI BAHAN LIMBAH
+# ADMINISTRASI DAN PEMASARAN USAHA KERAJINAN DARI BAHAN LIMBAH
 
-### Pengertian Administrasi
-**Administrasi** adalah usaha atau kegiatan yang berkenaan dengan penyelenggaraan kebijaksanaan untuk mencapai tujuan.
+## 1. Persiapan Administrasi Usaha Sebelum Membuat Kerajinan dari Limbah
 
--   **Dalam arti sempit**: catat-mencatat, surat-menyurat, pembukuan ringan, ketik-mengetik, agenda, dll.
--   **Dalam arti luas**: seluruh proses kerja sama antara dua orang atau lebih dalam mencapai tujuan dengan memanfaatkan sarana dan prasarana tertentu.
+Administrasi adalah usaha atau kegiatan yang berkenaan dengan penyelenggaraan kebijaksanaan untuk mencapai tujuan. Administrasi dalam arti sempit adalah kegiatan yang meliputi: catat-mencatat, surat-menyurat, pembukuan ringan, ketik-mengetik, agenda, dan sebagainya yang bersifat teknis ketatausahaan.
 
-### Kegiatan Administrasi Utama:
-a.  **Formulir**: Digunakan untuk mengurus atau menyelesaikan surat–surat tertentu.
-b.  **Surat**: Alat komunikasi tertulis untuk menyampaikan pesan.
-c.  **Laporan**: Bentuk catatan kantor yang memperkuat hubungan vertikal dari bawahan ke pimpinan.
+Administrasi dalam arti luas adalah seluruh proses kerja sama antara dua orang atau lebih dalam mencapai tujuan dengan memanfaatkan sarana dan prasarana tertentu secara berdaya guna dan berhasil guna Kegiatan administrasi banyak mengandalkan catatan yang dapat berupa formulir, surat – surat, dan laporan.
 
-### Fungsi Administrasi:
-1.  Tujuan yang ingin diperoleh disetarakan dengan beban kerja.
-2.  Pekerjaan terbagi secara efektif.
-3.  Mempermudah pekerjaan laporan atau pengarsipan dokumen.
-4.  Perusahaan lebih terarah dan terstruktur.
-5.  Manajemen yang tepat akan menyelesaikan tugas lebih efisien.
+a. **Formulir** banyak digunakan untuk mengurus atau menyelesaikan surat – surat tertentu.
+b. **Surat** merupakan alat komunikasi tertulis yang berasal dari satu pihak dan ditujukan kepada pihak lain untuk menyampaikan pesan.
+c. **Laporan** merupakan bentuk catatan kantor yang memperkuat hubungan vertical secara structural dari bawahan ke pimpinan.
 
-### Kegiatan Administrasi yang Perlu Dilakukan:
-1.  Mencatat penyelenggaraan produksi
-2.  Menyusun rencana anggaran perusahaan
-3.  Melakukan surat-menyurat
-4.  Membuat daftar gaji karyawan
-5.  Mencatat pesanan
-6.  Menyelenggarakan pembukuan
-7.  Melakukan pengarsipan dokumen
+## 2. Persiapan Administrasi Usaha Sebelum Membuat Perusahaan atau Memulai Berbisnis
 
-### Perizinan Usaha:
-a.  Mengurus Izin Usaha
-b.  Penetapan Besarnya Retribusi
-c.  Surat Izin Usaha Perdagangan (SIUP)
-d.  Pengurusan Pajak
-e.  Analisis Mengenai Dampak Lingkungan (AMDAL)
+### a. Persiapan Administrasi
+Administrasi bisa dikatakan sebagai membatu, melayani, memenuhi, dan melengkapi. Kegiatan administrasi banyak mengandalkan catatan yang dapat berupa formulir, surat – surat, dan laporan. Beberapa Fungsi Administrasi:
+1) Tujuan yang ingin diperoleh disetarakan dengan beban kerja yang ada.
+2) Pekerjaan terbagi secara efektif.
+3) Fungsi administrasi sebagai tata usaha adalah mempermudah pekerjaan laporan atau pengarsipan dokumen sehingga mempermudah kerja manaterial.
+4) Perusahaan lebih terarah dan lebih terstruktur bila bekerjasama dalam kelompok kerja.
+5) Manajemen yang tepat akan menyelesaikan tugas lebih efisien.
+
+### b. Maksud Dan Tujuan Administrasi
+Administrasi yang baik dan rapi adalah membantu pengelolaan perusahaan dan kelancaran usaha, khususnya dalam pelaporan hasil usaha dan pencatatan administrasi.
+
+**Tujuan diterapkannya administrasi yaitu:**
+1) Mendapatkan informasi proses bisnis perusahaan.
+2) Akan mendapatkan data yang akurat dalam mengambil keputusan strategic decision making process seperti keputusan penetapan harga, keputusan efisien, keputusan investasi, dan keputusan permodalan.
+3) Penyusunan program dalam rencana pengembangan usaha seperti lisensi atau waralaba franchise
+4) Mengetahui kinerja perusahaan.
+5) Memperlancar proses antar bagi dalam menjanlakan pekerjaan.
+
+**Kegunaan utama dari catatan administrasi perusahaan yaitu:**
+1) Administrasi di gunakan sebagai alat bukti catatan
+2) Administrasi di gunakan sebagai alat manajemen laporan
+3) Administrasi di butuhkan sebagai penilaian catatan dan laporan
+`
+    },
+    {
+      id: 'administrasi-usaha-2',
+      title: 'Kegiatan & Aspek Administrasi',
+      icon: '📂',
+      content: `
+### c. Kegiatan Administrasi
+
+Kegiatan administrasi atau tata usaha meliputi pekerjaan pencatatan yang perlu dilakukan dalam perusahaan seperti:
+1) Mencatat penyelenggaraan produksi
+2) Menyusun rencana anggaran perusahaan
+3) Melakukan surat-menyurat kedalam dan keluar perusahaan
+4) Membuat daftar gaji karyawan
+5) Mencatatan pesanan
+6) Menyelenggarakan pembukuan
+7) Melakukan pengarsipan dokumen
+
+<br>
+
+### Beberapa aspek penting dalam perencanaan administrasi usaha:
+
+**a. Mengurus Izin Usaha**
+Izin usaha adalah alat untuk membina, mengarahkan, mengawasi dan melindungi pengelolaan usaha.
+
+**b. Penetapan Besarnya Retribusi**
+Ketentuan tata cara perhitungan retribusi SITU
+
+**c. Surat Izin Usaha Perdagangan (SIUP)**
+
+**d. Pengurusan Pajak**
+
+**e. Analisis Mengenai Dampak Lingkungan (AMDAL)**
 `
     },
     {
@@ -1335,24 +1350,19 @@ e.  Analisis Mengenai Dampak Lingkungan (AMDAL)
       title: 'Perencanaan Pemasaran',
       icon: '📈',
       content: `
-## 3. PERENCANAAN PEMASARAN
+# d. Perencanaan Pemasaran Usaha Kerajinan dari Bahan Limbah
 
-Langkah awal sebelum memulai sebuah usaha kerajinan dari bahan limbah adalah menentukan **segmentasi pasar**.
+Langkah awal sebelum memulai sebuah usaha kerajinan dari bahan limbah adalah menentukan segmentasi pasar. Ada dua faktor utama yang bisa dimanfaatkan untuk menentukan segmentasi pasar dalam merencanakan pemasaran kerajinan dari bahan limbah yaitu:
 
-### Faktor Penentu Segmentasi Pasar:
+### 1) Lokasi Usaha 📍
+Segmentasi pasar bisa dibedakan berdasarkan lokasi usaha tersebut berada. Oleh sebab itu, perhatikan kebutuhan dan minat konsumen di sekitar lokasi usaha agar produk yang ditawarkan sesuai dengan permintaan para konsumen.
 
-**1. Lokasi Usaha 📍**
-Perhatikan kebutuhan dan minat konsumen di sekitar lokasi usaha agar produk yang ditawarkan sesuai dengan permintaan.
+### 2) Harga jual 🏷️
+Harga jual produk juga menjadi salah satu faktor utama dalam membedakan segmentasi pasar. Para pelaku usaha biasanya membagi target pasar menjadi tiga kelompok, yaitu kelompok konsumen bawah, konsumen menengah, dan konsumen segmen atas. Strategi pemasaran untuk setiap target pasar tentu saja berbeda.
 
-**2. Harga Jual 🏷️**
-Pelaku usaha biasanya membagi target pasar menjadi tiga kelompok:
--   Kelompok konsumen bawah
--   Konsumen menengah
--   Konsumen segmen atas
+<br>
 
-Strategi pemasaran untuk setiap target pasar tentu saja berbeda.
-
-> **Ingat:** Faktor pemasaran dapat dikatakan berhasil jika jangkauan pasar semakin luas dan masa produksi dapat bertahan dalam waktu yang lama.
+> Dengan menentukan segmentasi pasar sebelum memulai usaha, maka secara tidak langsung telah memilih fokus usaha yang ingin dioptimalkan untuk meningkatkan daya saing dan strategi pemasaran yang paling efektif untuk memulai usaha makanan internasional. Penguasaan pasar dalam arti menyebarkan hasil produksi merupakan faktor menentukan dalam perusahaan. Agar pasar dapat dikuasai maka kualitas dan harga makanan harus sesuai dengan selera konsumen dan daya beli (kemampuan) konsumen. Faktor pemasaran dapat dikatakan berhasil jika jangkauan pasar semakin luas dan masa produksi dapat bertahan dalam waktu yang lama. Untuk itu hal-hal yang perlu dipertimbangkan, meliputi sasaran pasar, selera konsumen, citra produk, saluran distribusi, dan penentuan harga.
 `
     },
     {
@@ -1360,24 +1370,25 @@ Strategi pemasaran untuk setiap target pasar tentu saja berbeda.
       title: '5 Kegiatan Pemasaran',
       icon: '📢',
       content: `
-## 5 Rencana Pemasaran
+# Rencana Pemasaran
 
-Ada lima kegiatan dan rencana pemasaran yang bisa dilakukan untuk mengomunikasikan produk dan merk usaha:
+Ada lima kegiatan dan rencana pemasaran yang bisa dilakukan untuk mengomunikasikan produk dan merk usaha, yaitu sebagai berikut:
 
-### a. Penjualan Personal (Personal Selling) 🤝
-Bentuk komunikasi yang menggunakan media individu.
+### a. Penjualan personal (personal selling) 🤝
+Merupakan bentuk komunikasi yang menggunakan media individu.
 
-### b. Iklan (Advertising) 📺
-Komunikasi produk melalui media dan tidak dilakukan secara individu atau perorangan.
+### b. Iklan (advertising) 📺
+Merupakan komunikasi produk melalui media dan tidak dilakukan secara individu atau perorangan.
 
-### c. Promosi Penjualan (Sales Promotion) 🎁
-Digunakan untuk memasarkan dan mengomunikasikan pesan produk anda kepada calon konsumen. Meliputi perencanaan, implementasi dan pengendalian komunikasi.
+### c. Promosi penjualan (sales promotion) 🎁
+Dapat digunakan untuk memasarkan dan mengomunikasikan pesan produk anda kepada calon konsumen.
+Promosi meliputi kegiatan perencanaan, implementasi dan pengendalian komunikasi dari suatu organisasi kepada konsumen serta sasaran lainya.
 
-### d. Publikasi (Publication) 📰
-Mencakup pengaturan komunikasi massa diluar iklan dan promosi penjualan. Bertujuan meningkatkan penjualan atau memperkuat merek secara tidak langsung.
+### d. Publikasi (publication) 📰
+Mencakup pengaturan komunikasi masa diluar iklan dan promosi penjualan yang bertujuan untuk meningkatkan penjualan atau memperkuat merek secara tidak langsung dan tidak bersifat menjual.
 
 ### e. Sponsorship 🏆
-Aplikasi dalam mempromosikan produk atau merek yang berasosiasi dengan kegiatan perusahaan lain atau kegiatan pemerintah dan masyarakat.
+Merupakan aplikasi dalam mempromosikan produk atau merek yang berasosiasi dengan kegiatan perusahaan lain atau kegiatan pemerintah dan masyarakat.
 `
     }
   ],
