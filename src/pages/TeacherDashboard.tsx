@@ -500,7 +500,11 @@ export default function TeacherDashboard() {
       ];
     } else if (selectedModuleId === 'pkwu-sumber-daya') {
       return [
-        { id: 1, title: "Tugas Analisis Mandiri" }
+        { id: 1, title: "Soal 1: Analisis Man (Manusia)" },
+        { id: 2, title: "Soal 2: Analisis Money (Uang)" },
+        { id: 3, title: "Soal 3: Analisis Material (Bahan)" },
+        { id: 4, title: "Soal 4: Analisis Machine (Alat)" },
+        { id: 5, title: "Soal 5: Analisis Market (Pasar)" },
       ];
     } else {
       return [
