@@ -1232,10 +1232,155 @@ export const sumberDayaModule: Module = {
   title: 'SUMBER DAYA USAHA, ADMINISTRASI DAN PEMASARAN',
   subtitle: 'KERAJINAN USAHA DARI BAHAN LIMBAH',
   description: 'Mempelajari Sumber Daya Usaha, Administrasi dan Pemasaran Kerajinan Usaha dari Bahan Limbah.',
-  objectives: [],
+  objectives: [
+    'Menjelaskan sumber daya usaha kerajinan dari bahan limbah.',
+    'Mengidentifikasi sumber daya usaha kerajinan dari bahan limbah dilingkungan sekitar tempat tinggal.',
+    'Mengidentifikasi administrasi yang harus dipersiapkan dalam usaha kerajinan dari bahan limbah.',
+    'Menentukan strategi pemasaran yang cocok untuk kegiatan usaha kerajinan dari bahan limbah.',
+  ],
   prerequisites: [],
-  duration: '0 JP',
-  sections: [],
+  duration: '2 JP (2 x 45 menit)',
+  sections: [
+    {
+      id: 'tujuan-pembelajaran',
+      title: 'Tujuan Pembelajaran',
+      icon: '🎯',
+      content: `
+# A. Tujuan Pembelajaran 🎯
+
+Setelah kegiatan pembelajaran 2 ini diharapkan, kalian dapat:
+
+1.  **Menjelaskan** sumber daya usaha kerajinan dari bahan limbah.
+2.  **Mengidentifikasi** sumber daya usaha kerajinan dari bahan limbah dilingkungan sekitar tempat tinggal.
+3.  **Mengidentifikasi** administrasi yang harus dipersiapkan dalam usaha kerajinan dari bahan limbah.
+4.  **Menentukan** strategi pemasaran yang cocok untuk kegiatan usaha kerajinan dari bahan limbah.
+`
+    },
+    {
+      id: 'sumber-daya-usaha',
+      title: 'Sumber Daya Usaha (6M)',
+      icon: '💪',
+      content: `
+# B. Uraian Materi
+
+## 1. SUMBER DAYA USAHA
+
+Apabila kalian sudah menentukan produk kerajinan berdasarkan analisis peluang usaha, kalian dapat menentukan sumber daya yang dibutuhkan dalam menjalankan usaha tersebut.
+
+Sumber daya yang dimiliki oleh perusahaan dapat dikategorikan atas **enam tipe sumber daya (6M)**, sebagai berikut:
+
+### 1. Man (Manusia) 🧑‍🤝‍🧑
+Manusia merupakan unsur manajemen yang penting dalam mencapai tujuan perusahaan.
+
+### 2. Money (Uang) 💰
+Uang merupakan unsur yang penting untuk mencapai tujuan perusahaan, karena segala sesuatu harus diperhitungkan secara rasional (biaya gaji, alat, bahan, dll).
+
+### 3. Material (Fisik) 🧱
+Perusahaan berusaha untuk memperoleh bahan mentah dengan harga paling murah dan bahan bagus, dengan menggunakan cara pengangkutan yang murah dan membuat proses pengolahan menjadi seefisien mungkin.
+
+### 4. Machine (Teknologi) ⚙️
+Mesin memiliki peranan penting dalam proses produksi. Perkembangan teknologi yang begitu pesat menyebabkan penggunaan mesin semakin meningkat.
+
+### 5. Method (Metode) 📋
+Metode sangat dibutuhkan agar mekanisme kerja berjalan efektif dan efisien, baik yang menyangkut proses produksi maupun administrasi.
+
+### 6. Market (Pasar) 🛒
+Penguasaan pasar dalam menyebarkan hasil produksi merupakan faktor penentuan dalam perusahaan. Pasar dapat dikuasai dengan cara kualitas barang harus sesuai dengan selera konsumen dan harga terjangkau.
+`
+    },
+    {
+      id: 'administrasi-usaha',
+      title: 'Administrasi Usaha',
+      icon: '📝',
+      content: `
+## 2. ADMINISTRASI USAHA KERAJINAN DARI BAHAN LIMBAH
+
+### Pengertian Administrasi
+**Administrasi** adalah usaha atau kegiatan yang berkenaan dengan penyelenggaraan kebijaksanaan untuk mencapai tujuan.
+
+-   **Dalam arti sempit**: catat-mencatat, surat-menyurat, pembukuan ringan, ketik-mengetik, agenda, dll.
+-   **Dalam arti luas**: seluruh proses kerja sama antara dua orang atau lebih dalam mencapai tujuan dengan memanfaatkan sarana dan prasarana tertentu.
+
+### Kegiatan Administrasi Utama:
+a.  **Formulir**: Digunakan untuk mengurus atau menyelesaikan surat–surat tertentu.
+b.  **Surat**: Alat komunikasi tertulis untuk menyampaikan pesan.
+c.  **Laporan**: Bentuk catatan kantor yang memperkuat hubungan vertikal dari bawahan ke pimpinan.
+
+### Fungsi Administrasi:
+1.  Tujuan yang ingin diperoleh disetarakan dengan beban kerja.
+2.  Pekerjaan terbagi secara efektif.
+3.  Mempermudah pekerjaan laporan atau pengarsipan dokumen.
+4.  Perusahaan lebih terarah dan terstruktur.
+5.  Manajemen yang tepat akan menyelesaikan tugas lebih efisien.
+
+### Kegiatan Administrasi yang Perlu Dilakukan:
+1.  Mencatat penyelenggaraan produksi
+2.  Menyusun rencana anggaran perusahaan
+3.  Melakukan surat-menyurat
+4.  Membuat daftar gaji karyawan
+5.  Mencatat pesanan
+6.  Menyelenggarakan pembukuan
+7.  Melakukan pengarsipan dokumen
+
+### Perizinan Usaha:
+a.  Mengurus Izin Usaha
+b.  Penetapan Besarnya Retribusi
+c.  Surat Izin Usaha Perdagangan (SIUP)
+d.  Pengurusan Pajak
+e.  Analisis Mengenai Dampak Lingkungan (AMDAL)
+`
+    },
+    {
+      id: 'perencanaan-pemasaran',
+      title: 'Perencanaan Pemasaran',
+      icon: '📈',
+      content: `
+## 3. PERENCANAAN PEMASARAN
+
+Langkah awal sebelum memulai sebuah usaha kerajinan dari bahan limbah adalah menentukan **segmentasi pasar**.
+
+### Faktor Penentu Segmentasi Pasar:
+
+**1. Lokasi Usaha 📍**
+Perhatikan kebutuhan dan minat konsumen di sekitar lokasi usaha agar produk yang ditawarkan sesuai dengan permintaan.
+
+**2. Harga Jual 🏷️**
+Pelaku usaha biasanya membagi target pasar menjadi tiga kelompok:
+-   Kelompok konsumen bawah
+-   Konsumen menengah
+-   Konsumen segmen atas
+
+Strategi pemasaran untuk setiap target pasar tentu saja berbeda.
+
+> **Ingat:** Faktor pemasaran dapat dikatakan berhasil jika jangkauan pasar semakin luas dan masa produksi dapat bertahan dalam waktu yang lama.
+`
+    },
+    {
+      id: 'kegiatan-pemasaran',
+      title: '5 Kegiatan Pemasaran',
+      icon: '📢',
+      content: `
+## 5 Rencana Pemasaran
+
+Ada lima kegiatan dan rencana pemasaran yang bisa dilakukan untuk mengomunikasikan produk dan merk usaha:
+
+### a. Penjualan Personal (Personal Selling) 🤝
+Bentuk komunikasi yang menggunakan media individu.
+
+### b. Iklan (Advertising) 📺
+Komunikasi produk melalui media dan tidak dilakukan secara individu atau perorangan.
+
+### c. Promosi Penjualan (Sales Promotion) 🎁
+Digunakan untuk memasarkan dan mengomunikasikan pesan produk anda kepada calon konsumen. Meliputi perencanaan, implementasi dan pengendalian komunikasi.
+
+### d. Publikasi (Publication) 📰
+Mencakup pengaturan komunikasi massa diluar iklan dan promosi penjualan. Bertujuan meningkatkan penjualan atau memperkuat merek secara tidak langsung.
+
+### e. Sponsorship 🏆
+Aplikasi dalam mempromosikan produk atau merek yang berasosiasi dengan kegiatan perusahaan lain atau kegiatan pemerintah dan masyarakat.
+`
+    }
+  ],
   videos: [],
   quizQuestions: [],
   glossary: {},
