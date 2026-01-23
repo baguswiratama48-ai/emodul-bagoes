@@ -14,7 +14,8 @@ import {
   Settings,
   User,
   Recycle,
-  Upload
+  Upload,
+  ChevronLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,6 +34,7 @@ const Index = () => {
   const { user, role, signOut, isGuru } = useAuth();
   const [userKelas, setUserKelas] = useState<string | null>(null);
   const [progressMap, setProgressMap] = useState<Record<string, number>>({});
+  const [selectedSubject, setSelectedSubject] = useState<'Ekonomi' | 'PKWU' | null>(null);
 
   useEffect(() => {
     const fetchUserKelas = async () => {
@@ -53,16 +55,29 @@ const Index = () => {
     const isKelasXI = userKelas?.startsWith('XI.');
 
     if (isGuru) {
-      return { availableModules: [...ekonomiModules, ...pkwuModules], mapelName: 'Semua Mapel', mapelKelas: 'Guru' };
+      if (selectedSubject === 'Ekonomi') {
+        return { availableModules: ekonomiModules, mapelName: 'Modul Ekonomi', mapelKelas: 'Guru' };
+      }
+      if (selectedSubject === 'PKWU') {
+        return { availableModules: pkwuModules, mapelName: 'Modul PKWU', mapelKelas: 'Guru' };
+      }
+      // If no subject selected (folder view), we technically don't display modules, so return empty or all
+      // But for progress calculation below, we might want all. 
+      // However, the progress calculation loop uses 'availableModules'. 
+      // Let's return ALL so progress can be calculated for all in background, 
+      // even if we don't display them in the folder view.
+      return { availableModules: [...ekonomiModules, ...pkwuModules], mapelName: 'E-Modul Guru', mapelKelas: '' };
     }
+
     if (isKelasX) {
       return { availableModules: ekonomiModules, mapelName: 'Ekonomi', mapelKelas: `Kelas ${userKelas}` };
     }
     if (isKelasXI) {
       return { availableModules: pkwuModules, mapelName: 'PKWU', mapelKelas: `Kelas ${userKelas}` };
     }
+    // Fallback for students without class or guests
     return { availableModules: [...ekonomiModules, ...pkwuModules], mapelName: 'E-Modul', mapelKelas: '' };
-  }, [userKelas, isGuru]);
+  }, [userKelas, isGuru, selectedSubject]);
 
   // Fetch real progress from database
   useEffect(() => {
@@ -226,48 +241,119 @@ const Index = () => {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {availableModules.map((module) => {
-              const progress = getModuleProgress(module.id);
-              // Use real DB progress if available, fallback to 0
-              const progressPercent = progressMap[module.id] || 0;
-              const isPKWU = module.id === 'kerajinan-limbah';
-
-              return (
-                <motion.div key={module.id} variants={itemVariants}>
-                  <Link to={`/modul/${module.id}`}>
-                    <Card className="h-full card-hover cursor-pointer border-2 hover:border-primary/50">
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-md ${isPKWU ? 'bg-gradient-to-br from-green-500 to-emerald-600' : 'bg-gradient-primary'}`}>
-                            {isPKWU ? <Recycle className="h-6 w-6 text-white" /> : <TrendingUp className="h-6 w-6 text-white" />}
-                          </div>
-                          {progress.isCompleted && (
-                            <span className="px-2 py-1 rounded-full bg-success/10 text-success text-xs font-medium">Selesai</span>
-                          )}
-                        </div>
-                        <CardTitle className="mt-4">{module.title}</CardTitle>
-                        <CardDescription>{module.subtitle}</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{module.description}</p>
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>Progress</span>
-                            <span>{progressPercent}%</span>
-                          </div>
-                          <Progress value={progressPercent} className="h-2" />
-                        </div>
-                        <div className="flex items-center gap-2 mt-4 text-sm text-primary font-medium">
-                          <span>Mulai Belajar</span>
-                          <ArrowRight className="h-4 w-4" />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
+          <div className="max-w-5xl mx-auto">
+            {isGuru && !selectedSubject ? (
+              /* Teacher View: Subject Selection (Folders) */
+              <div className="grid md:grid-cols-2 gap-6">
+                <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Card
+                    className="h-full cursor-pointer border-2 hover:border-teal-500/50 bg-gradient-to-br from-teal-500/5 to-cyan-600/5"
+                    onClick={() => setSelectedSubject('Ekonomi')}
+                  >
+                    <CardHeader className="text-center pt-10 pb-6">
+                      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-teal-500/20">
+                        <TrendingUp className="h-10 w-10 text-white" />
+                      </div>
+                      <CardTitle className="text-3xl font-bold mb-2">Ekonomi</CardTitle>
+                      <CardDescription className="text-lg">Modul Pembelajaran Kelas X</CardDescription>
+                    </CardHeader>
+                    <CardContent className="text-center pb-10">
+                      <p className="text-muted-foreground mb-6">Materi Ekonomi meliputi Konsep Dasar, Permintaan, Penawaran, dan Pasar.</p>
+                      <Button className="bg-gradient-to-r from-teal-500 to-cyan-600 border-0">
+                        Buka Folder <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </CardContent>
+                  </Card>
                 </motion.div>
-              );
-            })}
+
+                <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Card
+                    className="h-full cursor-pointer border-2 hover:border-emerald-500/50 bg-gradient-to-br from-emerald-500/5 to-green-600/5"
+                    onClick={() => setSelectedSubject('PKWU')}
+                  >
+                    <CardHeader className="text-center pt-10 pb-6">
+                      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/20">
+                        <Recycle className="h-10 w-10 text-white" />
+                      </div>
+                      <CardTitle className="text-3xl font-bold mb-2">PKWU</CardTitle>
+                      <CardDescription className="text-lg">Modul Pembelajaran Kelas XI</CardDescription>
+                    </CardHeader>
+                    <CardContent className="text-center pb-10">
+                      <p className="text-muted-foreground mb-6">Materi PKWU meliputi Kerajinan Limbah, Sumber Daya, dan Kewirausahaan.</p>
+                      <Button className="bg-gradient-to-r from-emerald-500 to-green-600 border-0">
+                        Buka Folder <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </div>
+            ) : (
+              /* Module List View (For Students OR Selected Subject for Teacher) */
+              <div>
+                {isGuru && selectedSubject && (
+                  <div className="mb-8 flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      onClick={() => setSelectedSubject(null)}
+                      className="gap-2 hover:bg-muted"
+                    >
+                      <ChevronLeft className="h-4 w-4" /> Kembali ke Pilihan Mapel
+                    </Button>
+                    <div className="h-6 w-px bg-border" />
+                    <span className="font-semibold text-lg">{selectedSubject}</span>
+                  </div>
+                )}
+
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {availableModules.map((module) => {
+                    const progress = getModuleProgress(module.id);
+                    const progressPercent = progressMap[module.id] || 0;
+                    const isPKWU = module.id.startsWith('pkwu-') || module.id === 'kerajinan-limbah';
+
+                    return (
+                      <motion.div key={module.id} variants={itemVariants}>
+                        <Link to={`/modul/${module.id}`}>
+                          <Card className="h-full card-hover cursor-pointer border-2 hover:border-primary/50">
+                            <CardHeader>
+                              <div className="flex items-start justify-between">
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-md ${isPKWU ? 'bg-gradient-to-br from-green-500 to-emerald-600' : 'bg-gradient-primary'}`}>
+                                  {isPKWU ? <Recycle className="h-6 w-6 text-white" /> : <TrendingUp className="h-6 w-6 text-white" />}
+                                </div>
+                                {progress.isCompleted && (
+                                  <span className="px-2 py-1 rounded-full bg-success/10 text-success text-xs font-medium">Selesai</span>
+                                )}
+                              </div>
+                              <CardTitle className="mt-4">{module.title}</CardTitle>
+                              <CardDescription>{module.subtitle}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{module.description}</p>
+                              <div className="space-y-2">
+                                <div className="flex justify-between text-xs text-muted-foreground">
+                                  <span>Progress</span>
+                                  <span>{progressPercent}%</span>
+                                </div>
+                                <Progress value={progressPercent} className="h-2" />
+                              </div>
+                              <div className="flex items-center gap-2 mt-4 text-sm text-primary font-medium">
+                                <span>Mulai Belajar</span>
+                                <ArrowRight className="h-4 w-4" />
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </Link>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+                {availableModules.length === 0 && (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                    <p>Belum ada modul tersedia untuk kategori ini.</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </motion.div>
       </section>
