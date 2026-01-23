@@ -255,8 +255,8 @@ export default function SummaryPage() {
           </motion.div>
         )}
 
-        {/* Key Concepts - Only for PKWU */}
-        {isPKWU && (
+        {/* Key Concepts - Only for PKWU (excluding Sumber Daya) */}
+        {isPKWU && moduleId !== 'pkwu-sumber-daya' && (
           <motion.div variants={itemVariants}>
             <Card className="bg-gradient-to-br from-green-500/5 to-emerald-500/5 border-green-500/20">
               <CardHeader>
