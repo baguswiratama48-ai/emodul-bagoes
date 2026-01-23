@@ -85,6 +85,25 @@ const pkwuTriggerQuestions = [
     hint: "Pikirkan tentang tren kesadaran lingkungan dan green economy.",
     icon: "🌿",
   },
+const sumberDayaTriggerQuestions = [
+  {
+    id: 1,
+    question: "Sebuah usaha kerajinan dari bahan limbah memiliki tenaga kerja terampil dan bahan baku yang mudah diperoleh, tetapi usaha tersebut tetap mengalami kerugian. Menurut analisismu, faktor apa yang paling mungkin menjadi penyebab utama masalah tersebut? Jelaskan alasan dan solusi yang dapat dilakukan.",
+    hint: "Pikirkan tentang aspek 6M selain Man dan Material, seperti pengelolaan keuangan atau metode kerja.",
+    icon: "📉",
+  },
+  {
+    id: 2,
+    question: "Banyak usaha kerajinan kecil berjalan tanpa pencatatan keuangan dan administrasi yang rapi. Menurut pendapatmu, apa risiko terbesar dari kondisi tersebut bagi kelangsungan usaha, dan bagaimana dampaknya terhadap pengambilan keputusan usaha di masa depan?",
+    hint: "Pertimbangkan sulitnya mengetahui untung/rugi dan merencanakan pengembangan usaha tanpa data.",
+    icon: "📝",
+  },
+  {
+    id: 3,
+    question: "Jika kamu ingin memulai usaha kerajinan dari bahan limbah dengan modal terbatas, bagaimana cara menentukan sasaran pasar dan strategi pemasaran yang tepat agar produk tetap diminati konsumen? Jelaskan pertimbangan yang kamu gunakan.",
+    hint: "Pikirkan tentang segmentasi pasar yang spesifik dan pemasaran biaya rendah (low budget marketing).",
+    icon: "🎯",
+  },
 ];
 
 export default function TriggerQuestions() {
@@ -104,7 +123,7 @@ export default function TriggerQuestions() {
   if (moduleId === 'kerajinan-limbah') {
     triggerQuestions = pkwuTriggerQuestions;
   } else if (moduleId === 'pkwu-sumber-daya') {
-    triggerQuestions = [];
+    triggerQuestions = sumberDayaTriggerQuestions;
   } else if (moduleId === 'penawaran') {
     triggerQuestions = penawaranTriggerQuestions;
   }

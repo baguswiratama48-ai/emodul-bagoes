@@ -1245,7 +1245,11 @@ export const sumberDayaModule: Module = {
     'Mengidentifikasi administrasi yang harus dipersiapkan dalam usaha kerajinan dari bahan limbah.',
     'Menentukan strategi pemasaran yang cocok untuk kegiatan usaha kerajinan dari bahan limbah.',
   ],
-  prerequisites: [],
+  prerequisites: [
+    '3.1.3 Mengidentifikasi sumber daya yang dibutuhkan dalam usaha kerajinan dari bahan limbah berbentuk bangun datar',
+    '3.1.4 Menentukan administrasi dan pemasaran usaha kerajinan dari bahan limbah berbentuk bangun datar',
+    '3.1.5 Menentukan komponen dan langkah-langkah dalam penyusunan perencanaan usaha kerajinan dari bahan limbah berbentuk bangun datar.',
+  ],
   duration: '4 JP (2 Pertemuan)',
   sections: [
     {
