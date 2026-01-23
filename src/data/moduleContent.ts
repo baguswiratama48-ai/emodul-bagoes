@@ -47,6 +47,7 @@ export interface Module {
   activity?: string;
   product?: string;
   meaningfulUnderstanding?: string;
+  reflectionQuestions?: { id: number; question: string; hint: string }[];
 }
 
 export const demandModule: Module = {

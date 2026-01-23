@@ -59,6 +59,9 @@ export default function ReflectionPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
+  // Use module-specific questions if available, otherwise use default
+  const questionsToUse = module?.reflectionQuestions || reflectionQuestions;
+
   // Fetch existing answers
   useEffect(() => {
     const fetchAnswers = async () => {
@@ -104,7 +107,7 @@ export default function ReflectionPage() {
         }
 
         // Check if all questions are answered (meaning submitted)
-        const allAnswered = reflectionQuestions.every(q => answersMap[q.id]?.trim());
+        const allAnswered = questionsToUse.every(q => answersMap[q.id]?.trim());
         setHasSubmitted(allAnswered);
       } catch (error) {
         console.error('Error fetching reflection answers:', error);
@@ -114,7 +117,7 @@ export default function ReflectionPage() {
     };
 
     fetchAnswers();
-  }, [user, moduleId]);
+  }, [user, moduleId, questionsToUse]);
 
   const handleAnswerChange = (questionId: number, value: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
@@ -126,6 +129,7 @@ export default function ReflectionPage() {
         title: "Error",
         description: "Kamu harus login untuk menyimpan jawaban",
         variant: "destructive",
+        duration: 3000,
       });
       return;
     }
@@ -156,6 +160,7 @@ export default function ReflectionPage() {
       toast({
         title: "Berhasil!",
         description: "Jawaban refleksi berhasil disimpan",
+        duration: 3000,
       });
 
       // Re-fetch to get IDs if new insert? simplified by just refreshing page or assumption.
@@ -172,7 +177,7 @@ export default function ReflectionPage() {
     }
   };
 
-  const allAnswered = reflectionQuestions.every(q => answers[q.id]?.trim());
+  const allAnswered = questionsToUse.every(q => answers[q.id]?.trim());
   const hasChanges = JSON.stringify(answers) !== JSON.stringify(savedAnswers);
 
   const containerVariants = {
@@ -216,7 +221,7 @@ export default function ReflectionPage() {
 
         {/* Reflection Questions */}
         <motion.div variants={itemVariants} className="space-y-6">
-          {reflectionQuestions.map((item, index) => (
+          {questionsToUse.map((item, index) => (
             <Card key={item.id} className="border-l-4 border-l-amber-500">
               <CardHeader>
                 <CardTitle className="text-lg flex items-start gap-3">

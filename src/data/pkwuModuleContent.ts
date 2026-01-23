@@ -1403,9 +1403,43 @@ Merupakan aplikasi dalam mempromosikan produk atau merek yang berasosiasi dengan
 `
     }
   ],
-  videos: [],
+  videos: [
+    {
+      id: 'video-sumber-daya',
+      title: 'Sumber Daya Usaha',
+      url: 'https://www.youtube.com/embed/sdgyMRNqB7g?si=ADbDbyS8dLK0U52Y',
+      description: 'Video pembelajaran tentang Sumber Daya Usaha, Administrasi, dan Pemasaran Kerajinan.',
+    }
+  ],
   quizQuestions: [],
   glossary: {},
+  reflectionQuestions: [
+    {
+      id: 1,
+      question: 'Bagian materi mana yang paling kamu pahami tentang usaha kerajinan dari bahan limbah? Mengapa bagian tersebut menurutmu penting?',
+      hint: 'Identifikasi konsep yang paling mudah kamu mengerti.'
+    },
+    {
+      id: 2,
+      question: 'Menurutmu, apa manfaat mencatat kegiatan dan keuangan usaha dalam menjalankan usaha kerajinan dari bahan limbah?',
+      hint: 'Pikirkan tentang keuntungan memiliki catatan yang rapi.'
+    },
+    {
+      id: 3,
+      question: 'Mengapa perencanaan usaha yang baik diperlukan agar usaha kerajinan dari bahan limbah dapat berjalan terus dan tidak berhenti di tengah jalan?',
+      hint: 'Hubungkan dengan keberlanjutan bisnis.'
+    },
+    {
+      id: 4,
+      question: 'Mengapa produk kerajinan perlu disesuaikan dengan kebutuhan, selera, dan kemampuan beli konsumen? Jelaskan dengan pendapatmu sendiri.',
+      hint: 'Kaitkan dengan kepuasan pelanggan dan penjualan.'
+    },
+    {
+      id: 5,
+      question: 'Setelah mempelajari materi ini, sikap atau keterampilan apa yang ingin kamu tingkatkan jika suatu saat ingin membuka usaha kerajinan dari bahan limbah?',
+      hint: 'Refleksi diri tentang potensi wirausahamu.'
+    }
+  ]
 };
 
 export const pkwuModules: Module[] = [kerajinanLimbahModule, sumberDayaModule];
