@@ -1,6 +1,7 @@
+
 import { Module } from './moduleContent';
 
-export const pkwuModule: Module = {
+export const kerajinanLimbahModule: Module = {
   id: 'kerajinan-limbah',
   title: 'Kerajinan dari Limbah',
   subtitle: 'Berbentuk Bangun Datar',
@@ -1225,3 +1226,19 @@ Menurut pendapatmu, apa **tantangan atau kesulitan terbesar** dalam memulai usah
     'Project Based Learning (PBL)': 'Model pembelajaran yang berpusat pada proyek sebagai media untuk mencapai tujuan pembelajaran.',
   },
 };
+
+export const sumberDayaModule: Module = {
+  id: 'pkwu-sumber-daya',
+  title: 'SUMBER DAYA USAHA, ADMINISTRASI DAN PEMASARAN',
+  subtitle: 'KERAJINAN USAHA DARI BAHAN LIMBAH',
+  description: 'Mempelajari Sumber Daya Usaha, Administrasi dan Pemasaran Kerajinan Usaha dari Bahan Limbah.',
+  objectives: [],
+  prerequisites: [],
+  duration: '0 JP',
+  sections: [],
+  videos: [],
+  quizQuestions: [],
+  glossary: {},
+};
+
+export const pkwuModules: Module[] = [kerajinanLimbahModule, sumberDayaModule];

@@ -62,7 +62,7 @@ export function ModuleSidebar({ module, currentSection, progress }: ModuleSideba
     { id: 'info', label: 'Informasi Modul', icon: BookOpen, path: `/modul/${module.id}` },
     { id: 'pemantik', label: 'Pertanyaan Pemantik', icon: HelpCircle, path: `/modul/${module.id}/pemantik` },
     { id: 'materi', label: 'Materi Pembelajaran', icon: FileText, path: `/modul/${module.id}/materi` },
-    ...(isPKWU ? [{ id: 'tugas-catatan', label: 'Tugas Catatan', icon: FileEdit, path: `/modul/${module.id}/tugas-catatan` }] : []),
+    ...(module.id === 'kerajinan-limbah' ? [{ id: 'tugas-catatan', label: 'Tugas Catatan', icon: FileEdit, path: `/modul/${module.id}/tugas-catatan` }] : []),
     { id: 'video', label: 'Video Pembelajaran', icon: Video, path: `/modul/${module.id}/video` },
     { id: 'lkpd', label: 'LKPD', icon: ClipboardList, path: `/modul/${module.id}/lkpd` },
     { id: 'kuis', label: 'Kuis & Latihan', icon: CheckCircle2, path: `/modul/${module.id}/kuis` },

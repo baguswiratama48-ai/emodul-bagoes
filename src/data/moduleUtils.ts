@@ -1,8 +1,8 @@
 import { ekonomiModules, demandModule, Module } from './moduleContent';
-import { pkwuModule } from './pkwuModuleContent';
+import { pkwuModules } from './pkwuModuleContent';
 
 // All modules combined
-export const allModules: Module[] = [...ekonomiModules, pkwuModule];
+export const allModules: Module[] = [...ekonomiModules, ...pkwuModules];
 
 // Get module by ID
 export function getModuleById(moduleId: string | undefined): Module | undefined {
@@ -12,7 +12,8 @@ export function getModuleById(moduleId: string | undefined): Module | undefined 
 
 // Check if module is PKWU
 export function isPKWUModule(moduleId: string | undefined): boolean {
-  return moduleId === 'kerajinan-limbah';
+  if (!moduleId) return false;
+  return moduleId.startsWith('pkwu-') || moduleId === 'kerajinan-limbah';
 }
 
 // Get class type from kelas string

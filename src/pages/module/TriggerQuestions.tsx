@@ -101,8 +101,10 @@ export default function TriggerQuestions() {
   const isPKWU = isPKWUModule(moduleId);
 
   let triggerQuestions = permintaanTriggerQuestions;
-  if (isPKWU) {
+  if (moduleId === 'kerajinan-limbah') {
     triggerQuestions = pkwuTriggerQuestions;
+  } else if (moduleId === 'pkwu-sumber-daya') {
+    triggerQuestions = [];
   } else if (moduleId === 'penawaran') {
     triggerQuestions = penawaranTriggerQuestions;
   }

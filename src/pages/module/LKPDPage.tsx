@@ -263,9 +263,19 @@ export default function LKPDPage() {
   let lkpdProblems = ekonomiLkpdProblems;
   let lkpdMeta = ekonomiLkpdMeta;
 
-  if (isPKWU) {
+  if (moduleId === 'kerajinan-limbah') {
     lkpdProblems = pkwuLkpdProblems;
     lkpdMeta = pkwuLkpdMeta;
+  } else if (moduleId === 'pkwu-sumber-daya') {
+    lkpdProblems = [];
+    lkpdMeta = {
+      ...pkwuLkpdMeta,
+      title: 'Lembar Kerja Peserta Didik (LKPD)',
+      subtitle: 'Materi Belum Tersedia',
+      tujuan: [],
+      petunjuk: [],
+      rumus: []
+    };
   } else if (moduleId === 'penawaran') {
     lkpdProblems = penawaranLkpdProblems;
     lkpdMeta = penawaranLkpdMeta;

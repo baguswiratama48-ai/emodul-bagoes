@@ -104,8 +104,10 @@ export default function SummaryPage() {
   let keyFormulaTitle = "Fungsi Permintaan";
   let keyFormulaContent = "Qd = -aP + b";
 
-  if (isPKWU) {
+  if (moduleId === 'kerajinan-limbah') {
     summaryPoints = pkwuSummaryPoints;
+  } else if (moduleId === 'pkwu-sumber-daya') {
+    summaryPoints = [];
   } else if (moduleId === 'penawaran') {
     summaryPoints = penawaranSummaryPoints;
     keyFormulaTitle = "Fungsi Penawaran";
