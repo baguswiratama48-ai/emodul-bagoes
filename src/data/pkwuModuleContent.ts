@@ -1455,35 +1455,18 @@ export const rencanaUsahaModule: Module = {
   activity: 'Menyusun Proposal Usaha',
   product: 'Dokumen Perencanaan Usaha',
   meaningfulUnderstanding: 'Perencanaan yang baik adalah kunci keberhasilan bisnis. Memahami aspek perencanaan usaha akan membantu mengubah ide kreatif menjadi bisnis yang menguntungkan dan berkelanjutan.',
-  objectives: [
-    'Menyusun rencana usaha kerajinan dari bahan limbah secara sistematis',
-    'Melakukan analisis SWOT untuk ide usaha yang dipilih',
-    'Merumuskan strategi pemasaran dan operasional',
-    'Menghitung proyeksi keuangan dasar',
-  ],
-  prerequisites: [
-    'Memahami jenis dan karakteristik limbah bangun datar',
-    'Memahami konsep dasar sumber daya usaha (6M)',
-  ],
+  objectives: [],
+  prerequisites: [],
   duration: '4 JP (2 Pertemuan)',
   sections: [
     {
       id: 'pendahuluan-rencana',
-      title: 'Pendahuluan Rencana Usaha',
+      title: 'Pendahuluan',
       icon: '🚀',
       content: `
-# Pendahuluan Rencana Usaha
+# Materi Belum Tersedia
 
-Perencanaan usaha (business plan) adalah dokumen tertulis yang menjelaskan secara rinci bagaimana suatu usaha baru akan dijalankan untuk mencapai tujuannya.
-
-## Mengapa Perlu Rencana Usaha?
-
-1. **Sebagai Peta Jalan (Roadmap)**: Mengarahkan operasional bisnis agar tetap on track.
-2. **Mengukur Kelayakan**: Menilai apakah ide bisnis realistis dan menguntungkan.
-3. **Mencari Pendanaan**: Investor atau bank butuh rencana usaha yang jelas sebelum memberikan modal.
-4. **Meminimalkan Risiko**: Mengantisipasi masalah yang mungkin muncul di kemudian hari.
-
-> "Gagal merencanakan berarti merencanakan kegagalan." - Benjamin Franklin
+Mohon maaf, materi untuk modul ini sedang dalam proses penyusunan. Silakan cek kembali nanti.
       `,
     }
   ],
