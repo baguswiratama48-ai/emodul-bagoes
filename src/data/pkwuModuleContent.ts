@@ -1564,7 +1564,15 @@ Hal-hal yang harus diperhatikan pada aspek keuangan adalah:
       `,
     }
   ],
-  videos: [],
+  videos: [
+    {
+      id: 'video-rencana-1',
+      title: 'Perencanaan Usaha Kerajinan Limbah',
+      url: 'https://www.youtube.com/embed/VIDEO_ID_HERE', // Ganti dengan ID video yang sesuai
+      description: 'Simak video berikut untuk memahami lebih dalam tentang penyusunan rencana usaha kerajinan dari bahan limbah.',
+      task: 'Kerjakan apa yang menjadi tugas di akhir video.',
+    }
+  ],
   quizQuestions: [],
   glossary: {},
   reflectionQuestions: []

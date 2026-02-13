@@ -23,7 +23,8 @@ import {
   Database,
   ChevronLeft,
   ChevronRight,
-  Download
+  Download,
+  Video
 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
@@ -94,6 +95,20 @@ interface StudentTriggerAnswer {
   module_id?: string;
 }
 
+interface StudentVideoAnswer {
+  id: string;
+  user_id: string;
+  full_name: string;
+  kelas: string;
+  video_id: string;
+  answer: string;
+  submitted_at: string;
+  feedback?: string;
+  student_reply?: string;
+  student_reply_at?: string;
+  module_id?: string;
+}
+
 interface StudentNote {
   id: string;
   user_id: string;
@@ -128,6 +143,7 @@ export default function TeacherDashboard() {
   const [quizResults, setQuizResults] = useState<StudentQuizResult[]>([]);
   const [lkpdAnswers, setLkpdAnswers] = useState<StudentLkpdAnswer[]>([]);
   const [triggerAnswers, setTriggerAnswers] = useState<StudentTriggerAnswer[]>([]);
+  const [videoAnswers, setVideoAnswers] = useState<StudentVideoAnswer[]>([]);
   const [reflectionAnswers, setReflectionAnswers] = useState<StudentTriggerAnswer[]>([]);
   const [studentNotes, setStudentNotes] = useState<StudentNote[]>([]);
   const [allStudents, setAllStudents] = useState<StudentProfile[]>([]);
@@ -164,6 +180,7 @@ export default function TeacherDashboard() {
 
   // Pagination States
   const [currentPageTrigger, setCurrentPageTrigger] = useState(1);
+  const [currentPageVideo, setCurrentPageVideo] = useState(1);
   const [currentPageReflection, setCurrentPageReflection] = useState(1);
   const [currentPageLkpd, setCurrentPageLkpd] = useState(1);
   const [currentPageQuiz, setCurrentPageQuiz] = useState(1);
@@ -403,6 +420,32 @@ export default function TeacherDashboard() {
       setStudentNotes(notes);
     }
 
+    // Fetch video answers
+    const { data: videoData } = await supabase
+      .from('video_answers' as any)
+      .select('id, user_id, module_id, video_id, answer, submitted_at')
+      .order('submitted_at', { ascending: false });
+
+    if (videoData) {
+      setVideoAnswers(videoData.map((item: any) => {
+        const profile = profilesMap[item.user_id];
+        const fb = fbMap[`video-${item.id}`];
+        return {
+          id: item.id,
+          user_id: item.user_id,
+          full_name: profile?.full_name || 'Unknown',
+          kelas: profile?.kelas || '-',
+          video_id: item.video_id,
+          answer: item.answer,
+          submitted_at: item.submitted_at,
+          feedback: fb?.feedback,
+          student_reply: fb?.student_reply,
+          student_reply_at: fb?.student_reply_at,
+          module_id: item.module_id
+        };
+      }));
+    }
+
     setLoading(false);
   };
 
@@ -430,6 +473,7 @@ export default function TeacherDashboard() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'quiz_answers' }, () => fetchStudentData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'lkpd_answers' }, () => fetchStudentData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'trigger_answers' }, () => fetchStudentData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'video_answers' }, () => fetchStudentData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'teacher_feedback' }, () => fetchStudentData())
       .subscribe();
 
@@ -484,6 +528,17 @@ export default function TeacherDashboard() {
     }
     return answers.sort(sortByName);
   }, [reflectionAnswers, mapelKelas, selectedKelas, selectedModuleId]);
+
+  const filteredVideoAnswers = useMemo(() => {
+    let answers = videoAnswers.filter(a => mapelKelas.includes(a.kelas));
+    if (selectedKelas !== 'all') {
+      answers = answers.filter(a => a.kelas === selectedKelas);
+    }
+    if (selectedModuleId) {
+      answers = answers.filter(a => a.module_id === selectedModuleId);
+    }
+    return answers.sort(sortByName);
+  }, [videoAnswers, mapelKelas, selectedKelas, selectedModuleId]);
 
   // Questions based on mapel and module
   const triggerQuestions = useMemo(() => {
@@ -705,6 +760,7 @@ export default function TeacherDashboard() {
             <Tabs defaultValue="trigger-answers" className="w-full">
               <TabsList className="w-full grid grid-cols-6 mb-6">
                 <TabsTrigger value="trigger-answers" className="gap-2"><MessageCircle className="h-4 w-4" /> <span className="hidden sm:inline">Pemantik</span></TabsTrigger>
+                <TabsTrigger value="video-answers" className="gap-2"><Video className="h-4 w-4" /> <span className="hidden sm:inline">Tugas Video</span></TabsTrigger>
                 <TabsTrigger value="reflection-answers" className="gap-2"><Lightbulb className="h-4 w-4" /> <span className="hidden sm:inline">Refleksi</span></TabsTrigger>
                 <TabsTrigger value="lkpd-answers" className="gap-2"><ClipboardList className="h-4 w-4" /> <span className="hidden sm:inline">LKPD</span></TabsTrigger>
                 <TabsTrigger value="quiz-results" className="gap-2"><CheckCircle2 className="h-4 w-4" /> <span className="hidden sm:inline">Kuis</span></TabsTrigger>
@@ -769,6 +825,78 @@ export default function TeacherDashboard() {
                                   <Button size="sm" variant="ghost" disabled={currentPageTrigger === 1} onClick={() => setCurrentPageTrigger(p => p - 1)}>Prev</Button>
                                   <span className="self-center text-sm">{currentPageTrigger}</span>
                                   <Button size="sm" variant="ghost" disabled={paginated.length < ITEMS_PER_PAGE} onClick={() => setCurrentPageTrigger(p => p + 1)}>Next</Button>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="video-answers">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Jawaban Tugas Video</CardTitle>
+                    <CardDescription>Jawaban tugas yang ada di video pembelajaran</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {filteredVideoAnswers.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground"><p>Belum ada data.</p></div>
+                    ) : (
+                      <div className="space-y-6">
+                        {Array.from(new Set(filteredVideoAnswers.map(a => a.video_id))).map(videoId => {
+                          const answersForVideo = filteredVideoAnswers.filter(a => a.video_id === videoId);
+                          const totalAnswers = answersForVideo.length;
+                          const startIndex = (currentPageVideo - 1) * ITEMS_PER_PAGE;
+                          const paginated = answersForVideo.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+                          const module = availableModules.find(m => m.id === selectedModuleId);
+                          const video = module?.videos.find(v => v.id === videoId);
+                          const videoTitle = video ? video.title : videoId;
+                          const videoTask = video ? video.task : '';
+
+                          return (
+                            <div key={videoId} className="border rounded-xl overflow-hidden shadow-sm">
+                              <div className={`p-4 ${selectedMapel === 'pkwu' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-muted/50'} border-b`}>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Badge variant="outline">Video: {videoTitle}</Badge>
+                                  <Badge variant="secondary">{totalAnswers} jawaban</Badge>
+                                </div>
+                                <p className="font-medium text-lg">{videoTask || 'Tugas Video'}</p>
+                              </div>
+                              <div className="divide-y bg-card">
+                                {paginated.map((answer, i) => (
+                                  <div key={i} className="p-4 hover:bg-accent/5 transition-colors">
+                                    <div className="flex items-start justify-between mb-2">
+                                      <div>
+                                        <p className="font-semibold text-primary">{answer.full_name}</p>
+                                        <div className="flex gap-2 text-xs text-muted-foreground mt-1">
+                                          <Badge variant="outline" className="text-[10px] h-5">Kelas {answer.kelas}</Badge>
+                                          <span>{new Date(answer.submitted_at).toLocaleDateString()}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <p className="text-sm bg-muted/30 p-3 rounded-lg border border-border/50 whitespace-pre-line">{answer.answer}</p>
+                                    <FeedbackForm
+                                      studentId={answer.user_id}
+                                      answerId={answer.id}
+                                      answerType="video"
+                                      existingFeedback={answer.feedback}
+                                      studentReply={answer.student_reply}
+                                      studentReplyAt={answer.student_reply_at}
+                                      onFeedbackSaved={fetchStudentData}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                              {totalAnswers > ITEMS_PER_PAGE && (
+                                <div className="p-4 border-t bg-muted/20 flex justify-center gap-2">
+                                  <Button size="sm" variant="ghost" disabled={currentPageVideo === 1} onClick={() => setCurrentPageVideo(p => p - 1)}>Prev</Button>
+                                  <span className="self-center text-sm">{currentPageVideo}</span>
+                                  <Button size="sm" variant="ghost" disabled={paginated.length < ITEMS_PER_PAGE} onClick={() => setCurrentPageVideo(p => p + 1)}>Next</Button>
                                 </div>
                               )}
                             </div>

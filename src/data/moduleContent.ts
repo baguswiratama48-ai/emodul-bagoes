@@ -25,6 +25,7 @@ export interface Video {
   title: string;
   url: string;
   description: string;
+  task?: string;
 }
 
 export interface Module {

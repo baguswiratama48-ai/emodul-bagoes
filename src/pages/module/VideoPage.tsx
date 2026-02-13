@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Video, 
-  ArrowRight, 
+import {
+  Video,
+  ArrowRight,
   ArrowLeft,
   Play,
   CheckCircle2,
@@ -19,15 +22,97 @@ export default function VideoPage() {
   const { moduleId } = useParams();
   const { markSectionComplete, markVideoWatched, getModuleProgress } = useProgress();
   const module = getModuleById(moduleId);
-  
+
   if (!module) {
     return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
   }
-  
+
   const progress = getModuleProgress(module.id);
   const isPKWU = isPKWUModule(moduleId);
-  
+
   const [selectedVideo, setSelectedVideo] = useState(module.videos[0]);
+  const [answer, setAnswer] = useState('');
+  const [answerId, setAnswerId] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const { user } = useAuth();
+  const { toast } = useToast(); // Fix import logic, assumed useToast hook is available
+
+  // Load existing answer and feedback
+  useEffect(() => {
+    if (user && selectedVideo) {
+      loadAnswer();
+      setAnswer(''); // Reset when video changes
+      setSaved(false);
+      setFeedback('');
+    }
+  }, [user, selectedVideo, module.id]); // Add dependencies
+
+  const loadAnswer = async () => {
+    if (!user) return;
+
+    try {
+      const { data }: { data: any } = await supabase
+        .from('video_answers' as any)
+        .select('id, answer')
+        .eq('user_id', user.id)
+        .eq('module_id', module.id)
+        .eq('video_id', selectedVideo.id)
+        .maybeSingle();
+
+      if (data) {
+        setAnswer(data.answer || '');
+        setAnswerId(data.id);
+        setSaved(true);
+
+        // Fetch feedback
+        const { data: fbData } = await supabase
+          .from('teacher_feedback')
+          .select('feedback')
+          .eq('answer_id', data.id)
+          .eq('answer_type', 'video')
+          .maybeSingle();
+
+        if (fbData) {
+          setFeedback(fbData.feedback);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading video answer:', error);
+    }
+  };
+
+  const saveAnswer = async () => {
+    if (!user || !answer.trim()) return;
+    setSaving(true);
+
+    try {
+      const { data, error }: { data: any, error: any } = await supabase
+        .from('video_answers' as any)
+        .upsert({
+          user_id: user.id,
+          module_id: module.id,
+          video_id: selectedVideo.id,
+          answer: answer.trim(),
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id,module_id,video_id'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setAnswerId(data.id);
+      setSaved(true);
+      // toast({ title: 'Tersimpan', description: 'Jawaban berhasil disimpan' }); // importing toast context is tricky here without modifying imports
+    } catch (error) {
+      console.error('Error saving answer:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleVideoComplete = (videoId: string) => {
     markVideoWatched(module.id, videoId);
@@ -133,27 +218,74 @@ export default function VideoPage() {
           </Card>
         </motion.div>
 
+        {/* Video Task Section */}
+        {selectedVideo.task && (
+          <motion.div variants={itemVariants}>
+            <Card className="border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg text-blue-700 dark:text-blue-400">
+                  <Clock className="h-5 w-5" />
+                  Tugas Video
+                </CardTitle>
+                <CardDescription className="text-blue-600/80 dark:text-blue-400/80">
+                  {selectedVideo.task}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {feedback ? (
+                  <div className="p-4 bg-background rounded-lg border">
+                    <p className="font-medium mb-2 text-sm text-muted-foreground">Jawaban Kamu:</p>
+                    <p className="mb-4 text-sm">{answer}</p>
+                    <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                      <p className="font-bold text-yellow-800 dark:text-yellow-400 text-sm mb-1">Feedback Guru:</p>
+                      <p className="text-yellow-700 dark:text-yellow-300 whitespace-pre-line">{feedback}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <textarea
+                      className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      placeholder="Tulis jawabanmu di sini..."
+                      value={answer}
+                      onChange={(e) => {
+                        setAnswer(e.target.value);
+                        setSaved(false);
+                      }}
+                    />
+                    <div className="flex justify-end">
+                      <Button
+                        onClick={saveAnswer}
+                        disabled={!answer.trim() || saving}
+                      >
+                        {saving ? 'Menyimpan...' : (saved ? 'Tersimpan' : 'Kirim Jawaban')}
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
         {/* Video List */}
         <motion.div variants={itemVariants}>
           <h3 className="text-lg font-semibold mb-4">Daftar Video</h3>
           <div className="grid gap-4 md:grid-cols-2">
             {module.videos.map((video, index) => (
-              <Card 
+              <Card
                 key={video.id}
-                className={`cursor-pointer transition-all ${
-                  selectedVideo.id === video.id 
-                    ? 'ring-2 ring-primary' 
-                    : 'hover:shadow-md'
-                }`}
+                className={`cursor-pointer transition-all ${selectedVideo.id === video.id
+                  ? 'ring-2 ring-primary'
+                  : 'hover:shadow-md'
+                  }`}
                 onClick={() => setSelectedVideo(video)}
               >
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      isVideoWatched(video.id) 
-                        ? 'bg-success/10' 
-                        : 'bg-primary/10'
-                    }`}>
+                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${isVideoWatched(video.id)
+                      ? 'bg-success/10'
+                      : 'bg-primary/10'
+                      }`}>
                       {isVideoWatched(video.id) ? (
                         <CheckCircle2 className="h-6 w-6 text-success" />
                       ) : (
@@ -180,8 +312,8 @@ export default function VideoPage() {
           <Card className="bg-accent/50 border-accent">
             <CardContent className="pt-6">
               <p className="text-sm text-foreground">
-                💡 <strong>Tips:</strong> Tonton semua video dengan seksama dan jangan ragu untuk 
-                memutar ulang bagian yang belum kamu pahami. Catat poin-poin penting untuk membantu 
+                💡 <strong>Tips:</strong> Tonton semua video dengan seksama dan jangan ragu untuk
+                memutar ulang bagian yang belum kamu pahami. Catat poin-poin penting untuk membantu
                 mengingat materi.
               </p>
             </CardContent>
@@ -197,7 +329,7 @@ export default function VideoPage() {
             </Button>
           </Link>
           <Link to={`/modul/${module.id}/lkpd`}>
-            <Button 
+            <Button
               onClick={handleComplete}
               className="gap-2 bg-gradient-primary hover:opacity-90"
             >
