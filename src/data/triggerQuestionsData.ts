@@ -83,9 +83,19 @@ export const sumberDayaTriggerQuestions = [
     },
 ];
 
+export const rencanaUsahaTriggerQuestions = [
+    {
+        id: 1,
+        question: "Materi Belum Tersedia. Mohon maaf, materi untuk modul ini sedang dalam proses penyusunan. Silakan cek kembali nanti.",
+        hint: "",
+        icon: "🚧",
+    }
+];
+
 export const getTriggerQuestionsByModuleId = (moduleId: string | undefined) => {
     if (moduleId === 'kerajinan-limbah') return pkwuTriggerQuestions;
     if (moduleId === 'pkwu-sumber-daya') return sumberDayaTriggerQuestions;
+    if (moduleId === 'rencana-usaha') return rencanaUsahaTriggerQuestions;
     if (moduleId === 'penawaran') return penawaranTriggerQuestions;
     return permintaanTriggerQuestions; // Default to permintaan
 };

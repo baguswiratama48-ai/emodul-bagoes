@@ -339,6 +339,28 @@ export default function LKPDPage() {
   } else if (moduleId === 'pkwu-sumber-daya') {
     lkpdProblems = pkwuSumberDayaLkpdProblems;
     lkpdMeta = pkwuSumberDayaLkpdMeta;
+  } else if (moduleId === 'rencana-usaha') {
+    lkpdProblems = [
+      {
+        id: 1,
+        title: "Materi Belum Tersedia",
+        story: "Mohon maaf, materi untuk modul ini sedang dalam proses penyusunan.",
+        question: "Silakan cek kembali nanti.",
+        hint: "",
+        rubrik: ""
+      }
+    ];
+    lkpdMeta = {
+      title: "Materi Belum Tersedia",
+      subtitle: "Sedang dalam proses penyusunan",
+      mapel: "PKWU",
+      kelas: "XI",
+      waktu: "-",
+      tujuan: [],
+      kompetensi: "-",
+      petunjuk: [],
+      rumus: []
+    };
   } else if (moduleId === 'penawaran') {
     lkpdProblems = penawaranLkpdProblems;
     lkpdMeta = penawaranLkpdMeta;
