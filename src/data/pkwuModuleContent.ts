@@ -131,10 +131,10 @@ Wirausaha kerajinan dari bahan limbah (upcycling) merupakan salah satu bentuk wi
     },
     {
       id: 'ide-kreatif',
-      title: 'RENCANA USAHA KERAJINAN DARI BAHAN LIMBAH',
+      title: 'Sumber Ide Kreatif',
       icon: '💡',
       content: `
-# RENCANA USAHA KERAJINAN DARI BAHAN LIMBAH
+# Sumber Ide Kreatif untuk Kerajinan Limbah
 
 ## Dari Mana Ide Kreatif Berasal?
 
@@ -1442,4 +1442,55 @@ Merupakan aplikasi dalam mempromosikan produk atau merek yang berasosiasi dengan
   ]
 };
 
-export const pkwuModules: Module[] = [kerajinanLimbahModule, sumberDayaModule];
+
+export const rencanaUsahaModule: Module = {
+  id: 'rencana-usaha',
+  title: 'RENCANA USAHA KERAJINAN DARI BAHAN LIMBAH',
+  subtitle: 'Perencanaan dan Analisis Usaha',
+  description: 'Mempelajari cara menyusun rencana usaha yang matang untuk kerajinan dari bahan limbah, termasuk analisis peluang, strategi pemasaran, dan perhitungan keuangan.',
+  level: 'XI',
+  phase: 'F',
+  lessonNumber: 3,
+  model: 'Project Based Learning (PBL)',
+  activity: 'Menyusun Proposal Usaha',
+  product: 'Dokumen Perencanaan Usaha',
+  meaningfulUnderstanding: 'Perencanaan yang baik adalah kunci keberhasilan bisnis. Memahami aspek perencanaan usaha akan membantu mengubah ide kreatif menjadi bisnis yang menguntungkan dan berkelanjutan.',
+  objectives: [
+    'Menyusun rencana usaha kerajinan dari bahan limbah secara sistematis',
+    'Melakukan analisis SWOT untuk ide usaha yang dipilih',
+    'Merumuskan strategi pemasaran dan operasional',
+    'Menghitung proyeksi keuangan dasar',
+  ],
+  prerequisites: [
+    'Memahami jenis dan karakteristik limbah bangun datar',
+    'Memahami konsep dasar sumber daya usaha (6M)',
+  ],
+  duration: '4 JP (2 Pertemuan)',
+  sections: [
+    {
+      id: 'pendahuluan-rencana',
+      title: 'Pendahuluan Rencana Usaha',
+      icon: '🚀',
+      content: `
+# Pendahuluan Rencana Usaha
+
+Perencanaan usaha (business plan) adalah dokumen tertulis yang menjelaskan secara rinci bagaimana suatu usaha baru akan dijalankan untuk mencapai tujuannya.
+
+## Mengapa Perlu Rencana Usaha?
+
+1. **Sebagai Peta Jalan (Roadmap)**: Mengarahkan operasional bisnis agar tetap on track.
+2. **Mengukur Kelayakan**: Menilai apakah ide bisnis realistis dan menguntungkan.
+3. **Mencari Pendanaan**: Investor atau bank butuh rencana usaha yang jelas sebelum memberikan modal.
+4. **Meminimalkan Risiko**: Mengantisipasi masalah yang mungkin muncul di kemudian hari.
+
+> "Gagal merencanakan berarti merencanakan kegagalan." - Benjamin Franklin
+      `,
+    }
+  ],
+  videos: [],
+  quizQuestions: [],
+  glossary: {},
+  reflectionQuestions: []
+};
+
+export const pkwuModules: Module[] = [kerajinanLimbahModule, sumberDayaModule, rencanaUsahaModule];
