@@ -1454,9 +1454,17 @@ export const rencanaUsahaModule: Module = {
   model: 'Project Based Learning (PBL)',
   activity: 'Menyusun Proposal Usaha',
   product: 'Dokumen Perencanaan Usaha',
-  meaningfulUnderstanding: 'Perencanaan yang baik adalah kunci keberhasilan bisnis. Memahami aspek perencanaan usaha akan membantu mengubah ide kreatif menjadi bisnis yang menguntungkan dan berkelanjutan.',
-  objectives: [],
-  prerequisites: [],
+  meaningfulUnderstanding: 'Perencanaan usaha yang matang adalah peta jalan menuju kesuksesan. Hal ini membantu mengubah ide kreatif menjadi bisnis yang berkelanjutan dan meminimalkan risiko kegagalan.',
+  objectives: [
+    'Menentukan komponen perencanaan usaha kerajinan dari bahan limbah',
+    'Menentukan langkah-langkah penyusunan proposal perencanaan usaha kerajinan dari bahan limbah',
+    'Membuat proposal perencanaan usaha kerajinan dari bahan limbah',
+  ],
+  prerequisites: [
+    'Memahami jenis dan karakteristik bahan limbah',
+    'Memahami analisis peluang usaha (SWOT)',
+    'Memahami konsep dasar sumber daya usaha (6M)',
+  ],
   duration: '4 JP (2 Pertemuan)',
   sections: [
     {

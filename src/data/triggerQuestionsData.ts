@@ -86,10 +86,34 @@ export const sumberDayaTriggerQuestions = [
 export const rencanaUsahaTriggerQuestions = [
     {
         id: 1,
-        question: "Materi Belum Tersedia. Mohon maaf, materi untuk modul ini sedang dalam proses penyusunan. Silakan cek kembali nanti.",
-        hint: "",
-        icon: "🚧",
-    }
+        question: "Menurutmu, mengapa banyak usaha baru yang gagal di tahun pertama? Apakah hanya karena modal, atau ada faktor lain yang lebih penting?",
+        hint: "Pikirkan tentang persiapan sebelum memulai, seperti riset pasar.",
+        icon: "📉",
+    },
+    {
+        id: 2,
+        question: "Jika kamu diberi modal Rp10 juta hari ini untuk membuat usaha kerajinan, apa hal pertama yang akan kamu lakukan sebelum membeli bahan?",
+        hint: "Ingat, ide bagus belum tentu laku dijual.",
+        icon: "💡",
+    },
+    {
+        id: 3,
+        question: "Pernahkah kamu melihat produk yang viral tapi tiba-tiba hilang dari pasaran? Kira-kira apa yang salah dari perencanaan mereka?",
+        hint: "Pertimbangkan keberlanjutan dan inovasi jangka panjang.",
+        icon: "🔥",
+    },
+    {
+        id: 4,
+        question: "Seberapa penting peran proposal atau rencana tertulis jika kamu ingin mengajak temanmu bekerjasama dalam bisnis?",
+        hint: "Bayangkan jika tidak ada kesepakatan tertulis tentang pembagian tugas dan keuntungan.",
+        icon: "🤝",
+    },
+    {
+        id: 5,
+        question: "Bagaimana cara kita tahu apakah ide produk kerajinan kita benar-benar akan laku dijual sebelum kita memproduksinya dalam jumlah banyak?",
+        hint: "Pikirkan tentang validasi ide atau tes pasar skala kecil.",
+        icon: "✅",
+    },
 ];
 
 export const getTriggerQuestionsByModuleId = (moduleId: string | undefined) => {
