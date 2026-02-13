@@ -291,706 +291,706 @@ const pkwuLkpdMeta = {
     "Tuliskan jawaban dengan jelas dan sistematis"
   ],
   rumus: [
-    { nama: "Peluang Usaha", formula: "Kebutuhan Pasar + Keunikan Produk + Modal Tersedia" },
-    { nama: "Keuntungan", formula: "Laba = Harga Jual - Modal Produksi" },
     { nama: "Analisis SWOT", formula: "Strengths, Weaknesses, Opportunities, Threats" }
   ]
+};
+
 const pkwuSumberDayaLkpdMeta = {
-    title: "Lembar Kerja Peserta Didik (LKPD)",
-    subtitle: "Analisis Sumber Daya Usaha (6M)",
-    mapel: "Prakarya dan Kewirausahaan (PKWU)",
-    kelas: "XI",
-    waktu: "45 menit",
-    tujuan: [
-      "Siswa mampu mengidentifikasi kebutuhan sumber daya usaha (6M)",
-      "Siswa mampu merencanakan kebutuhan bahan, alat, dan SDM",
-      "Siswa mampu menentukan strategi pemasaran dasar"
-    ],
-    kompetensi: "Menganalisis perencanaan usaha kerajinan dari bahan limbah berbentuk bangun datar meliputi ide, peluang usaha, sumber daya, administrasi, dan pemasaran",
-    petunjuk: [
-      "Pilihlah satu ide usaha kerajinan sederhana",
-      "Analisis kebutuhan sumber dayanya menggunakan pendekatan 6M",
-      "Tuliskan jawaban dengan rinci dan logis"
-    ],
-    rumus: [
-      { nama: "6M", formula: "Man, Money, Material, Machine, Method, Market" },
-      { nama: "BEP", formula: "Titik Impas (Balik Modal)" }
-    ]
+  title: "Lembar Kerja Peserta Didik (LKPD)",
+  subtitle: "Analisis Sumber Daya Usaha (6M)",
+  mapel: "Prakarya dan Kewirausahaan (PKWU)",
+  kelas: "XI",
+  waktu: "45 menit",
+  tujuan: [
+    "Siswa mampu mengidentifikasi kebutuhan sumber daya usaha (6M)",
+    "Siswa mampu merencanakan kebutuhan bahan, alat, dan SDM",
+    "Siswa mampu menentukan strategi pemasaran dasar"
+  ],
+  kompetensi: "Menganalisis perencanaan usaha kerajinan dari bahan limbah berbentuk bangun datar meliputi ide, peluang usaha, sumber daya, administrasi, dan pemasaran",
+  petunjuk: [
+    "Pilihlah satu ide usaha kerajinan sederhana",
+    "Analisis kebutuhan sumber dayanya menggunakan pendekatan 6M",
+    "Tuliskan jawaban dengan rinci dan logis"
+  ],
+  rumus: [
+    { nama: "6M", formula: "Man, Money, Material, Machine, Method, Market" },
+    { nama: "BEP", formula: "Titik Impas (Balik Modal)" }
+  ]
+};
+
+export default function LKPDPage() {
+  const { moduleId } = useParams();
+  const { markSectionComplete } = useProgress();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const module = getModuleById(moduleId);
+
+  if (!module) {
+    return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
+  }
+
+  const isPKWU = isPKWUModule(moduleId);
+  let lkpdProblems = ekonomiLkpdProblems;
+  let lkpdMeta = ekonomiLkpdMeta;
+
+  if (moduleId === 'kerajinan-limbah') {
+    lkpdProblems = pkwuLkpdProblems;
+    lkpdMeta = pkwuLkpdMeta;
+  } else if (moduleId === 'pkwu-sumber-daya') {
+    lkpdProblems = pkwuSumberDayaLkpdProblems;
+    lkpdMeta = pkwuSumberDayaLkpdMeta;
+  } else if (moduleId === 'penawaran') {
+    lkpdProblems = penawaranLkpdProblems;
+    lkpdMeta = penawaranLkpdMeta;
+  }
+
+  // PKWU only has main problems, no refleksi
+  const allProblems = lkpdProblems;
+  const totalQuestions = allProblems.length;
+
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [answerIds, setAnswerIds] = useState<Record<number, string>>({});
+  const [feedbackMap, setFeedbackMap] = useState<Record<number, string>>({});
+  const [showHints, setShowHints] = useState<Record<number, boolean>>({});
+  const [saving, setSaving] = useState<Record<number, boolean>>({});
+  const [savedAnswers, setSavedAnswers] = useState<Record<number, boolean>>({});
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [loadingCheck, setLoadingCheck] = useState(true);
+  const [studentProfile, setStudentProfile] = useState<{ full_name: string; kelas: string; nis: string } | null>(null);
+
+  // Fetch student profile and check submission status
+  useEffect(() => {
+    if (user) {
+      fetchStudentProfile();
+      checkSubmissionStatus();
+    } else {
+      setLoadingCheck(false);
+    }
+  }, [user]);
+
+  const fetchStudentProfile = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('profiles')
+      .select('full_name, kelas, nis')
+      .eq('id', user.id)
+      .single();
+
+    if (data) {
+      setStudentProfile(data);
+    }
   };
 
-  export default function LKPDPage() {
-    const { moduleId } = useParams();
-const { markSectionComplete } = useProgress();
-const { user } = useAuth();
-const { toast } = useToast();
-const module = getModuleById(moduleId);
+  const checkSubmissionStatus = async () => {
+    if (!user) return;
 
-if (!module) {
-  return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
-}
+    // FETCH 'id' IS CRITICAL
+    const { data } = await supabase
+      .from('lkpd_answers')
+      .select('id, problem_id, answer')
+      .eq('user_id', user.id)
+      .eq('module_id', module.id);
 
-const isPKWU = isPKWUModule(moduleId);
-let lkpdProblems = ekonomiLkpdProblems;
-let lkpdMeta = ekonomiLkpdMeta;
+    if (data && data.length > 0) {
+      const loadedAnswers: Record<number, string> = {};
+      const loadedSaved: Record<number, boolean> = {};
+      const loadedIds: Record<number, string> = {};
 
-if (moduleId === 'kerajinan-limbah') {
-  lkpdProblems = pkwuLkpdProblems;
-  lkpdMeta = pkwuLkpdMeta;
-} else if (moduleId === 'pkwu-sumber-daya') {
-  lkpdProblems = pkwuSumberDayaLkpdProblems;
-  lkpdMeta = pkwuSumberDayaLkpdMeta;
-} else if (moduleId === 'penawaran') {
-  lkpdProblems = penawaranLkpdProblems;
-  lkpdMeta = penawaranLkpdMeta;
-}
-
-// PKWU only has main problems, no refleksi
-const allProblems = lkpdProblems;
-const totalQuestions = allProblems.length;
-
-const [answers, setAnswers] = useState<Record<number, string>>({});
-const [answerIds, setAnswerIds] = useState<Record<number, string>>({});
-const [feedbackMap, setFeedbackMap] = useState<Record<number, string>>({});
-const [showHints, setShowHints] = useState<Record<number, boolean>>({});
-const [saving, setSaving] = useState<Record<number, boolean>>({});
-const [savedAnswers, setSavedAnswers] = useState<Record<number, boolean>>({});
-const [hasSubmitted, setHasSubmitted] = useState(false);
-const [loadingCheck, setLoadingCheck] = useState(true);
-const [studentProfile, setStudentProfile] = useState<{ full_name: string; kelas: string; nis: string } | null>(null);
-
-// Fetch student profile and check submission status
-useEffect(() => {
-  if (user) {
-    fetchStudentProfile();
-    checkSubmissionStatus();
-  } else {
-    setLoadingCheck(false);
-  }
-}, [user]);
-
-const fetchStudentProfile = async () => {
-  if (!user) return;
-  const { data } = await supabase
-    .from('profiles')
-    .select('full_name, kelas, nis')
-    .eq('id', user.id)
-    .single();
-
-  if (data) {
-    setStudentProfile(data);
-  }
-};
-
-const checkSubmissionStatus = async () => {
-  if (!user) return;
-
-  // FETCH 'id' IS CRITICAL
-  const { data } = await supabase
-    .from('lkpd_answers')
-    .select('id, problem_id, answer')
-    .eq('user_id', user.id)
-    .eq('module_id', module.id);
-
-  if (data && data.length > 0) {
-    const loadedAnswers: Record<number, string> = {};
-    const loadedSaved: Record<number, boolean> = {};
-    const loadedIds: Record<number, string> = {};
-
-    data.forEach(item => {
-      loadedAnswers[item.problem_id] = item.answer;
-      loadedSaved[item.problem_id] = true;
-      loadedIds[item.problem_id] = item.id;
-    });
-    setAnswers(loadedAnswers);
-    setSavedAnswers(loadedSaved);
-    setAnswerIds(loadedIds);
-
-    // Fetch feedback
-    const { data: feedbackData } = await supabase
-      .from('teacher_feedback')
-      .select('answer_id, feedback')
-      // We use 'lkpd' as answer_type
-      .eq('answer_type', 'lkpd')
-      .in('answer_id', Object.values(loadedIds));
-
-    if (feedbackData) {
-      const fbMap: Record<number, string> = {};
-      feedbackData.forEach((fb: any) => {
-        const pId = Object.keys(loadedIds).find(key => loadedIds[Number(key)] === fb.answer_id);
-        if (pId) fbMap[Number(pId)] = fb.feedback;
+      data.forEach(item => {
+        loadedAnswers[item.problem_id] = item.answer;
+        loadedSaved[item.problem_id] = true;
+        loadedIds[item.problem_id] = item.id;
       });
-      setFeedbackMap(fbMap);
+      setAnswers(loadedAnswers);
+      setSavedAnswers(loadedSaved);
+      setAnswerIds(loadedIds);
+
+      // Fetch feedback
+      const { data: feedbackData } = await supabase
+        .from('teacher_feedback')
+        .select('answer_id, feedback')
+        // We use 'lkpd' as answer_type
+        .eq('answer_type', 'lkpd')
+        .in('answer_id', Object.values(loadedIds));
+
+      if (feedbackData) {
+        const fbMap: Record<number, string> = {};
+        feedbackData.forEach((fb: any) => {
+          const pId = Object.keys(loadedIds).find(key => loadedIds[Number(key)] === fb.answer_id);
+          if (pId) fbMap[Number(pId)] = fb.feedback;
+        });
+        setFeedbackMap(fbMap);
+      }
+
+      const allAnswered = allProblems.every(p => loadedAnswers[p.id]?.trim());
+      setHasSubmitted(allAnswered);
     }
+    setLoadingCheck(false);
+  };
 
-    const allAnswered = allProblems.every(p => loadedAnswers[p.id]?.trim());
-    setHasSubmitted(allAnswered);
-  }
-  setLoadingCheck(false);
-};
+  const handleAnswerChange = (id: number, value: string) => {
+    setAnswers(prev => ({ ...prev, [id]: value }));
+    setSavedAnswers(prev => ({ ...prev, [id]: false }));
+  };
 
-const handleAnswerChange = (id: number, value: string) => {
-  setAnswers(prev => ({ ...prev, [id]: value }));
-  setSavedAnswers(prev => ({ ...prev, [id]: false }));
-};
+  const saveAnswer = async (problemId: number) => {
+    if (!user || !answers[problemId]?.trim()) return;
 
-const saveAnswer = async (problemId: number) => {
-  if (!user || !answers[problemId]?.trim()) return;
+    setSaving(prev => ({ ...prev, [problemId]: true }));
 
-  setSaving(prev => ({ ...prev, [problemId]: true }));
+    const { error } = await supabase
+      .from('lkpd_answers')
+      .upsert({
+        user_id: user.id,
+        module_id: module.id,
+        problem_id: problemId,
+        answer: answers[problemId],
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id,module_id,problem_id'
+      });
 
-  const { error } = await supabase
-    .from('lkpd_answers')
-    .upsert({
-      user_id: user.id,
-      module_id: module.id,
-      problem_id: problemId,
-      answer: answers[problemId],
-      updated_at: new Date().toISOString()
-    }, {
-      onConflict: 'user_id,module_id,problem_id'
-    });
+    setSaving(prev => ({ ...prev, [problemId]: false }));
 
-  setSaving(prev => ({ ...prev, [problemId]: false }));
+    if (error) {
+      toast({
+        title: 'Gagal menyimpan',
+        description: 'Terjadi kesalahan saat menyimpan jawaban.',
+        variant: 'destructive'
+      });
+    } else {
+      setSavedAnswers(prev => ({ ...prev, [problemId]: true }));
+      toast({
+        title: 'Tersimpan',
+        description: `Jawaban soal ${problemId} berhasil disimpan.`
+      });
+    }
+  };
 
-  if (error) {
-    toast({
-      title: 'Gagal menyimpan',
-      description: 'Terjadi kesalahan saat menyimpan jawaban.',
-      variant: 'destructive'
-    });
-  } else {
-    setSavedAnswers(prev => ({ ...prev, [problemId]: true }));
-    toast({
-      title: 'Tersimpan',
-      description: `Jawaban soal ${problemId} berhasil disimpan.`
-    });
-  }
-};
+  const toggleHint = (id: number) => {
+    setShowHints(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
-const toggleHint = (id: number) => {
-  setShowHints(prev => ({ ...prev, [id]: !prev[id] }));
-};
+  const handleComplete = () => {
+    markSectionComplete(module.id, 'lkpd');
+  };
 
-const handleComplete = () => {
-  markSectionComplete(module.id, 'lkpd');
-};
+  const answeredCount = Object.values(answers).filter(a => a?.trim()?.length > 0).length;
+  const maxScore = isPKWU ? 100 : 100; // PKWU: 15+15+15+15+20+10+10 = 100
 
-const answeredCount = Object.values(answers).filter(a => a?.trim()?.length > 0).length;
-const maxScore = isPKWU ? 100 : 100; // PKWU: 15+15+15+15+20+10+10 = 100
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 },
+    },
+  };
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 },
-  },
-};
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
+  };
 
-const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: { y: 0, opacity: 1 },
-};
-
-return (
-  <ModuleLayout module={module} currentSection="lkpd">
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-      className="space-y-6"
-    >
-      {/* 1. JUDUL LKPD */}
-      <motion.div variants={itemVariants}>
-        <Card className={`border-2 ${isPKWU ? 'border-green-500/30 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20' : 'border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5'}`}>
-          <CardHeader className="text-center pb-4">
-            <div className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-background border mb-3 mx-auto">
-              <ClipboardList className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
-              <span className="font-medium">{lkpdMeta.mapel}</span>
-            </div>
-            <CardTitle className="text-2xl md:text-3xl font-display">
-              {lkpdMeta.title}
-            </CardTitle>
-            <CardDescription className="text-lg font-medium text-foreground/80">
-              {lkpdMeta.subtitle}
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </motion.div>
-
-      {/* 2. IDENTITAS SISWA */}
-      <motion.div variants={itemVariants}>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <User className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
-              Identitas Siswa
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <p className="text-xs text-muted-foreground mb-1">Nama Lengkap</p>
-                <p className="font-medium">{studentProfile?.full_name || '-'}</p>
+  return (
+    <ModuleLayout module={module} currentSection="lkpd">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="space-y-6"
+      >
+        {/* 1. JUDUL LKPD */}
+        <motion.div variants={itemVariants}>
+          <Card className={`border-2 ${isPKWU ? 'border-green-500/30 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20' : 'border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5'}`}>
+            <CardHeader className="text-center pb-4">
+              <div className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-background border mb-3 mx-auto">
+                <ClipboardList className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
+                <span className="font-medium">{lkpdMeta.mapel}</span>
               </div>
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <p className="text-xs text-muted-foreground mb-1">Kelas</p>
-                <p className="font-medium">{studentProfile?.kelas || lkpdMeta.kelas}</p>
-              </div>
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <p className="text-xs text-muted-foreground mb-1">NIS</p>
-                <p className="font-medium">{studentProfile?.nis || '-'}</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4 mt-4">
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <p className="text-xs text-muted-foreground mb-1">Mata Pelajaran</p>
-                <p className="font-medium">{lkpdMeta.mapel}</p>
-              </div>
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <p className="text-xs text-muted-foreground mb-1">Alokasi Waktu</p>
-                <p className="font-medium">{lkpdMeta.waktu}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+              <CardTitle className="text-2xl md:text-3xl font-display">
+                {lkpdMeta.title}
+              </CardTitle>
+              <CardDescription className="text-lg font-medium text-foreground/80">
+                {lkpdMeta.subtitle}
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </motion.div>
 
-      {/* 3. TUJUAN PEMBELAJARAN & KOMPETENSI */}
-      <motion.div variants={itemVariants}>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Target className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
-              Tujuan Pembelajaran & Kompetensi
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground mb-2">Kompetensi Dasar:</p>
-              <p className={`p-3 rounded-lg border-l-4 ${isPKWU ? 'border-green-500 bg-green-50/50 dark:bg-green-900/20' : 'border-primary bg-primary/5'}`}>
-                {lkpdMeta.kompetensi}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground mb-2">Tujuan Pembelajaran:</p>
-              <ul className="space-y-2">
-                {lkpdMeta.tujuan.map((tujuan, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className={`flex-shrink-0 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center ${isPKWU ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300' : 'bg-primary/10 text-primary'}`}>
-                      {index + 1}
-                    </span>
-                    <span className="text-sm">{tujuan}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* 4. PETUNJUK BELAJAR */}
-      <motion.div variants={itemVariants}>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <ListChecks className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
-              Petunjuk Pengerjaan
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ol className="space-y-2">
-              {lkpdMeta.petunjuk.map((petunjuk, index) => (
-                <li key={index} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
-                  <span className={`flex-shrink-0 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center text-white ${isPKWU ? 'bg-green-600' : 'bg-primary'}`}>
-                    {index + 1}
-                  </span>
-                  <span className="text-sm pt-0.5">{petunjuk}</span>
-                </li>
-              ))}
-            </ol>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* 5. INFORMASI PENDUKUNG (Rumus/Konsep) */}
-      <motion.div variants={itemVariants}>
-        <Card className={`${isPKWU ? 'bg-gradient-to-br from-green-500/5 to-emerald-500/5 border-green-500/20' : 'bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20'}`}>
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <BookOpen className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
-              {isPKWU ? 'Konsep Penting' : 'Rumus yang Digunakan'}
-            </CardTitle>
-            <CardDescription>
-              Informasi pendukung untuk mengerjakan LKPD
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className={`grid gap-3 ${lkpdMeta.rumus.length > 2 ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}>
-              {lkpdMeta.rumus.map((item, index) => (
-                <div key={index} className="p-4 bg-card rounded-lg border">
-                  <p className="font-medium text-foreground mb-2 text-sm">{item.nama}</p>
-                  <p className={`font-mono text-base ${isPKWU ? 'text-green-600 dark:text-green-400' : 'text-primary'}`}>
-                    {item.formula}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* Progress */}
-      <motion.div variants={itemVariants}>
-        <Card className="bg-muted/50">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Calculator className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
-                <span className="text-foreground font-medium">Progress LKPD</span>
-              </div>
-              <span className="text-sm text-muted-foreground">
-                {answeredCount} dari {totalQuestions} soal terjawab
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* 6. TUGAS DAN LANGKAH KERJA */}
-      <motion.div variants={itemVariants}>
-        <div className="flex items-center gap-2 mb-4">
-          <FileText className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
-          <h2 className="text-xl font-bold">Tugas dan Langkah Kerja</h2>
-        </div>
-      </motion.div>
-
-      {lkpdProblems.map((problem, index) => (
-        <motion.div key={problem.id} variants={itemVariants}>
+        {/* 2. IDENTITAS SISWA */}
+        <motion.div variants={itemVariants}>
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-start gap-3 text-lg">
-                <span className={`flex-shrink-0 w-8 h-8 rounded-full text-lg flex items-center justify-center ${isPKWU ? 'bg-green-100 dark:bg-green-900/50' : 'bg-primary/10'}`}>
-                  {isPKWU && 'icon' in problem ? (problem as { icon: string }).icon : (
-                    <span className={`text-sm font-bold text-white ${isPKWU ? 'bg-green-600' : 'bg-primary'} w-full h-full rounded-full flex items-center justify-center`}>
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                  )}
-                </span>
-                <span className="text-foreground">{problem.title}</span>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <User className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
+                Identitas Siswa
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Story/Context */}
-              <div className={`p-4 rounded-lg border-l-4 ${isPKWU ? 'border-green-500 bg-green-50/50 dark:bg-green-900/10' : 'border-primary bg-muted/50'}`}>
-                <p className="text-sm font-medium text-muted-foreground mb-1">📖 Konteks:</p>
-                <p className="text-foreground leading-relaxed">{problem.story}</p>
-              </div>
-
-              {/* Question */}
-              <div className="p-4 bg-accent/50 rounded-lg border">
-                <p className="text-sm font-medium text-muted-foreground mb-1">❓ Pertanyaan:</p>
-                <p className="font-medium text-foreground whitespace-pre-line">{problem.question}</p>
-              </div>
-
-              {/* Hint Toggle */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => toggleHint(problem.id)}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <HelpCircle className="h-4 w-4 mr-2" />
-                {showHints[problem.id] ? 'Sembunyikan Petunjuk' : 'Tampilkan Petunjuk'}
-              </Button>
-
-              {showHints[problem.id] && (
-                <div className={`p-3 rounded-lg border ${isPKWU ? 'bg-amber-50/50 border-amber-200 dark:bg-amber-900/10 dark:border-amber-700' : 'bg-warning/10 border-warning/30'}`}>
-                  <p className="text-sm text-foreground">
-                    <strong>💡 Contoh:</strong> {problem.hint}
-                  </p>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <p className="text-xs text-muted-foreground mb-1">Nama Lengkap</p>
+                  <p className="font-medium">{studentProfile?.full_name || '-'}</p>
                 </div>
-              )}
-
-              {/* Answer Area */}
-              <div className="space-y-2">
-                <Label htmlFor={`answer-${problem.id}`} className="flex items-center gap-2">
-                  <span>✏️ Jawaban:</span>
-                  {hasSubmitted && (
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${isPKWU ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300' : 'bg-primary/10 text-primary'}`}>
-                      Sudah Dikumpulkan
-                    </span>
-                  )}
-                </Label>
-                {hasSubmitted ? (
-                  <div>
-                    <div className="p-4 bg-muted/50 rounded-lg font-mono text-sm whitespace-pre-wrap border">
-                      {answers[problem.id] || '(Tidak ada jawaban)'}
-                    </div>
-                    {feedbackMap[problem.id] && (
-                      <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                        <div className="flex items-center gap-2 mb-1 text-blue-700 dark:text-blue-400">
-                          <MessageSquare className="h-4 w-4" />
-                          <span className="font-medium text-sm">Feedback Guru</span>
-                        </div>
-                        <p className="text-sm text-blue-800 dark:text-blue-300">
-                          {feedbackMap[problem.id]}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <>
-                    <Textarea
-                      id={`answer-${problem.id}`}
-                      placeholder="Tuliskan jawabanmu di sini..."
-                      className="min-h-[120px] font-mono text-sm"
-                      value={answers[problem.id] || ''}
-                      onChange={(e) => handleAnswerChange(problem.id, e.target.value)}
-                    />
-                    <div className="flex items-center justify-between">
-                      <div>
-                        {savedAnswers[problem.id] && (
-                          <div className={`flex items-center gap-2 text-sm ${isPKWU ? 'text-green-600' : 'text-success'}`}>
-                            <CheckCircle2 className="h-4 w-4" />
-                            <span>Tersimpan di database</span>
-                          </div>
-                        )}
-                      </div>
-                      <Button
-                        size="sm"
-                        onClick={() => saveAnswer(problem.id)}
-                        disabled={!answers[problem.id]?.trim() || saving[problem.id]}
-                        className={`gap-2 ${isPKWU ? 'bg-green-600 hover:bg-green-700' : ''}`}
-                      >
-                        <Save className="h-4 w-4" />
-                        {saving[problem.id] ? 'Menyimpan...' : 'Simpan Jawaban'}
-                      </Button>
-                    </div>
-                  </>
-                )}
-              </div>
-
-              {/* Rubrik per soal - only show if has rubrik */}
-              {'rubrik' in problem && problem.rubrik && (
-                <div className={`p-3 rounded-lg border text-sm ${isPKWU ? 'bg-green-50/30 border-green-200 dark:bg-green-900/10 dark:border-green-800' : 'bg-primary/5 border-primary/20'}`}>
-                  <span className="font-medium">📊 Kriteria Penilaian:</span> {problem.rubrik}
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <p className="text-xs text-muted-foreground mb-1">Kelas</p>
+                  <p className="font-medium">{studentProfile?.kelas || lkpdMeta.kelas}</p>
                 </div>
-              )}
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <p className="text-xs text-muted-foreground mb-1">NIS</p>
+                  <p className="font-medium">{studentProfile?.nis || '-'}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <p className="text-xs text-muted-foreground mb-1">Mata Pelajaran</p>
+                  <p className="font-medium">{lkpdMeta.mapel}</p>
+                </div>
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <p className="text-xs text-muted-foreground mb-1">Alokasi Waktu</p>
+                  <p className="font-medium">{lkpdMeta.waktu}</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </motion.div>
-      ))}
 
-
-      {/* 7. PENILAIAN (Rubrik) */}
-      <motion.div variants={itemVariants}>
-        <Card className={`${isPKWU ? 'border-green-500/30' : 'border-primary/30'}`}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Star className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
-              Rubrik Penilaian LKPD
-            </CardTitle>
-            <CardDescription>
-              Panduan penilaian untuk LKPD ini
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              {isPKWU ? (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-green-50 dark:bg-green-900/20">
-                      <th className="p-3 text-left font-medium border">No</th>
-                      <th className="p-3 text-left font-medium border">Aspek Penilaian</th>
-                      <th className="p-3 text-center font-medium border w-20">Skor</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="p-3 border text-center">1</td>
-                      <td className="p-3 border">Identifikasi Limbah (minimal 5 jenis)</td>
-                      <td className="p-3 text-center border font-bold">15</td>
-                    </tr>
-                    <tr className="bg-muted/30">
-                      <td className="p-3 border text-center">2</td>
-                      <td className="p-3 border">Ide Produk Kerajinan</td>
-                      <td className="p-3 text-center border font-bold">15</td>
-                    </tr>
-                    <tr>
-                      <td className="p-3 border text-center">3</td>
-                      <td className="p-3 border">Karakteristik Limbah</td>
-                      <td className="p-3 text-center border font-bold">15</td>
-                    </tr>
-                    <tr className="bg-muted/30">
-                      <td className="p-3 border text-center">4</td>
-                      <td className="p-3 border">Target Pasar Utama</td>
-                      <td className="p-3 text-center border font-bold">15</td>
-                    </tr>
-                    <tr>
-                      <td className="p-3 border text-center">5</td>
-                      <td className="p-3 border">Analisis SWOT</td>
-                      <td className="p-3 text-center border font-bold">25</td>
-                    </tr>
-                    <tr className="bg-muted/30">
-                      <td className="p-3 border text-center">6</td>
-                      <td className="p-3 border">Estimasi Peluang Pasar</td>
-                      <td className="p-3 text-center border font-bold">15</td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr className="bg-green-100 dark:bg-green-900/30">
-                      <td className="p-3 border font-bold" colSpan={2}>Total Skor Maksimal</td>
-                      <td className="p-3 text-center border font-bold">100</td>
-                    </tr>
-                  </tfoot>
-                </table>
-              ) : (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-primary/5">
-                      <th className="p-3 text-left font-medium border">Kriteria</th>
-                      <th className="p-3 text-center font-medium border w-20">Skor</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="p-3 border">Jawaban lengkap dengan langkah sistematis dan hasil benar</td>
-                      <td className="p-3 text-center border font-bold">25</td>
-                    </tr>
-                    <tr className="bg-muted/30">
-                      <td className="p-3 border">Jawaban benar namun langkah kurang lengkap</td>
-                      <td className="p-3 text-center border font-bold">20</td>
-                    </tr>
-                    <tr>
-                      <td className="p-3 border">Langkah benar namun hasil akhir salah</td>
-                      <td className="p-3 text-center border font-bold">15</td>
-                    </tr>
-                    <tr className="bg-muted/30">
-                      <td className="p-3 border">Ada usaha menjawab namun banyak kesalahan</td>
-                      <td className="p-3 text-center border font-bold">10</td>
-                    </tr>
-                    <tr>
-                      <td className="p-3 border">Tidak menjawab atau jawaban tidak relevan</td>
-                      <td className="p-3 text-center border font-bold">0</td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr className="bg-primary/10">
-                      <td className="p-3 border font-bold">Total Skor Maksimal</td>
-                      <td className="p-3 text-center border font-bold">100</td>
-                    </tr>
-                  </tfoot>
-                </table>
-              )}
-            </div>
-
-            {hasSubmitted && (
-              <div className={`mt-4 p-4 rounded-lg text-center ${isPKWU ? 'bg-green-50 dark:bg-green-900/20' : 'bg-primary/5'}`}>
-                <p className="text-sm text-muted-foreground mb-1">Status Pengumpulan</p>
-                <div className="flex items-center justify-center gap-2">
-                  <CheckCircle2 className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
-                  <span className="font-bold text-lg">LKPD Sudah Dikumpulkan</span>
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Semua {totalQuestions} soal telah terjawab dan disimpan
+        {/* 3. TUJUAN PEMBELAJARAN & KOMPETENSI */}
+        <motion.div variants={itemVariants}>
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Target className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
+                Tujuan Pembelajaran & Kompetensi
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-2">Kompetensi Dasar:</p>
+                <p className={`p-3 rounded-lg border-l-4 ${isPKWU ? 'border-green-500 bg-green-50/50 dark:bg-green-900/20' : 'border-primary bg-primary/5'}`}>
+                  {lkpdMeta.kompetensi}
                 </p>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      </motion.div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-2">Tujuan Pembelajaran:</p>
+                <ul className="space-y-2">
+                  {lkpdMeta.tujuan.map((tujuan, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <span className={`flex-shrink-0 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center ${isPKWU ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300' : 'bg-primary/10 text-primary'}`}>
+                        {index + 1}
+                      </span>
+                      <span className="text-sm">{tujuan}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-      {/* Penilaian Presentasi - Only for PKWU */}
-      {isPKWU && (
+        {/* 4. PETUNJUK BELAJAR */}
         <motion.div variants={itemVariants}>
-          <Card className="border-green-500/30 bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-900/10 dark:to-emerald-900/10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-xl">🎤</span>
-                Penilaian Presentasi Hasil LKPD
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <ListChecks className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
+                Petunjuk Pengerjaan
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ol className="space-y-2">
+                {lkpdMeta.petunjuk.map((petunjuk, index) => (
+                  <li key={index} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                    <span className={`flex-shrink-0 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center text-white ${isPKWU ? 'bg-green-600' : 'bg-primary'}`}>
+                      {index + 1}
+                    </span>
+                    <span className="text-sm pt-0.5">{petunjuk}</span>
+                  </li>
+                ))}
+              </ol>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* 5. INFORMASI PENDUKUNG (Rumus/Konsep) */}
+        <motion.div variants={itemVariants}>
+          <Card className={`${isPKWU ? 'bg-gradient-to-br from-green-500/5 to-emerald-500/5 border-green-500/20' : 'bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20'}`}>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <BookOpen className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
+                {isPKWU ? 'Konsep Penting' : 'Rumus yang Digunakan'}
               </CardTitle>
               <CardDescription>
-                Panduan penilaian untuk presentasi hasil pengerjaan LKPD
+                Informasi pendukung untuk mengerjakan LKPD
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className={`grid gap-3 ${lkpdMeta.rumus.length > 2 ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}>
+                {lkpdMeta.rumus.map((item, index) => (
+                  <div key={index} className="p-4 bg-card rounded-lg border">
+                    <p className="font-medium text-foreground mb-2 text-sm">{item.nama}</p>
+                    <p className={`font-mono text-base ${isPKWU ? 'text-green-600 dark:text-green-400' : 'text-primary'}`}>
+                      {item.formula}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Progress */}
+        <motion.div variants={itemVariants}>
+          <Card className="bg-muted/50">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Calculator className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
+                  <span className="text-foreground font-medium">Progress LKPD</span>
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  {answeredCount} dari {totalQuestions} soal terjawab
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* 6. TUGAS DAN LANGKAH KERJA */}
+        <motion.div variants={itemVariants}>
+          <div className="flex items-center gap-2 mb-4">
+            <FileText className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
+            <h2 className="text-xl font-bold">Tugas dan Langkah Kerja</h2>
+          </div>
+        </motion.div>
+
+        {lkpdProblems.map((problem, index) => (
+          <motion.div key={problem.id} variants={itemVariants}>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-start gap-3 text-lg">
+                  <span className={`flex-shrink-0 w-8 h-8 rounded-full text-lg flex items-center justify-center ${isPKWU ? 'bg-green-100 dark:bg-green-900/50' : 'bg-primary/10'}`}>
+                    {isPKWU && 'icon' in problem ? (problem as { icon: string }).icon : (
+                      <span className={`text-sm font-bold text-white ${isPKWU ? 'bg-green-600' : 'bg-primary'} w-full h-full rounded-full flex items-center justify-center`}>
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                    )}
+                  </span>
+                  <span className="text-foreground">{problem.title}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Story/Context */}
+                <div className={`p-4 rounded-lg border-l-4 ${isPKWU ? 'border-green-500 bg-green-50/50 dark:bg-green-900/10' : 'border-primary bg-muted/50'}`}>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">📖 Konteks:</p>
+                  <p className="text-foreground leading-relaxed">{problem.story}</p>
+                </div>
+
+                {/* Question */}
+                <div className="p-4 bg-accent/50 rounded-lg border">
+                  <p className="text-sm font-medium text-muted-foreground mb-1">❓ Pertanyaan:</p>
+                  <p className="font-medium text-foreground whitespace-pre-line">{problem.question}</p>
+                </div>
+
+                {/* Hint Toggle */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => toggleHint(problem.id)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <HelpCircle className="h-4 w-4 mr-2" />
+                  {showHints[problem.id] ? 'Sembunyikan Petunjuk' : 'Tampilkan Petunjuk'}
+                </Button>
+
+                {showHints[problem.id] && (
+                  <div className={`p-3 rounded-lg border ${isPKWU ? 'bg-amber-50/50 border-amber-200 dark:bg-amber-900/10 dark:border-amber-700' : 'bg-warning/10 border-warning/30'}`}>
+                    <p className="text-sm text-foreground">
+                      <strong>💡 Contoh:</strong> {problem.hint}
+                    </p>
+                  </div>
+                )}
+
+                {/* Answer Area */}
+                <div className="space-y-2">
+                  <Label htmlFor={`answer-${problem.id}`} className="flex items-center gap-2">
+                    <span>✏️ Jawaban:</span>
+                    {hasSubmitted && (
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${isPKWU ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300' : 'bg-primary/10 text-primary'}`}>
+                        Sudah Dikumpulkan
+                      </span>
+                    )}
+                  </Label>
+                  {hasSubmitted ? (
+                    <div>
+                      <div className="p-4 bg-muted/50 rounded-lg font-mono text-sm whitespace-pre-wrap border">
+                        {answers[problem.id] || '(Tidak ada jawaban)'}
+                      </div>
+                      {feedbackMap[problem.id] && (
+                        <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                          <div className="flex items-center gap-2 mb-1 text-blue-700 dark:text-blue-400">
+                            <MessageSquare className="h-4 w-4" />
+                            <span className="font-medium text-sm">Feedback Guru</span>
+                          </div>
+                          <p className="text-sm text-blue-800 dark:text-blue-300">
+                            {feedbackMap[problem.id]}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <>
+                      <Textarea
+                        id={`answer-${problem.id}`}
+                        placeholder="Tuliskan jawabanmu di sini..."
+                        className="min-h-[120px] font-mono text-sm"
+                        value={answers[problem.id] || ''}
+                        onChange={(e) => handleAnswerChange(problem.id, e.target.value)}
+                      />
+                      <div className="flex items-center justify-between">
+                        <div>
+                          {savedAnswers[problem.id] && (
+                            <div className={`flex items-center gap-2 text-sm ${isPKWU ? 'text-green-600' : 'text-success'}`}>
+                              <CheckCircle2 className="h-4 w-4" />
+                              <span>Tersimpan di database</span>
+                            </div>
+                          )}
+                        </div>
+                        <Button
+                          size="sm"
+                          onClick={() => saveAnswer(problem.id)}
+                          disabled={!answers[problem.id]?.trim() || saving[problem.id]}
+                          className={`gap-2 ${isPKWU ? 'bg-green-600 hover:bg-green-700' : ''}`}
+                        >
+                          <Save className="h-4 w-4" />
+                          {saving[problem.id] ? 'Menyimpan...' : 'Simpan Jawaban'}
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Rubrik per soal - only show if has rubrik */}
+                {'rubrik' in problem && problem.rubrik && (
+                  <div className={`p-3 rounded-lg border text-sm ${isPKWU ? 'bg-green-50/30 border-green-200 dark:bg-green-900/10 dark:border-green-800' : 'bg-primary/5 border-primary/20'}`}>
+                    <span className="font-medium">📊 Kriteria Penilaian:</span> {problem.rubrik}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+
+
+        {/* 7. PENILAIAN (Rubrik) */}
+        <motion.div variants={itemVariants}>
+          <Card className={`${isPKWU ? 'border-green-500/30' : 'border-primary/30'}`}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Star className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
+                Rubrik Penilaian LKPD
+              </CardTitle>
+              <CardDescription>
+                Panduan penilaian untuk LKPD ini
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-green-50 dark:bg-green-900/20">
-                      <th className="p-3 text-left font-medium border">No</th>
-                      <th className="p-3 text-left font-medium border">Aspek Penilaian</th>
-                      <th className="p-3 text-left font-medium border">Deskripsi</th>
-                      <th className="p-3 text-center font-medium border w-20">Skor</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pkwuPresentasiCriteria.map((item, index) => (
-                      <tr key={index} className={index % 2 === 1 ? 'bg-muted/30' : ''}>
-                        <td className="p-3 border text-center">{index + 1}</td>
-                        <td className="p-3 border font-medium">{item.aspek}</td>
-                        <td className="p-3 border text-muted-foreground">{item.deskripsi}</td>
-                        <td className="p-3 text-center border font-bold">{item.skor}</td>
+                {isPKWU ? (
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-green-50 dark:bg-green-900/20">
+                        <th className="p-3 text-left font-medium border">No</th>
+                        <th className="p-3 text-left font-medium border">Aspek Penilaian</th>
+                        <th className="p-3 text-center font-medium border w-20">Skor</th>
                       </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr className="bg-green-100 dark:bg-green-900/30">
-                      <td className="p-3 border font-bold" colSpan={3}>Total Skor Maksimal Presentasi</td>
-                      <td className="p-3 text-center border font-bold">100</td>
-                    </tr>
-                  </tfoot>
-                </table>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="p-3 border text-center">1</td>
+                        <td className="p-3 border">Identifikasi Limbah (minimal 5 jenis)</td>
+                        <td className="p-3 text-center border font-bold">15</td>
+                      </tr>
+                      <tr className="bg-muted/30">
+                        <td className="p-3 border text-center">2</td>
+                        <td className="p-3 border">Ide Produk Kerajinan</td>
+                        <td className="p-3 text-center border font-bold">15</td>
+                      </tr>
+                      <tr>
+                        <td className="p-3 border text-center">3</td>
+                        <td className="p-3 border">Karakteristik Limbah</td>
+                        <td className="p-3 text-center border font-bold">15</td>
+                      </tr>
+                      <tr className="bg-muted/30">
+                        <td className="p-3 border text-center">4</td>
+                        <td className="p-3 border">Target Pasar Utama</td>
+                        <td className="p-3 text-center border font-bold">15</td>
+                      </tr>
+                      <tr>
+                        <td className="p-3 border text-center">5</td>
+                        <td className="p-3 border">Analisis SWOT</td>
+                        <td className="p-3 text-center border font-bold">25</td>
+                      </tr>
+                      <tr className="bg-muted/30">
+                        <td className="p-3 border text-center">6</td>
+                        <td className="p-3 border">Estimasi Peluang Pasar</td>
+                        <td className="p-3 text-center border font-bold">15</td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-green-100 dark:bg-green-900/30">
+                        <td className="p-3 border font-bold" colSpan={2}>Total Skor Maksimal</td>
+                        <td className="p-3 text-center border font-bold">100</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                ) : (
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-primary/5">
+                        <th className="p-3 text-left font-medium border">Kriteria</th>
+                        <th className="p-3 text-center font-medium border w-20">Skor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="p-3 border">Jawaban lengkap dengan langkah sistematis dan hasil benar</td>
+                        <td className="p-3 text-center border font-bold">25</td>
+                      </tr>
+                      <tr className="bg-muted/30">
+                        <td className="p-3 border">Jawaban benar namun langkah kurang lengkap</td>
+                        <td className="p-3 text-center border font-bold">20</td>
+                      </tr>
+                      <tr>
+                        <td className="p-3 border">Langkah benar namun hasil akhir salah</td>
+                        <td className="p-3 text-center border font-bold">15</td>
+                      </tr>
+                      <tr className="bg-muted/30">
+                        <td className="p-3 border">Ada usaha menjawab namun banyak kesalahan</td>
+                        <td className="p-3 text-center border font-bold">10</td>
+                      </tr>
+                      <tr>
+                        <td className="p-3 border">Tidak menjawab atau jawaban tidak relevan</td>
+                        <td className="p-3 text-center border font-bold">0</td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-primary/10">
+                        <td className="p-3 border font-bold">Total Skor Maksimal</td>
+                        <td className="p-3 text-center border font-bold">100</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                )}
               </div>
 
-              <div className="mt-6 p-4 bg-green-100/50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                <h4 className="font-semibold text-green-800 dark:text-green-300 mb-3 flex items-center gap-2">
-                  📋 Pedoman Presentasi
-                </h4>
-                <ul className="space-y-2 text-sm text-green-700 dark:text-green-400">
-                  <li className="flex items-start gap-2">
-                    <span className="text-green-600">•</span>
-                    <span>Presentasikan hasil analisis peluang usaha kerajinan limbah yang telah kalian kerjakan</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-green-600">•</span>
-                    <span>Waktu presentasi maksimal 5-7 menit per kelompok/individu</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-green-600">•</span>
-                    <span>Siapkan contoh produk atau visualisasi ide produk kerajinan</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-green-600">•</span>
-                    <span>Sesi tanya jawab akan dilakukan setelah presentasi</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-center border border-green-200 dark:border-green-800">
-                  <p className="text-2xl font-bold text-green-600">86-100</p>
-                  <p className="text-xs text-muted-foreground">Sangat Baik (A)</p>
+              {hasSubmitted && (
+                <div className={`mt-4 p-4 rounded-lg text-center ${isPKWU ? 'bg-green-50 dark:bg-green-900/20' : 'bg-primary/5'}`}>
+                  <p className="text-sm text-muted-foreground mb-1">Status Pengumpulan</p>
+                  <div className="flex items-center justify-center gap-2">
+                    <CheckCircle2 className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
+                    <span className="font-bold text-lg">LKPD Sudah Dikumpulkan</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Semua {totalQuestions} soal telah terjawab dan disimpan
+                  </p>
                 </div>
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-center border border-blue-200 dark:border-blue-800">
-                  <p className="text-2xl font-bold text-blue-600">71-85</p>
-                  <p className="text-xs text-muted-foreground">Baik (B)</p>
-                </div>
-                <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-center border border-amber-200 dark:border-amber-800">
-                  <p className="text-2xl font-bold text-amber-600">56-70</p>
-                  <p className="text-xs text-muted-foreground">Cukup (C)</p>
-                </div>
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-center border border-red-200 dark:border-red-800">
-                  <p className="text-2xl font-bold text-red-600">&lt; 56</p>
-                  <p className="text-xs text-muted-foreground">Kurang (D)</p>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </motion.div>
-      )}
 
-    </motion.div>
-  </ModuleLayout>
-);
+        {/* Penilaian Presentasi - Only for PKWU */}
+        {isPKWU && (
+          <motion.div variants={itemVariants}>
+            <Card className="border-green-500/30 bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-900/10 dark:to-emerald-900/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="text-xl">🎤</span>
+                  Penilaian Presentasi Hasil LKPD
+                </CardTitle>
+                <CardDescription>
+                  Panduan penilaian untuk presentasi hasil pengerjaan LKPD
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-green-50 dark:bg-green-900/20">
+                        <th className="p-3 text-left font-medium border">No</th>
+                        <th className="p-3 text-left font-medium border">Aspek Penilaian</th>
+                        <th className="p-3 text-left font-medium border">Deskripsi</th>
+                        <th className="p-3 text-center font-medium border w-20">Skor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pkwuPresentasiCriteria.map((item, index) => (
+                        <tr key={index} className={index % 2 === 1 ? 'bg-muted/30' : ''}>
+                          <td className="p-3 border text-center">{index + 1}</td>
+                          <td className="p-3 border font-medium">{item.aspek}</td>
+                          <td className="p-3 border text-muted-foreground">{item.deskripsi}</td>
+                          <td className="p-3 text-center border font-bold">{item.skor}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-green-100 dark:bg-green-900/30">
+                        <td className="p-3 border font-bold" colSpan={3}>Total Skor Maksimal Presentasi</td>
+                        <td className="p-3 text-center border font-bold">100</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+
+                <div className="mt-6 p-4 bg-green-100/50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <h4 className="font-semibold text-green-800 dark:text-green-300 mb-3 flex items-center gap-2">
+                    📋 Pedoman Presentasi
+                  </h4>
+                  <ul className="space-y-2 text-sm text-green-700 dark:text-green-400">
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600">•</span>
+                      <span>Presentasikan hasil analisis peluang usaha kerajinan limbah yang telah kalian kerjakan</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600">•</span>
+                      <span>Waktu presentasi maksimal 5-7 menit per kelompok/individu</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600">•</span>
+                      <span>Siapkan contoh produk atau visualisasi ide produk kerajinan</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600">•</span>
+                      <span>Sesi tanya jawab akan dilakukan setelah presentasi</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-center border border-green-200 dark:border-green-800">
+                    <p className="text-2xl font-bold text-green-600">86-100</p>
+                    <p className="text-xs text-muted-foreground">Sangat Baik (A)</p>
+                  </div>
+                  <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-center border border-blue-200 dark:border-blue-800">
+                    <p className="text-2xl font-bold text-blue-600">71-85</p>
+                    <p className="text-xs text-muted-foreground">Baik (B)</p>
+                  </div>
+                  <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-center border border-amber-200 dark:border-amber-800">
+                    <p className="text-2xl font-bold text-amber-600">56-70</p>
+                    <p className="text-xs text-muted-foreground">Cukup (C)</p>
+                  </div>
+                  <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-center border border-red-200 dark:border-red-800">
+                    <p className="text-2xl font-bold text-red-600">&lt; 56</p>
+                    <p className="text-xs text-muted-foreground">Kurang (D)</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+      </motion.div>
+    </ModuleLayout>
+  );
 }
