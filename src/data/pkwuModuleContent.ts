@@ -1460,13 +1460,99 @@ export const rencanaUsahaModule: Module = {
   duration: '4 JP (2 Pertemuan)',
   sections: [
     {
-      id: 'pendahuluan-rencana',
-      title: 'Pendahuluan',
-      icon: '🚀',
+      id: 'komponen-perencanaan-1',
+      title: 'Komponen Perencanaan Usaha (Bagian 1)',
+      icon: '📝',
       content: `
-# Materi Belum Tersedia
+# Komponen Perencanaan Usaha
 
-Mohon maaf, materi untuk modul ini sedang dalam proses penyusunan. Silakan cek kembali nanti.
+Dalam menyusun rencana bisnis terdapat 7 komponen perencanaan usaha. Semua bagian tersebut penting, saling terkait dan berhubungan dalam kegiatan perencanaan bisnis sehingga menghasilkan sebuah persiapan yang baik untuk memulai usaha.
+
+Berikut adalah komponen dalam menyusun sebuah rencana:
+
+## 1. Ulasan Deskripsi Bisnis
+Di sini kalian harus menjelaskan secara singkat bidang usaha apa yang akan dijalankan. Tuliskan potensi produk kalian saat ini dan kemungkinannya dimasa depan. Selain itu, berikan informasi peluang pasarnya serta perkembangan produk untuk bisa bertahan dan menyesuaikan dengan pasar yang ada.
+
+## 2. Strategi Pemasaran
+Strategi pemasaran yang dijalankan harus sesuai dengan hasil analisis pasar yang telah dilakukan dengan cermat. Analisis pasar adalah kekuatan yang harus kalian gunakan untuk menciptakan target pembeli. Kalian harus memahami seluruh aspek yang berkaitan dengan pasar sehingga target penjualan dapat ditentukan (ke mana produk kalian akan dipasarkan).
+
+## 3. Analisis Pesaing
+Analisis pesaing digunakan untuk mengetahui kekuatan dan kelemahan pesaing kalian dalam satu pasar yang sama. Setelah menemukan kekuatannya, kemudian mencari strategi untuk memasarkan produk dengan cara yang berbeda dengan pesaing. Kalian juga harus mencari strategi untuk menghalangi pesaing masuk dan meniru strategi yang sama dengan kalian. Demikian juga dengan kelemahan yang ditemukan, dapat dieksploitasi dengan mengembangkan produk yang lebih baik dari pesaing kalian.
+
+## 4. Rencana Desain dan Pengembangan
+Rencana desain dan pengembangan diperlukan untuk menunjukkan tahap perencanaan produk serta grafik pengembangan dalam konteks produksi dan penjualan. Ini berguna untuk membuat rencana anggaran biaya produksi yang sesuai dengan kebutuhan.
+      `,
+    },
+    {
+      id: 'komponen-perencanaan-2',
+      title: 'Komponen Perencanaan Usaha (Bagian 2)',
+      icon: '📊',
+      content: `
+# Komponen Perencanaan Usaha (Lanjutan)
+
+## 5. Rencana Operasional dan Manajemen
+Rencana operasional dan manajemen dibuat untuk menjelaskan bagaimana usaha akan berjalan dan berkelanjutan. Rencana operasional akan berfokus pada kebutuhan logistik perusahaan. Seperti tugas dan tanggung jawab tim manajemen, bagaimana prosedur usahanya, serta kebutuhan anggaran.
+
+## 6. Pembiayaan
+Faktor pembiayaan menjadi unsur paling penting dalam sebuah rencana usaha. Hal ini diperlukan untuk mengetahui dari mana sumber dana berasal dan cara mengatur anggaran usaha.
+
+## 7. Kesimpulan Usaha
+Kalian dapat menampilkan jadwal waktu tiap komponen yang akan dilakukan. Perkiraan waktu dan hal-hal penting lainnya yang akan mendukung segala aktivitas dalam memulai usaha.
+      `,
+    },
+    {
+      id: 'langkah-penyusunan-1',
+      title: 'Langkah Penyusunan Proposal (Bagian 1)',
+      icon: '🛠️',
+      content: `
+# Langkah-langkah Penyusunan Proposal
+
+Di dalam perencanaan suatu usaha terdapat langkah-langkah dalam penyusunan proposal/perencanaan usaha kerajinan dari bahan limbah yang baik, antara lain:
+
+## 1. Pemilihan Jenis Usaha
+Jenis usaha yang dipilih yaitu yang telah melalui hasil analisis dengan memperhatikan banyak faktor.
+
+## 2. Nama Perusahaan
+Pemilihan nama perusahaan yaitu nama yang mudah dikenal atau menunjukkan makna tertentu.
+
+## 3. Lokasi Usaha
+Lokasi usaha yang dipilih merupakan lokasi yang dekat dengan bahan baku, tidak jauh dari lokasi rumah pengelola, dan tidak terlalu jauh dari jangkauan pasar yang akan dituju.
+
+## 4. Perizinan Usaha
+Izin usaha yang disiapkan antara lain:
+- NPWP dari kantor pajak
+- Akta notaris dari kantor notaris
+- SIUP/TDP dari dinas perindustrian kota/kabupaten
+- Izin PIRT dari dinas Kesehatan kota/kabupaten
+      `,
+    },
+    {
+      id: 'langkah-penyusunan-2',
+      title: 'Langkah Penyusunan Proposal (Bagian 2)',
+      icon: '👥',
+      content: `
+# Langkah-langkah Penyusunan Proposal (Lanjutan)
+
+## 5. Sumber Daya Manusia (SDM)
+SDM yang disiapkan terdiri atas tiga orang pendiri, yang mempunyai tugas masing-masing yaitu:
+- Penanggung jawab produksi
+- Penanggung jawab pemasaran
+- Penanggung jawab administrasi dan keuangan
+
+## 6. Aspek Produksi
+Hal-hal yang harus diperhatikan pada aspek produksi adalah:
+- Bahan baku dan bahan tambahan
+- Peralatan yang digunakan
+- Jumlah tenaga kerja
+- Hasil produksi
+
+## 7. Aspek Keuangan
+Hal-hal yang harus diperhatikan pada aspek keuangan adalah:
+- Biaya tidak tetap (Variable Cost)
+- Biaya tetap (Fixed Cost)
+- Total biaya
+- Penerimaan kotor
+- Pendapatan bersih (Laba)
       `,
     }
   ],
