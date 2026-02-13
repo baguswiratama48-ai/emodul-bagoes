@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MessageSquare, Send, Check } from 'lucide-react';
+import { MessageSquare, Send, Check, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
@@ -28,15 +28,46 @@ export function FeedbackForm({
   const { user } = useAuth();
   const { toast } = useToast();
   const [feedback, setFeedback] = useState(existingFeedback || '');
+  const [rating, setRating] = useState(0); // Add rating state
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!existingFeedback);
 
+  // Helper to extract rating from existing feedback if possible (optional, but good for UX)
   useEffect(() => {
     if (existingFeedback) {
-      setFeedback(existingFeedback);
+      if (existingFeedback.includes('⭐⭐⭐⭐⭐')) setRating(5);
+      else if (existingFeedback.includes('⭐⭐⭐⭐')) setRating(4);
+      else if (existingFeedback.includes('⭐⭐⭐')) setRating(3);
+      else if (existingFeedback.includes('⭐⭐')) setRating(2);
+      else if (existingFeedback.includes('⭐')) setRating(1);
     }
   }, [existingFeedback]);
+
+  const handleRating = (score: number) => {
+    setRating(score);
+    let text = '';
+    switch (score) {
+      case 1:
+        text = "⭐ Perlu Perbaikan: Jawaban belum menjawab pertanyaan inti. Coba baca ulang materinya ya.";
+        break;
+      case 2:
+        text = "⭐⭐ Cukup: Jawaban sudah ada, namun perlu lebih detail lagi.";
+        break;
+      case 3:
+        text = "⭐⭐⭐ Baik: Jawaban sudah menjawab pertanyaan dengan baik.";
+        break;
+      case 4:
+        text = "⭐⭐⭐⭐ Sangat Baik: Jawaban detail dan relevan dengan konteks materi.";
+        break;
+      case 5:
+        text = "⭐⭐⭐⭐⭐ Luar Biasa: Analisis sangat mendalam dan kreatif! Pertahankan.";
+        break;
+    }
+    setFeedback(text);
+  };
+
+
 
   const handleSave = async () => {
     if (!user || !feedback.trim()) return;
@@ -133,10 +164,27 @@ export function FeedbackForm({
         <MessageSquare className="h-4 w-4 text-primary" />
         <span className="text-sm font-medium">Feedback Guru</span>
       </div>
+      <div className="flex items-center gap-1 mb-3">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            onClick={() => handleRating(star)}
+            className={`transition-all hover:scale-110 focus:outline-none ${star <= rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'
+              }`}
+            type="button"
+          >
+            <Star className="h-6 w-6" />
+          </button>
+        ))}
+        <span className="ml-2 text-sm text-muted-foreground">
+          {rating > 0 ? `${rating}/5 Bintang` : 'Beri nilai'}
+        </span>
+      </div>
+
       <Textarea
         value={feedback}
         onChange={(e) => setFeedback(e.target.value)}
-        placeholder="Tulis feedback untuk siswa..."
+        placeholder="Tulis feedback atau pilih bintang..."
         className="min-h-[80px] mb-2"
       />
       <div className="flex items-center gap-2">
