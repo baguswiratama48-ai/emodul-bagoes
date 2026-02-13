@@ -131,10 +131,10 @@ Wirausaha kerajinan dari bahan limbah (upcycling) merupakan salah satu bentuk wi
     },
     {
       id: 'ide-kreatif',
-      title: 'Sumber Ide Kreatif',
+      title: 'RENCANA USAHA KERAJINAN DARI BAHAN LIMBAH',
       icon: '💡',
       content: `
-# Sumber Ide Kreatif untuk Kerajinan Limbah
+# RENCANA USAHA KERAJINAN DARI BAHAN LIMBAH
 
 ## Dari Mana Ide Kreatif Berasal?
 
