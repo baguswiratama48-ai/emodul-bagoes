@@ -303,7 +303,7 @@ export default function VideoPage() {
                           disabled={saving}
                           className="bg-gradient-primary"
                         >
-                          {saving ? 'Menyimpan...' : (saved ? 'Tersimpan' : 'Kirim Ringkasan')}
+                          {saving ? 'Menyimpan...' : (saved ? 'Tersimpan' : 'Simpan Ringkasan')}
                         </Button>
                       </div>
                     )}
