@@ -940,6 +940,50 @@ export default function LKPDPage() {
                     </tfoot>
                   </table>
                 ) : (
+                {moduleId === 'pasar' ? (
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-primary/5">
+                        <th className="p-3 text-left font-medium border w-12 text-center">No</th>
+                        <th className="p-3 text-left font-medium border">Aspek Penilaian</th>
+                        <th className="p-3 text-center font-medium border w-20">Skor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="p-3 border text-center">1</td>
+                        <td className="p-3 border">Analisis Syarat & Pengertian Pasar (Wacana Digital)</td>
+                        <td className="p-3 text-center border font-bold">20</td>
+                      </tr>
+                      <tr className="bg-muted/30">
+                        <td className="p-3 border text-center">2</td>
+                        <td className="p-3 border">Ketepatan Fungsi & Klasifikasi Waktu (Pasar Tumpah)</td>
+                        <td className="p-3 text-center border font-bold">20</td>
+                      </tr>
+                      <tr>
+                        <td className="p-3 border text-center">3</td>
+                        <td className="p-3 border">Analisis Wujud & Jangkauan Pasar (Ekspor Komoditas)</td>
+                        <td className="p-3 text-center border font-bold">20</td>
+                      </tr>
+                      <tr className="bg-muted/30">
+                        <td className="p-3 border text-center">4</td>
+                        <td className="p-3 border">Analisis Struktur Pasar (Pertamina & Eceran)</td>
+                        <td className="p-3 text-center border font-bold">20</td>
+                      </tr>
+                      <tr>
+                        <td className="p-3 border text-center">5</td>
+                        <td className="p-3 border">Identifikasi Pasar Input & Peran IPTEK (Tani Cerdas)</td>
+                        <td className="p-3 text-center border font-bold">20</td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-primary/10">
+                        <td className="p-3 border font-bold" colSpan={2}>Total Skor Maksimal</td>
+                        <td className="p-3 text-center border font-bold">100</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                ) : (
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-primary/5">
@@ -976,6 +1020,7 @@ export default function LKPDPage() {
                       </tr>
                     </tfoot>
                   </table>
+                )}
                 )}
               </div>
 
