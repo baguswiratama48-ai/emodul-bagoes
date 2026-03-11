@@ -1490,7 +1490,75 @@ d. Penawaran faktor produksi kadang merupakan monopoli, sementara permintaan fak
     'Monopolistik': 'Pasar dengan banyak penjual yang membedakan produknya melalui merek atau kualitas.',
     'Monopsoni': 'Keadaan di mana hanya ada satu pembeli tunggal.',
     'Pasar Input': 'Pasar yang menyediakan faktor produksi seperti tanah, modal, dan tenaga kerja.',
+    'Pasar Output': 'Tempat jual beli barang dan jasa hasil produksi (barang jadi).',
+    'Permintaan': 'Jumlah barang atau jasa yang ingin dibeli masyarakat pada berbagai tingkat harga.',
+    'Penawaran': 'Jumlah barang atau jasa yang ditawarkan penjual pada berbagai tingkat harga.',
+    'Ceteris Paribus': 'Asumsi bahwa faktor-faktor lain selain harga dianggap tetap atau tidak berubah.',
+    'Pasar Konkrit': 'Pasar di mana barang yang diperjualbelikan tersedia di tempat (nyata).',
+    'Pasar Abstrak': 'Pasar di mana transaksi dilakukan tanpa kehadiran fisik barang (misal: pasar online).',
+    'Pasar Harian': 'Pasar yang menyelenggarakan kegiatan jual beli setiap hari.',
+    'Pasar Mingguan': 'Pasar yang diadakan hanya satu kali dalam satu minggu (misal: pasar senin).',
+    'Pasar Bulanan': 'Pasar yang diadakan sebulan sekali, biasanya di sekitar pabrik atau kantor.',
+    'Pasar Tahunan': 'Pasar yang diadakan sekali dalam setahun (misal: PRJ atau pasar malam tahunan).',
+    'Pasar Temporer': 'Pasar yang diselenggarakan pada waktu tertentu saja (misal: pasar bazaar).',
+    'Pasar Lokal': 'Pasar yang wilayah pemasarannya hanya meliputi daerah tertentu (kota/desa).',
+    'Pasar Nasional': 'Pasar yang melayani permintaan dan penawaran dari seluruh wilayah negara.',
+    'Pasar Regional': 'Pasar yang cakupan pemasarannya meliputi kawasan beberapa negara (misal: ASEAN).',
+    'Pasar Internasional': 'Pasar yang mempertemukan permintaan dan penawaran dari seluruh penjuru dunia.',
+    'Diferensiasi Produk': 'Perbedaan yang sengaja dibuat pada produk (logo, kemasan, kualitas) untuk menarik konsumen.',
+    'Barang Homogen': 'Barang-barang yang memiliki sifat dan kualitas yang sama atau identik.',
+    'Price Maker': 'Penjual yang memiliki kekuatan untuk menentukan harga sendiri (biasanya pada monopoli).',
+    'Pasar Persaingan Sempurna': 'Pasar dengan banyak penjual/pembeli dan barang bersifat homogen.',
+    'Pasar Persaingan Tidak Sempurna': 'Pasar di mana salah satu syarat pasar persaingan sempurna tidak terpenuhi.',
+    'Oligopsoni': 'Keadaan pasar yang dikuasai oleh beberapa pembeli saja.',
+    'Pasar Modal': 'Tempat transaksi instrumen keuangan jangka panjang (saham, obligasi).',
+    'Saham': 'Tanda penyertaan modal seseorang atau pihak dalam suatu perusahaan.',
+    'Obligasi': 'Surat utang jangka panjang yang diterbitkan perusahaan atau pemerintah.',
+    'Faktor Produksi': 'Segala sumber daya yang digunakan dalam proses menghasilkan barang/jasa.',
+    'Sewa (Rent)': 'Balas jasa yang diterima pemilik faktor produksi alam (tanah).',
+    'Upah (Wage)': 'Balas jasa yang diterima pemilik faktor produksi tenaga kerja.',
+    'Bunga (Interest)': 'Balas jasa yang diterima pemilik faktor produksi modal.',
+    'Laba (Profit)': 'Balas jasa yang diterima pengusaha/wirausahawan atas pengelolaan faktor produksi.',
+    'IPTEK': 'Ilmu Pengetahuan dan Teknologi yang mendukung perkembangan pasar.',
+    'Marketplace': 'Platform digital tempat bertemunya banyak penjual dan pembeli secara online.',
+    'E-Commerce': 'Kegiatan perdagangan barang dan jasa melalui media elektronik/internet.',
+    'Distribusi': 'Kegiatan menyalurkan barang dari produsen ke tangan konsumen.',
+    'Promosi': 'Kegiatan memperkenalkan dan membujuk konsumen agar membeli produk.',
+    'Alokasi': 'Pembagian sumber daya atau dana untuk tujuan tertentu agar efektif.',
+    'Efisiensi Ekonomi': 'Keadaan di mana sumber daya dialokasikan secara optimal untuk meminimalisir pemborosan.',
+    'Surplus Konsumen': 'Selisih antara harga maksimum yang bersedia dibayar konsumen dengan harga pasar.',
+    'Surplus Produsen': 'Selisih antara harga pasar dengan harga terendah yang bersedia diterima produsen.',
+    'Kartel': 'Kerja sama antarperusahaan pesaing untuk mengontrol harga atau produksi.',
+    'Pasar Barang Konsumsi': 'Pasar yang memperjualbelikan barang untuk keperluan hidup sehari-hari.',
+    'Bursa Efek': 'Lembaga yang menyelenggarakan sistem perdagangan efek (saham/obligasi).',
   },
+  reflectionQuestions: [
+    {
+      id: 1,
+      question: 'Sejauh mana pemahaman Anda mengenai perbedaan antara pasar persaingan sempurna dan tidak sempurna setelah mempelajari modul ini?',
+      hint: 'Jelaskan poin-poin utama yang kamu pahami tentang struktur pasar tersebut.'
+    },
+    {
+      id: 2,
+      question: 'Dari berbagai jenis pasar yang ada, manakah yang menurut Anda paling berpengaruh dalam kehidupan sehari-hari? Berikan alasannya.',
+      hint: 'Pikirkan pasar yang sering kamu kunjungi atau gunakan jasanya.'
+    },
+    {
+      id: 3,
+      question: 'Bagaimana pendapat Anda mengenai peran teknologi (IPTEK) dalam mengubah wajah pasar tradisional menjadi pasar digital saat ini?',
+      hint: 'Pertimbangkan kemudahan and tantangan yang muncul akibat digitalisasi pasar.'
+    },
+    {
+      id: 4,
+      question: 'Apakah Anda menemui kesulitan dalam memahami konsep pasar input (faktor produksi)? Bagian mana yang menurut Anda paling menantang?',
+      hint: 'Kejujuranmu membantu dalam evaluasi pembelajaran ke depannya.'
+    },
+    {
+      id: 5,
+      question: 'Setelah mempelajari modul Pasar ini, apa target atau rencana Anda dalam menerapkan ilmu ini di kehidupan nyata atau rencana wirausaha Anda?',
+      hint: 'Hubungkan materi pasar dengan cita-cita atau kegiatan ekonomimu.'
+    }
+  ]
 };
 
 // Ekonomi module for Kelas X
