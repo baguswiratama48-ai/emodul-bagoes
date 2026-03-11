@@ -105,68 +105,69 @@ const penawaranLkpdProblems = [
 const pasarLkpdProblems = [
   {
     id: 1,
-    title: "Analisis Klasifikasi Pasar",
-    story: "Wacana: Dinamika Pasar di Era Digital",
-    question: "Berdasarkan wacana di atas, kelompokkan fenomena 'Pasar Hewan' dan 'Marketplace Orange' berdasarkan jenisnya (Waktu & Wujud). Jelaskan alasan pengelompokanmu!",
-    hint: "Pikirkan tentang frekuensi buka pasar hewan dan ada tidaknya bangunan fisik Marketplace Orange.",
-    rubrik: "Skor 20: Mampu mengelompokkan kedua fenomena dengan alasan yang tepat."
+    title: "Menganalisis Syarat dan Pengertian Pasar",
+    story: "Andi membeli sebuah sepatu langka melalui aplikasi 'SneakerHub'. Ia melakukan tawar-menawar lewat fitur chat, membayar via transfer, dan barang dikirim lewat kurir. Andi dan penjual tidak pernah bertemu muka, bahkan tidak tahu lokasi fisik toko tersebut.",
+    question: "Berdasarkan ilustrasi di atas, jelaskan mengapa transaksi tersebut tetap dikatakan sebagai 'Pasar'! Sebutkan syarat-syarat pasar apa saja yang terpenuhi dalam transaksi digital Andi!",
+    hint: "Ingat 4 syarat utama terbentuknya pasar: Pedagang, Pembeli, Barang, dan Interaksi/Kesepakatan.",
+    rubrik: "Skor 20: Mampu menjelaskan definisi pasar modern dan menguraikan 4 syarat yang terpenuhi."
   },
   {
     id: 2,
-    title: "Analisis Pasar Persaingan Sempurna",
-    story: "Wacana: Dinamika Pasar di Era Digital",
-    question: "Identifikasi fenomena mana dalam wacana yang paling mendekati karakteristik Pasar Persaingan Sempurna! Sebutkan 2 ciri yang mendukung jawabanmu.",
-    hint: "Cari pasar yang memiliki banyak penjual dengan barang yang identik/seragam.",
-    rubrik: "Skor 20: Identifikasi benar (Pasar Induk pedang cabai) disertai 2 ciri yang relevan."
+    title: "Fungsi Pasar dan Klasifikasi Waktu",
+    story: "Setiap hari Minggu pagi, lapangan desa diubah menjadi 'Pasar Tumpah'. Warga menjual hasil kebun, kerajinan tangan lokal, hingga pakaian. Selain tempat jual beli, banyak produsen baru yang memperkenalkan produknya kepada warga desa melalui sampel gratis di pasar ini.",
+    question: "Analisis fungsi pasar yang muncul ketika produsen membagikan sampel gratis! Selain itu, termasuk klasifikasi pasar menurut waktu apakah 'Pasar Tumpah' tersebut?",
+    hint: "Pikirkan tentang fungsi pasar sebagai sarana promosi. Untuk waktu, perhatikan frekuensi kegiatannya.",
+    rubrik: "Skor 20: Analisis fungsi promosi tepat dan klasifikasi waktu (pasar mingguan) benar."
   },
   {
     id: 3,
-    title: "Perbandingan Struktur Pasar Tidak Sempurna",
-    story: "Wacana: Dinamika Pasar di Era Digital",
-    question: "Bandingkan struktur pasar PT Kereta Cepat (Monopoli) dengan Perusahaan ISP (Oligopoli). Apa dampak perbedaan jumlah penjual tersebut bagi pilihan konsumen?",
-    hint: "Monopoli hanya satu penjual, Oligopoli ada beberapa. Pikirkan tentang variasi harga dan layanan bagi pembeli.",
-    rubrik: "Skor 20: Mampu menjelaskan perbedaan struktur dan dampaknya bagi pilihan konsumen secara logis."
+    title: "Klasifikasi Wujud dan Jangkauan Pasar",
+    story: "Koperasi Desa 'Maju Makmur' berhasil mengekspor Kopi Luwak asli daerahnya ke Jerman melalui Bursa Komoditas Internasional. Transaksi dilakukan secara kontrak berjangka di mana contoh barang (sampel) dikirim terlebih dahulu, baru kemudian pengiriman besar dilakukan.",
+    question: "Identifikasi jenis pasar berdasarkan wujudnya (pasar nyata/abstrak) and jangkauannya (wilayah/internasional)! Jelaskan alasan kalian!",
+    hint: "Pasar abstrak jika barang tidak tersedia secara fisik saat transaksi. Jangkauan internasional jika melibatkan antarnegara.",
+    rubrik: "Skor 20: Klasifikasi wujud (abstrak) dan jangkauan (internasional) benar disertai alasan logis."
   },
   {
     id: 4,
-    title: "Analisis Peran dan Fungsi Pasar",
-    story: "Wacana: Dinamika Pasar di Era Digital",
-    question: "Bagaimana Marketplace Orange menjalankan fungsi distribusi bagi produsen di daerah terpencil? Jelaskan analisis kalian!",
-    hint: "Pikirkan tentang jangkauan pengiriman dan kemudahan akses produk tanpa perantara fisik.",
-    rubrik: "Skor 20: Analisis mendalam tentang efisiensi jalur distribusi digital."
+    title: "Analisis Struktur Pasar Persaingan Sempurna vs Tidak Sempurna",
+    story: "Di jalan protokol, terdapat 5 SPBU milik PERTAMINA (BUMN) yang menjadi pemain utama bahan bakar. Namun, di gang-gang pemukiman, terdapat puluhan pedagang 'Bensin Eceran' yang menjual produk yang sama dengan harga yang bersaing ketat satu sama lain.",
+    question: "Bandingkan struktur pasar pada industri BBM (Pertamina) vs industri Bensin Eceran! Termasuk struktur pasar manakah masing-masing fenomena tersebut?",
+    hint: "Pertamina cenderung monopoli/oligopoli negara. Bensin eceran di pemukiman banyak penjual menyerupai persaingan sempurna.",
+    rubrik: "Skor 20: Mampu membedakan dua struktur pasar tersebut dengan tepat."
   },
   {
     id: 5,
-    title: "Evaluasi Syarat Terbentuknya Pasar",
-    story: "Wacana: Dinamika Pasar di Era Digital",
-    question: "Dahulu pasar identik dengan bangunan fisik (tempat). Mengapa Marketplace Orange tetap sah disebut sebagai pasar menurut teori ekonomi saat ini? Hubungkan dengan 4 syarat pasar!",
-    hint: "Ingat syarat pasar: Ada penjual, pembeli, barang/jasa, dan kesepakatan/interaksi (tidak harus tatap muka).",
-    rubrik: "Skor 20: Mampu mengaitkan fenomena digital dengan 4 syarat terbentuknya pasar secara lengkap."
+    title: "IPTEK dan Pasar Input (Faktor Produksi)",
+    story: "Pak Budi adalah seorang petani modern. Ia menggunakan aplikasi 'TaniCerdas' untuk meminjam modal usaha, menyewa traktor (modal), and merekrut tenaga panen (tenaga kerja). Berkat teknologi, Pak Budi tidak perlu lagi keliling desa mencari pinjaman atau pekerja.",
+    question: "Sebutkan jenis-jenis pasar input apa saja yang diakses Pak Budi melalui aplikasi tersebut! Bagaimana peran IPTEK dalam memudahkan interaksi di pasar faktor produksi tersebut?",
+    hint: "Pasar input meliputi modal, tenaga kerja, tanah, dan kewirausahaan. Analisis efisiensi yang didapat berkat aplikasi.",
+    rubrik: "Skor 20: Mampu mengidentifikasi minimal 2 jenis pasar input and menjelaskan dampak positif IPTEK."
   }
 ];
 
 const pasarLkpdMeta = {
   title: "Lembar Kerja Peserta Didik (LKPD)",
-  subtitle: "Analisis Dinamika dan Struktur Pasar",
+  subtitle: "Analisis Komprehensif Konsep dan Struktur Pasar",
   mapel: "Ekonomi",
   kelas: "X",
-  waktu: "45 menit",
+  waktu: "60 menit",
   tujuan: [
-    "Siswa mampu mengklasifikasikan jenis pasar berdasarkan wacana",
-    "Siswa mampu menganalisis karakteristik pasar persaingan sempurna dan tidak sempurna",
-    "Siswa mampu mengevaluasi syarat terbentuknya pasar di era digital",
-    "Siswa mampu menganalisis peran pasar dalam mempermudah kegiatan ekonomi"
+    "Siswa mampu menganalisis syarat pasar dalam konteks digital",
+    "Siswa mampu mengidentifikasi fungsi dan klasifikasi pasar dari berbagai kasus",
+    "Siswa mampu membedakan jenis pasar berdasarkan wujud dan jangkauan",
+    "Siswa mampu membandingkan struktur pasar di kehidupan nyata",
+    "Siswa mampu menganalisis pengaruh IPTEK terhadap pasar faktor produksi (input)"
   ],
-  kompetensi: "Menganalisis struktur, jenis, dan peran pasar dalam kegiatan ekonomi melalui studi kasus",
+  kompetensi: "Menganalisis secara kritis berbagai fenomena pasar selaras dengan perkembangan zaman",
   petunjuk: [
-    "Bacalah wacana 'Dinamika Pasar di Era Digital' dengan seksama",
-    "Gunakan konsep yang telah dipelajari untuk menjawab pertanyaan analisis",
-    "Tuliskan jawaban yang argumennya kuat dan didukung fakta dari wacana",
-    "Tanyakan pada guru jika ada instruksi yang kurang jelas"
+    "Bacalah setiap wacana kasus dengan teliti",
+    "Gunakan materi yang telah dipelajari sebagai dasar analisis",
+    "Hubungkan jawabanmu dengan fakta yang ada di dalam wacana",
+    "Berikan argumen yang logis dan sistematis"
   ],
   rumus: [
-    { nama: "Syarat Pasar", formula: "Penjual + Pembeli + Barang/Jasa + Interaksi" },
-    { nama: "Struktur Pasar", formula: "Persaingan Sempurna vs Monopoli, Oligopoli, Monopolistik" }
+    { nama: "Syarat Pasar", formula: "Subjek (Penjual/Pembeli) + Objek (Barang/Jasa) + Interaksi" },
+    { nama: "Pasar Input", formula: "Modal + Tenaga Kerja + Alam (Tanah) + Kewirausahaan" }
   ]
 };
 
@@ -757,32 +758,6 @@ export default function LKPDPage() {
             <h2 className="text-xl font-bold">Tugas dan Langkah Kerja</h2>
           </div>
         </motion.div>
-
-        {/* Discourse Section (Wacana) for PASAR module */}
-        {moduleId === 'pasar' && (
-          <motion.div variants={itemVariants}>
-            <Card className="border-primary/20 bg-primary/5">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xl flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-primary" />
-                  Wacana: Dinamika Pasar di Era Digital
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="p-5 bg-background rounded-lg border shadow-sm prose prose-sm dark:prose-invert max-w-none">
-                  <p className="text-foreground leading-relaxed italic text-lg">
-                    "Di kota <strong>'Gemilang'</strong>, terdapat <strong>Pasar Induk</strong> tempat ratusan pedagang cabai bersaing ketat dengan harga seragam. Di sisi lain, ada <strong>PT Kereta Cepat</strong> sebagai pemain tunggal layanan transportasi kilat. 
-                    Ada juga <strong>Marketplace Orange</strong>, platform digital yang mendisrupsi cara belanja tradisional, serta <strong>Pasar Hewan</strong> yang hanya buka setiap Selasa. 
-                    Terakhir, tiga perusahaan <strong>ISP (Internet Service Provider)</strong> besar saling berebut pelanggan dengan perang harga."
-                  </p>
-                </div>
-                <p className="text-xs text-muted-foreground mt-3 italic">
-                  *Gunakan wacana di atas untuk menjawab 5 pertanyaan analisis di bawah ini.
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
 
         {lkpdProblems.map((problem, index) => (
           <motion.div key={problem.id} variants={itemVariants}>
