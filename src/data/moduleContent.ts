@@ -1098,13 +1098,388 @@ d. Penawaran faktor produksi kadang merupakan monopoli, sementara permintaan fak
       task: 'Buatlah ringkasan dari video pembelajaran di atas minimal 100 kata.'
     },
   ],
-  quizQuestions: Array.from({ length: 10 }, (_, i) => ({
-    id: `q-pasar-${i + 1}`,
-    question: `Pertanyaan placeholder untuk materi Pasar ${i + 1}?`,
-    options: ['Opsi A', 'Opsi B', 'Opsi C', 'Opsi D'],
-    correctAnswer: 0,
-    explanation: 'Penjelasan placeholder.',
-  })),
+  quizQuestions: [
+    {
+      id: 'q-pasar-1',
+      question: 'Secara ekonomi, pasar dapat terbentuk meskipun penjual dan pembeli tidak bertemu secara fisik. Syarat utama terjadinya pasar adalah...',
+      options: [
+        'Adanya gedung pasar yang megah',
+        'Pertemuan langsung antara penjual dan pembeli',
+        'Adanya kesepakatan harga dan transaksi atas barang/jasa',
+        'Tersedianya barang dalam jumlah yang sangat banyak'
+      ],
+      correctAnswer: 2,
+      explanation: 'Syarat utama pasar adalah adanya penjual, pembeli, barang/jasa, dan terjadinya kesepakatan transaksi/harga, baik secara langsung maupun tidak langsung.'
+    },
+    {
+      id: 'q-pasar-2',
+      question: 'Pasar memiliki fungsi mengorganisir faktor-faktor produksi untuk menghasilkan barang dan jasa. Hal ini disebut fungsi...',
+      options: ['Distribusi', 'Pembentukan Harga', 'Promosi', 'Produksi'],
+      correctAnswer: 1,
+      explanation: 'Fungsi pembentukan harga terjadi melalui interaksi permintaan dan penawaran yang mengorganisir nilai barang/jasa.'
+    },
+    {
+      id: 'q-pasar-3',
+      question: 'Berdasarkan wujudnya, pasar bursa efek dan pasar online termasuk dalam kategori pasar...',
+      options: ['Konkrit', 'Abstrak', 'Harian', 'Nasional'],
+      correctAnswer: 1,
+      explanation: 'Pasar abstrak adalah pasar di mana penjual dan pembeli tidak bertemu langsung dan barang yang diperjualbelikan tidak tersedia secara fisik saat transaksi.'
+    },
+    {
+      id: 'q-pasar-4',
+      question: 'Pasar yang hanya dibuka satu kali dalam setahun, seperti Pekan Raya Jakarta (PRJ), disebut pasar...',
+      options: ['Mingguan', 'Bulanan', 'Temporer', 'Tahunan'],
+      correctAnswer: 3,
+      explanation: 'Pasar tahunan diadakan sekali setahun dan biasanya bertujuan memperingati peristiwa tertentu.'
+    },
+    {
+      id: 'q-pasar-5',
+      question: 'Struktur pasar yang ditandai dengan banyak penjual tetapi produk yang dijual memiliki perbedaan (diferensiasi) disebut...',
+      options: ['Persaingan Sempurna', 'Monopoli', 'Oligopoli', 'Persaingan Monopolistik'],
+      correctAnswer: 3,
+      explanation: 'Pasar persaingan monopolistik memiliki banyak penjual dengan produk yang serupa tapi memiliki ciri khas (diferensiasi) seperti merek atau kemasan.'
+    },
+    {
+      id: 'q-pasar-6',
+      question: 'Pasar di mana hanya terdapat satu pembeli tunggal untuk banyak penjual disebut...',
+      options: ['Monopoli', 'Oligopoli', 'Monopsoni', 'Oligopsoni'],
+      correctAnswer: 2,
+      explanation: 'Monopsoni adalah keadaan pasar dengan satu pembeli tunggal yang menguasai penerimaan pasokan barang.'
+    },
+    {
+      id: 'q-pasar-7',
+      question: 'Salah satu ciri pasar persaingan sempurna adalah penjual berperan sebagai...',
+      options: ['Price Maker', 'Price Taker', 'Price Leader', 'Price Driver'],
+      correctAnswer: 1,
+      explanation: 'Dalam pasar persaingan sempurna, penjual tidak bisa menentukan harga sendiri dan hanya mengikuti harga pasar (Price Taker).'
+    },
+    {
+      id: 'q-pasar-8',
+      question: 'Perusahaan Listrik Negara (PLN) dalam menyediakan listrik bagi masyarakat Indonesia merupakan contoh pasar...',
+      options: ['Monopoli', 'Oligopoli', 'Monopolistik', 'Persaingan Sempurna'],
+      correctAnswer: 0,
+      explanation: 'PLN adalah penjual tunggal jasa listrik di Indonesia, sehingga dikategorikan sebagai pasar monopoli (monopoli negara).'
+    },
+    {
+      id: 'q-pasar-9',
+      question: 'Pasar yang memperjualbelikan faktor produksi berupa mesin dan peralatan termasuk dalam pasar...',
+      options: ['Input Modal', 'Input Tenaga Kerja', 'Barang Konsumsi', 'Input Alam'],
+      correctAnswer: 0,
+      explanation: 'Mesin dan peralatan adalah bagian dari faktor produksi modal.'
+    },
+    {
+      id: 'q-pasar-10',
+      question: 'Perkembangan IPTEK memungkinkan adanya "Marketplace" digital. Dampak positif IPTEK bagi konsumen adalah...',
+      options: [
+        'Memperpendek rantai distribusi sehingga harga lebih murah',
+        'Menghilangkan peran pedagang kecil',
+        'Menyebabkan perilaku konsumtif berlebihan',
+        'Mengurangi lapangan pekerjaan di pasar tradisional'
+      ],
+      correctAnswer: 0,
+      explanation: 'IPTEK memudahkan akses langsung dari produsen ke konsumen, sehingga memotong biaya perantara dan harga menjadi lebih bersaing.'
+    },
+    {
+      id: 'q-pasar-11',
+      question: 'Balas jasa yang diterima oleh pemilik faktor produksi alam (tanah) disebut...',
+      options: ['Upah', 'Bunga', 'Sewa', 'Laba'],
+      correctAnswer: 2,
+      explanation: 'Pemilik tanah menerima sewa (rent) sebagai balas jasa atas penggunaan tanahnya dalam proses produksi.'
+    },
+    {
+      id: 'q-pasar-12',
+      question: 'Pasar modal merupakan tempat transaksi instrumen keuangan jangka panjang, contohnya adalah...',
+      options: ['Saham dan Obligasi', 'Uang Tunai', 'Beras dan Gula', 'Tenaga Kerja'],
+      correctAnswer: 0,
+      explanation: 'Saham dan obligasi adalah instrumen utama yang diperjualbelikan di pasar modal.'
+    },
+    {
+      id: 'q-pasar-13',
+      question: 'Dalam pasar oligopoli, munculnya persaingan harga yang sangat ketat sering dihindari karena akan merugikan semua pihak. Maka perusahaan cenderung bersaing lewat...',
+      options: ['Kualitas barang', 'Iklan dan Pelayanan', 'Jumlah karyawan', 'Lokasi toko'],
+      correctAnswer: 1,
+      explanation: 'Perusahaan oligopoli lebih memilih persaingan non-harga seperti iklan yang masif dan peningkatan pelayanan.'
+    },
+    {
+      id: 'q-pasar-14',
+      question: 'Salah satu kelemahan pasar monopoli bagi masyarakat adalah...',
+      options: [
+        'Efisien dalam penggunaan sumber daya',
+        'Harga barang cenderung stabil',
+        'Kualitas barang sangat tinggi',
+        'Konsumen tidak punya pilihan barang lain'
+      ],
+      correctAnswer: 3,
+      explanation: 'Karena hanya ada satu penjual, konsumen terpaksa menerima produk dan harga yang ditetapkan monopolis tanpa pilihan alternatif.'
+    },
+    {
+      id: 'q-pasar-15',
+      question: 'Pasar yang menyediakan bibit unggul, pupuk, dan lahan pertanian disebut pasar input...',
+      options: ['Modal', 'Alam', 'Tenaga Kerja', 'Kewirausahaan'],
+      correctAnswer: 1,
+      explanation: 'Lahan dan bibit (sumber daya organik) termasuk dalam kategori faktor produksi alam.'
+    },
+    {
+      id: 'q-pasar-16',
+      question: 'Pasar Sayur di suatu daerah hanya buka subuh hingga jam 7 pagi. Berdasarkan waktunya, ini termasuk pasar...',
+      options: ['Harian', 'Mingguan', 'Temporer', 'Bulanan'],
+      correctAnswer: 0,
+      explanation: 'Pasar harian adalah pasar yang kegiatannya berlangsung setiap hari, meskipun jam operasionalnya terbatas.'
+    },
+    {
+      id: 'q-pasar-17',
+      question: 'Seseorang yang memiliki inisiatif untuk mengorganisir faktor produksi guna mencapai efisiensi maksimal dalam pasar disebut...',
+      options: ['Manajer', 'Karyawan', 'Wirausahawan', 'Investor'],
+      correctAnswer: 2,
+      explanation: 'Wirausahawan bertugas mengoordinasikan tanah, modal, dan tenaga kerja.'
+    },
+    {
+      id: 'q-pasar-18',
+      question: 'Contoh pasar oligopoli di Indonesia yang paling terlihat adalah industri...',
+      options: ['Beras', 'Semen dan Telekomunikasi (Provider)', 'Pakaian Jadi', 'Listrik'],
+      correctAnswer: 1,
+      explanation: 'Industri semen and provider seluler hanya dikuasai oleh beberapa perusahaan besar, sehingga disebut oligopoli.'
+    },
+    {
+      id: 'q-pasar-19',
+      question: 'Di pasar persaingan sempurna, informasi pasar bersifat...',
+      options: ['Tertutup', 'Rahasia perusahaan', 'Sempurna dan terbuka', 'Sangat mahal'],
+      correctAnswer: 2,
+      explanation: 'Semua pelaku pasar memiliki informasi yang sama dan lengkap mengenai harga serta kondisi pasar.'
+    },
+    {
+      id: 'q-pasar-20',
+      question: 'Pasar faktor produksi tenaga kerja mempertemukan permintaan tenaga kerja dari ... dengan penawaran dari ...',
+      options: [
+        'Rumah Tangga Konsumen (RTK); Rumah Tangga Produsen (RTP)',
+        'Rumah Tangga Produsen (RTP); Rumah Tangga Konsumen (RTK)',
+        'Pemerintah; Luar Negeri',
+        'Bank; Nasabah'
+      ],
+      correctAnswer: 1,
+      explanation: 'Perusahaan (RTP) membutuhkan/meminta tenaga kerja, sedangkan masyarakat (RTK) sebagai pemilik tenaga kerja menawarkan jasanya.'
+    },
+    {
+      id: 'q-pasar-21',
+      question: 'Bursa tenaga kerja online memungkinkan pencari kerja melamar ke luar negeri dengan mudah. Ini adalah contoh pengaruh IPTEK terhadap pasar...',
+      options: ['Lokal', 'Nasional', 'Internasional', 'Regional'],
+      correctAnswer: 2,
+      explanation: 'Teknologi meniadakan batasan geografis, memungkinkan jangkauan pasar hingga level internasional.'
+    },
+    {
+      id: 'q-pasar-22',
+      question: 'Hambatan masuk (barriers to entry) yang sangat tinggi merupakan ciri utama dari pasar...',
+      options: ['Persaingan Sempurna', 'Monopoli', 'Persaingan Monopolistik', 'Oligopsoni'],
+      correctAnswer: 1,
+      explanation: 'Pasar monopoli sulit ditembus pesaing baru karena adanya undang-undang, penguasaan bahan baku, atau modal yang sangat besar.'
+    },
+    {
+      id: 'q-pasar-23',
+      question: 'Pasar yang jangkauannya mencakup satu wilayah negara tertentu disebut pasar...',
+      options: ['Lokal', 'Regional', 'Nasional', 'Global'],
+      correctAnswer: 2,
+      explanation: 'Pasar nasional melayani permintaan and penawaran dari seluruh penjuru suatu negara.'
+    },
+    {
+      id: 'q-pasar-24',
+      question: 'Harga yang terbentuk di pasar merupakan hasil dari kesepakatan antara...',
+      options: ['Penjual dan Pemerintah', 'Pembeli dan Bank', 'Permintaan dan Penawaran', 'Produsen dan Distributor'],
+      correctAnswer: 2,
+      explanation: 'Harga pasar terbentuk dari titik temu antara kurva permintaan (pembeli) and penawaran (penjual).'
+    },
+    {
+      id: 'q-pasar-25',
+      question: 'Fungsi pasar sebagai sarana memperkenalkan barang baru kepada calon pembeli disebut fungsi...',
+      options: ['Distribusi', 'Pembentukan Harga', 'Promosi', 'Produksi'],
+      correctAnswer: 2,
+      explanation: 'Promosi bertujuan membujuk konsumen agar tertarik membeli produk.'
+    },
+    {
+      id: 'q-pasar-26',
+      question: 'Contoh nyata dari pasar persaingan monopolistik adalah pasar...',
+      options: ['Sabun mandi dan sampo', 'Listrik', 'Beras di pasar induk', 'Bensin oleh Pertamina'],
+      correctAnswer: 0,
+      explanation: 'Banyak merek sabun/sampo yang bersaing dengan keunggulan merek masing-masing (diferensiasi).'
+    },
+    {
+      id: 'q-pasar-27',
+      question: 'Pasar input modal sering juga disebut sebagai pasar...',
+      options: ['Tenaga Kerja', 'Dana atau Invetasi', 'Lahan Pertanian', 'Bahan Baku'],
+      correctAnswer: 1,
+      explanation: 'Modal dalam ekonomi tidak hanya berupa mesin, tapi juga dana investasi yang digunakan untuk produksi.'
+    },
+    {
+      id: 'q-pasar-28',
+      question: 'Jika pasar hanya terdiri dari beberapa pembeli besar bagi banyak penjual kecil, maka disebut...',
+      options: ['Oligopoli', 'Oligopsoni', 'Monopoli', 'Monopsoni'],
+      correctAnswer: 1,
+      explanation: 'Oligopsoni adalah penguasaan pasar oleh beberapa pembeli saja.'
+    },
+    {
+      id: 'q-pasar-29',
+      question: 'Hukum pasar menyatakan bahwa jika harga naik, maka penawaran akan...',
+      options: ['Turun', 'Tetap', 'Naik', 'Hilang'],
+      correctAnswer: 2,
+      explanation: 'Hukum penawaran berbanding lurus: harga naik, jumlah barang yang ditawarkan naik.'
+    },
+    {
+      id: 'q-pasar-30',
+      question: 'Pasar yang menjual barang-barang mentah seperti gandum, kopi, and karet dunia disebut pasar...',
+      options: ['Konsumsi', 'Barang Jadi', 'Komoditas', 'Input Tenaga Kerja'],
+      correctAnswer: 2,
+      explanation: 'Bursa komoditas memperdagangkan barang mentah utama dalam skala besar/internasional.'
+    },
+    {
+      id: 'q-pasar-31',
+      question: 'Suatu bentuk pasar yang di dalamnya terdapat banyak penjual barang yang sejenis tetapi mempunyai perbedaan-perbedaan pada produknya (merk, kualitas, kemasan) disebut pasar...',
+      options: ['Persaingan Sempurna', 'Monopoli', 'Oligopoli', 'Monopolistik'],
+      correctAnswer: 3,
+      explanation: 'Definisi kunci pasar monopolistik adalah diferensiasi produk.'
+    },
+    {
+      id: 'q-pasar-32',
+      question: 'Pasar Sekunder pada bursa efek termasuk dalam kategori pasar...',
+      options: ['Konkrit', 'Abstrak', 'Lokal', 'Mingguan'],
+      correctAnswer: 1,
+      explanation: 'Transaksi bursa efek tidak memerlukan kehadiran fisik barang dagangan saat deal terjadi.'
+    },
+    {
+      id: 'q-pasar-33',
+      question: 'Fungsi pasar dalam menyalurkan barang dari produsen ke konsumen agar tepat waktu dan tempat disebut fungsi...',
+      options: ['Distribusi', 'Pembentukan Harga', 'Promosi', 'Alokasi'],
+      correctAnswer: 0,
+      explanation: 'Distribusi adalah proses penyampaian barang/jasa kepada para pemakai.'
+    },
+    {
+      id: 'q-pasar-34',
+      question: 'Dalam pasar monopoli, kurva permintaan yang dihadapi perusahaan adalah...',
+      options: [
+        'Horizontal (datar)',
+        'Vertikal (tegak)',
+        'Menurun dari kiri atas ke kanan bawah',
+        'Menaik dari kiri bawah ke kanan atas'
+      ],
+      correctAnswer: 2,
+      explanation: 'Karena monopolis adalah satu-satunya penjual, kurva permintaannya sama dengan kurva permintaan pasar yang menurun.'
+    },
+    {
+      id: 'q-pasar-35',
+      question: 'Pasar yang memperjualbelikan faktor produksi modal fisik seperti gedung dan traktor disebut pasar...',
+      options: ['Input Modal', 'Input Tenaga Kerja', 'Input Alam', 'Barang Jadi'],
+      correctAnswer: 0,
+      explanation: 'Gedung and alat mesin adalah bentuk modal tetap/fisik.'
+    },
+    {
+      id: 'q-pasar-36',
+      question: 'Berikut merupakan contoh pasar harian, KECUALI...',
+      options: ['Pasar Tradisional Kota', 'Supermarket', 'Pasar Kaget Hari Minggu', 'Warung Kelontong'],
+      correctAnswer: 2,
+      explanation: 'Pasar kaget hari Minggu adalah pasar mingguan.'
+    },
+    {
+      id: 'q-pasar-37',
+      question: 'Pasar persaingan sempurna sulit ditemukan di dunia nyata secara murni, namun yang paling mendekati adalah pasar...',
+      options: ['Mobil Mewah', 'Hasil Pertanian (Beras/Sayur)', 'Smartphone', 'Jasa Transportasi Kereta Api'],
+      correctAnswer: 1,
+      explanation: 'Barang pertanian cenderung homogen and banyak penjual/pembeli kecil.'
+    },
+    {
+      id: 'q-pasar-38',
+      question: 'Kartel merupakan kerja sama beberapa perusahaan di bawah satu pimpinan untuk menguasai pasar. Fenomena ini biasanya terjadi pada struktur...',
+      options: ['Monopoli', 'Oligopoli', 'Persaingan Sempurna', 'Monopolistik'],
+      correctAnswer: 1,
+      explanation: 'Beberapa perusahaan besar dalam oligopoli bisa melakukan kolusi/kartel untuk menentukan harga.'
+    },
+    {
+      id: 'q-pasar-39',
+      question: 'Pasar yang menjadi tempat bertemunya penawaran tenaga kerja terampil dengan perusahaan yang membutuhkan disebut...',
+      options: ['Pasar Komoditas', 'Bursa Tenaga Kerja', 'Bursa Efek', 'Pasar Barang Jasa'],
+      correctAnswer: 1,
+      explanation: 'Bursa tenaga kerja menyediakan informasi and akses untuk faktor produksi manusia.'
+    },
+    {
+      id: 'q-pasar-40',
+      question: 'Salah satu dampak negatif adanya pasar monopoli adalah terjadinya "deadweight loss" yang berarti...',
+      options: [
+        'Keuntungan yang terlalu besar bagi konsumen',
+        'Hilangnya kesejahteraan masyarakat karena harga terlalu tinggi',
+        'Pemerintah kehilangan pendapatan pajak',
+        'Penjual mengalami kerugian terus menerus'
+      ],
+      correctAnswer: 1,
+      explanation: 'Harga tinggi dan jumlah barang sedikit di pasar monopoli mengurangi total kesejahteraan ekonomi masyarakat.'
+    },
+    {
+      id: 'q-pasar-41',
+      question: 'Pasar yang melakukan transaksi untuk pengiriman di masa depan disebut pasar...',
+      options: ['Spot', 'Mingguan', 'Berjangka (Futures)', 'Konkrit'],
+      correctAnswer: 2,
+      explanation: 'Pasar berjangka melakukan kontrak sekarang untuk penyerahan barang di kemudian hari.'
+    },
+    {
+      id: 'q-pasar-42',
+      question: 'Pemberian upah kepada buruh pabrik merupakan bentuk transaksi di pasar...',
+      options: ['Barang Jasa', 'Input Alam', 'Input Tenaga Kerja', 'Input Modal'],
+      correctAnswer: 2,
+      explanation: 'Upah adalah balas jasa di pasar tenaga kerja.'
+    },
+    {
+      id: 'q-pasar-43',
+      question: 'Sektor perbankan yang terdiri dari beberapa bank besar dominan merupakan contoh aplikasi struktur pasar...',
+      options: ['Monopoli', 'Oligopoli', 'Persaingan Sempurna', 'Monopsoni'],
+      correctAnswer: 1,
+      explanation: 'Layanan perbankan dikuasai beberapa pemain besar di tiap negara.'
+    },
+    {
+      id: 'q-pasar-44',
+      question: 'Penggunaan QRIS di pasar tradisional memudahkan transaksi secara digital. Ini menunjukkan peran IPTEK dalam meningkatkan...',
+      options: ['Jumlah barang', 'Kualitas barang', 'Efisiensi dan Kemudahan Pembayaran', 'Jumlah pedagang'],
+      correctAnswer: 2,
+      explanation: 'Digitalisasi pembayaran memangkas hambatan teknis transaksi.'
+    },
+    {
+      id: 'q-pasar-45',
+      question: 'Pasar regional adalah pasar yang jangkauannya mencakup...',
+      options: ['Satu kecamatan', 'Beberapa negara di kawasan tertentu (misal: ASEAN)', 'Seluruh dunia', 'Satu provinsi saja'],
+      correctAnswer: 1,
+      explanation: 'Regional merujuk pada kawasan geografis tertentu (lintas negara).'
+    },
+    {
+      id: 'q-pasar-46',
+      question: 'Pasar input kewirausahaan memberikan balas jasa berupa...',
+      options: ['Bunga', 'Sewa', 'Upah', 'Laba (Profit)'],
+      correctAnswer: 3,
+      explanation: 'Pengusaha menerima laba atas keberanian mengambil risiko and mengelola usaha.'
+    },
+    {
+      id: 'q-pasar-47',
+      question: 'Di pasar persaingan sempurna, barang yang dijual bersifat homogen, artinya...',
+      options: ['Sangat mahal', 'Berbeda-beda kualitasnya', 'Sama atau serupa secara fisik dan kualitas', 'Langka'],
+      correctAnswer: 2,
+      explanation: 'Barang homogen membuat konsumen tidak pilih-pilih merk karena barang dianggap identik.'
+    },
+    {
+      id: 'q-pasar-48',
+      question: 'Penetapan harga eceran tertinggi (HET) oleh pemerintah di pasar bertujuan untuk...',
+      options: ['Melindungi Produsen', 'Melindungi Konsumen', 'Menambah Pajak', 'Menciptakan Monopoli'],
+      correctAnswer: 1,
+      explanation: 'HET mencegah harga naik terlalu tinggi sehingga tetap terjangkau oleh konsumen.'
+    },
+    {
+      id: 'q-pasar-49',
+      question: 'Pasar internasional adalah pasar yang mempertemukan permintaan dan penawaran dari...',
+      options: ['Dua orang dari desa berbeda', 'Seluruh negara di dunia', 'Hanya negara kaya', 'Hanya negara berkembang'],
+      correctAnswer: 1,
+      explanation: 'Melibatkan interaksi antarnegara di seluruh dunia.'
+    },
+    {
+      id: 'q-pasar-50',
+      question: 'Dalam jangka panjang, keuntungan perusahaan di pasar persaingan sempurna cenderung...',
+      options: ['Sangat besar (Supernormal)', 'Normal (Nol ekonomi)', 'Mengalami kerugian', 'Tidak terbatas'],
+      correctAnswer: 1,
+      explanation: 'Karena kemudahan masuk/keluar pasar, persaingan akan menekan keuntungan hingga level normal.'
+    }
+  ],
   glossary: {
     'Pasar': 'Tempat bertemunya penjual dan pembeli untuk melakukan transaksi.',
     'Barter': 'Pertukaran barang dengan barang tanpa perantara uang.',
