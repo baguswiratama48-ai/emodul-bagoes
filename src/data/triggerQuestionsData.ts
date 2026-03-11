@@ -116,7 +116,29 @@ export const rencanaUsahaTriggerQuestions = [
     },
 ];
 
+export const pasarTriggerQuestions = [
+    {
+        id: 1,
+        question: "Jika di kotamu hanya ada satu toko yang menjual buku sekolah, apa yang akan terjadi jika toko tersebut menaikkan harga?",
+        hint: "Pikirkan tentang ketergantungan konsumen pada satu penjual (Monopoli).",
+        icon: "📚",
+    },
+    {
+        id: 2,
+        question: "Mengapa harga sayuran di pasar tradisional bisa berbeda-beda antara penjual satu dengan yang lain?",
+        hint: "Pertimbangkan persaingan antar penjual di pasar.",
+        icon: "🥬",
+    },
+    {
+        id: 3,
+        question: "Apa yang membuat sebuah tempat bisa disebut sebagai 'Pasar'? Apakah harus ada bangunannya?",
+        hint: "Pikirkan tentang pasar digital atau e-commerce saat ini.",
+        icon: "🌐",
+    },
+];
+
 export const getTriggerQuestionsByModuleId = (moduleId: string | undefined) => {
+    if (moduleId === 'pasar') return pasarTriggerQuestions;
     if (moduleId === 'kerajinan-limbah') return pkwuTriggerQuestions;
     if (moduleId === 'pkwu-sumber-daya') return sumberDayaTriggerQuestions;
     if (moduleId === 'rencana-usaha') return rencanaUsahaTriggerQuestions;

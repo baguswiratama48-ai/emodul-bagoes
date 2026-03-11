@@ -61,6 +61,22 @@ const penawaranSummaryPoints = [
   }
 ];
 
+// Summary for Ekonomi (Pasar)
+const pasarSummaryPoints = [
+  {
+    title: "Pengertian Pasar",
+    content: "Pasar adalah tempat bertemunya permintaan (pembeli) dan penawaran (penjual) untuk melakukan transaksi barang atau jasa."
+  },
+  {
+    title: "Struktur Pasar",
+    content: "Terbagi menjadi Pasar Persaingan Sempurna dan Pasar Persaingan Tidak Sempurna (Monopoli, Oligopoli, Monopolistik)."
+  },
+  {
+    title: "Fungsi Pasar",
+    content: "Fungsi Distribusi, Fungsi Pembentuk Harga (Nilai), dan Fungsi Promosi."
+  }
+];
+
 // Summary for PKWU
 const pkwuSummaryPoints = [
   {
@@ -140,6 +156,8 @@ export default function SummaryPage() {
     summaryPoints = penawaranSummaryPoints;
     keyFormulaTitle = "Fungsi Penawaran";
     keyFormulaContent = "Qs = aP + b";
+  } else if (moduleId === 'pasar') {
+    summaryPoints = pasarSummaryPoints;
   }
 
   const reflectionQuestions = ekonomiReflectionQuestions;

@@ -364,6 +364,9 @@ export default function LKPDPage() {
   } else if (moduleId === 'penawaran') {
     lkpdProblems = penawaranLkpdProblems;
     lkpdMeta = penawaranLkpdMeta;
+  } else if (moduleId === 'pasar') {
+    lkpdProblems = pasarLkpdProblems;
+    lkpdMeta = pasarLkpdMeta;
   }
 
   // PKWU only has main problems, no refleksi

@@ -864,8 +864,64 @@ Perubahan **faktor-faktor lain selain harga**, misalnya adanya **pajak** atau **
   },
 };
 
+export const ekonomiPasarModule: Module = {
+  id: 'pasar',
+  title: 'PASAR',
+  subtitle: 'Konsep dan Struktur Pasar',
+  description: 'Mempelajari konsep pasar dalam ekonomi, berbagai struktur pasar, serta peran pasar bagi produsen dan konsumen.',
+  objectives: [
+    'Menjelaskan pengertian pasar',
+    'Mengidentifikasi syarat-syarat terbentuknya pasar',
+    'Membedakan berbagai jenis struktur pasar (Persaingan Sempurna & Tak Sempurna)',
+    'Menganalisis peran pasar dalam kegiatan ekonomi',
+  ],
+  prerequisites: [
+    'Memahami konsep permintaan dan penawaran',
+    'Memahami mekanisme harga keseimbangan',
+  ],
+  duration: '4 JP (4 x 45 menit)',
+  sections: [
+    {
+      id: 'pengertian-pasar',
+      title: 'Materi Pembelajaran',
+      icon: '🏪',
+      content: `
+# Materi Pembelajaran: PASAR
+
+*(Konten materi akan segera diperbarui)*
+
+## Poin-poin Penting:
+1. Pengertian Pasar
+2. Syarat Terbentuknya Pasar
+3. Klasifikasi Pasar
+4. Fungsi Pasar
+      `,
+    },
+  ],
+  videos: [
+    {
+      id: 'video-pasar-1',
+      title: 'Video Pembelajaran: Konsep Pasar',
+      url: 'https://www.youtube.com/embed/placeholder',
+      description: 'Video pengantar mengenai konsep dan jenis-jenis pasar.',
+    },
+  ],
+  quizQuestions: Array.from({ length: 10 }, (_, i) => ({
+    id: `q-pasar-${i + 1}`,
+    question: `Pertanyaan placeholder untuk materi Pasar ${i + 1}?`,
+    options: ['Opsi A', 'Opsi B', 'Opsi C', 'Opsi D'],
+    correctAnswer: 0,
+    explanation: 'Penjelasan placeholder.',
+  })),
+  glossary: {
+    'Pasar': 'Tempat bertemunya penjual dan pembeli untuk melakukan transaksi.',
+    'Monopoli': 'Struktur pasar di mana hanya ada satu penjual.',
+    'Oligopoli': 'Struktur pasar dengan beberapa penjual yang mendominasi.',
+  },
+};
+
 // Ekonomi module for Kelas X
-export const ekonomiModules: Module[] = [demandModule, supplyModule];
+export const ekonomiModules: Module[] = [demandModule, supplyModule, ekonomiPasarModule];
 
 // All modules (untuk backwards compatibility)
 export const modules: Module[] = [demandModule, supplyModule];
