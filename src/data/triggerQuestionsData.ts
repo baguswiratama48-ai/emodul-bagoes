@@ -119,21 +119,33 @@ export const rencanaUsahaTriggerQuestions = [
 export const pasarTriggerQuestions = [
     {
         id: 1,
-        question: "Jika di kotamu hanya ada satu toko yang menjual buku sekolah, apa yang akan terjadi jika toko tersebut menaikkan harga?",
-        hint: "Pikirkan tentang ketergantungan konsumen pada satu penjual (Monopoli).",
-        icon: "📚",
+        question: "Ketika kalian ingin membeli suatu barang, ke mana biasanya kalian mencarinya dan mengapa memilih tempat tersebut?",
+        hint: "Pikirkan alasan memilih tempat belanja favoritmu (harga, jarak, kelengkapan).",
+        icon: "🏪",
     },
     {
         id: 2,
-        question: "Mengapa harga sayuran di pasar tradisional bisa berbeda-beda antara penjual satu dengan yang lain?",
-        hint: "Pertimbangkan persaingan antar penjual di pasar.",
-        icon: "🥬",
+        question: "Mengapa satu barang yang sama bisa memiliki harga yang berbeda di tempat yang berbeda?",
+        hint: "Pertimbangkan faktor persaingan, biaya sewa tempat, atau layanan yang diberikan.",
+        icon: "🏷️",
     },
     {
         id: 3,
-        question: "Apa yang membuat sebuah tempat bisa disebut sebagai 'Pasar'? Apakah harus ada bangunannya?",
-        hint: "Pikirkan tentang pasar digital atau e-commerce saat ini.",
-        icon: "🌐",
+        question: "Bagaimana perkembangan internet dan teknologi memengaruhi cara orang menjual dan membeli barang saat ini?",
+        hint: "Pikirkan tentang kemudahan belanja online dibandingkan pasar fisik.",
+        icon: "📱",
+    },
+    {
+        id: 4,
+        question: "Menurut kalian, apa yang akan terjadi jika hanya ada satu penjual untuk suatu barang yang sangat dibutuhkan banyak orang?",
+        hint: "Ingat konsep monopoli dan pengaruhnya terhadap harga.",
+        icon: "☝️",
+    },
+    {
+        id: 5,
+        question: "Mengapa dalam kegiatan jual beli selalu melibatkan lebih dari satu pihak, dan apa yang terjadi jika salah satu pihak tidak ada?",
+        hint: "Pikirkan tentang interaksi antara ketersediaan barang dan kebutuhan konsumen.",
+        icon: "🤝",
     },
 ];
 

@@ -9,7 +9,8 @@ import {
   MessageSquare,
   Lightbulb,
   CheckCircle,
-  Save
+  Save,
+  Star
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -243,6 +244,34 @@ export default function TriggerQuestions() {
                         <p className="text-sm text-blue-800 dark:text-blue-300">
                           {feedbackMap[q.id]}
                         </p>
+                        
+                        {/* Visual Stars Display */}
+                        {(() => {
+                          const fb = feedbackMap[q.id];
+                          let stars = 0;
+                          if (fb.includes('⭐⭐⭐⭐⭐')) stars = 5;
+                          else if (fb.includes('⭐⭐⭐⭐')) stars = 4;
+                          else if (fb.includes('⭐⭐⭐')) stars = 3;
+                          else if (fb.includes('⭐⭐')) stars = 2;
+                          else if (fb.includes('⭐')) stars = 1;
+                          
+                          if (stars > 0) {
+                            return (
+                              <div className="mt-2 flex items-center gap-1">
+                                {[1, 2, 3, 4, 5].map((s) => (
+                                  <Star 
+                                    key={s} 
+                                    className={`h-4 w-4 ${s <= stars ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} 
+                                  />
+                                ))}
+                                <span className="ml-1 text-xs font-bold text-yellow-600 dark:text-yellow-400">
+                                  {stars}/5 Bintang
+                                </span>
+                              </div>
+                            );
+                          }
+                          return null;
+                        })()}
                       </div>
                     )}
                   </div>

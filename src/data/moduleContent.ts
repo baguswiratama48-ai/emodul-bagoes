@@ -883,6 +883,7 @@ export const ekonomiPasarModule: Module = {
     'Mekanisme terbentuknya harga dalam kegiatan pasar.',
   ],
   duration: '6 JP (2 × Pertemuan × 3 JP × 45 menit)',
+  meaningfulUnderstanding: 'Kegiatan jual beli merupakan bagian penting dalam kehidupan ekonomi masyarakat. Melalui interaksi antara penjual dan pembeli, kebutuhan manusia dapat terpenuhi dan harga barang terbentuk. Perkembangan teknologi juga membuat kegiatan jual beli tidak hanya terjadi secara langsung, tetapi juga melalui media digital. Memahami hal ini membantu peserta didik mengenali bagaimana kegiatan ekonomi berlangsung dalam kehidupan sehari-hari.',
   sections: [
     {
       id: 'pengertian-syarat',
