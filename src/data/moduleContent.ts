@@ -882,19 +882,171 @@ export const ekonomiPasarModule: Module = {
   duration: '4 JP (4 x 45 menit)',
   sections: [
     {
-      id: 'pengertian-pasar',
-      title: 'Materi Pembelajaran',
+      id: 'pengertian-syarat',
+      title: 'Pengertian & Syarat',
       icon: '🏪',
       content: `
-# Materi Pembelajaran: PASAR
+# 1. Pengertian dan Syarat Pasar
 
-*(Konten materi akan segera diperbarui)*
+Pasar telah dikenal sejak zaman dahulu sebagai pusat pertemuan penjual (produsen) dan pembeli (konsumen). 
 
-## Poin-poin Penting:
-1. Pengertian Pasar
-2. Syarat Terbentuknya Pasar
-3. Klasifikasi Pasar
-4. Fungsi Pasar
+> **Sejarah Singkat:** 
+> Dahulu, perdagangan dilakukan dengan cara **barter** (tukar barang). Pasar awalnya terbentuk di lokasi strategis seperti persimpangan jalan atau pelabuhan, lalu meluas seiring perkembangan zaman.
+
+### A. Pengertian Pasar
+*   **Arti Sempit:** Tempat bertemunya penjual dan pembeli untuk bertransaksi barang dan jasa.
+*   **Arti Luas:** Proses interaksi penjual dan pembeli untuk menetapkan **harga keseimbangan**.
+*   **Secara Umum:** Tempat bertemunya Permintaan dan Penawaran.
+
+### B. Syarat Terjadinya Pasar
+Agar sebuah pasar dapat terbentuk, diperlukan syarat-syarat berikut:
+1.  Terdapat **Penjual dan Pembeli**.
+2.  Tersedia **Barang dan Jasa** yang diperjualbelikan.
+3.  Terjadi **Transaksi** melalui proses tawar-menawar.
+4.  Tersedia **Media Interaksi** (fisik maupun digital).
+      `,
+    },
+    {
+      id: 'fungsi-peran',
+      title: 'Fungsi & Peranan',
+      icon: '⚙️',
+      content: `
+# 2. Fungsi dan Peranan Pasar
+
+Pasar menjalankan peran vital dalam perekonomian melalui tiga fungsi utama.
+
+### 🌟 Tiga Fungsi Utama Pasar
+1.  **Fungsi Distribusi:** Memperpendek jarak antara produsen dan konsumen sehingga barang tersalurkan dengan efisien.
+2.  **Fungsi Pembentukan Harga:** Melalui kesepakatan tawar-menawar antara penjual dan pembeli.
+3.  **Fungsi Promosi:** Tempat strategis bagi produsen untuk memperkenalkan produk baru kepada masyarakat.
+
+---
+
+### 👥 Peranan Pasar bagi Berbagai Pihak
+*   **Bagi Produsen:** Memperlancar penjualan, tempat promosi, dan memperoleh bahan baku produksi.
+*   **Bagi Konsumen:** Memudahkan memperoleh barang/jasa kebutuhan sehari-hari.
+*   **Bagi Pembangunan:** Menyediakan material pembangunan dan menjadi sumber pendapatan negara (Pajak & Retribusi).
+*   **Bagi Sumber Daya Manusia:** Membantu mengurangi pengangguran dan membuka lapangan kerja baru.
+      `,
+    },
+    {
+      id: 'macam-pasar',
+      title: 'Klasifikasi Pasar',
+      icon: '📦',
+      content: `
+# 3. Macam-Macam Pasar
+
+Pasar dapat dikelompokkan berdasarkan berbagai kriteria:
+
+| Kriteria | Jenis Pasar | Contoh |
+|----------|-------------|--------|
+| **Jenisnya** | Pasar Barang Konsumsi & Faktor Produksi | Pasar beras vs Pasar tenaga kerja |
+| **Wujudnya** | Pasar Konkret (Nyata) & Abstrak (Digital) | Pasar Tradisional vs Tokopedia |
+| **Jangkauan** | Lokal, Daerah, Nasional, Internasional | Pasar desa vs Bursa efek |
+| **Waktu** | Harian, Mingguan, Bulanan, Tahunan | Pasar sayur vs Pekan Raya Jakarta |
+| **Nama Tempat** | Berdasarkan lokasi | Pasar Cikini, Pasar Kramat Jati |
+| **Barang Dijual** | Berdasarkan komoditas | Pasar Buah, Pasar Sayur, Pasar Ikan |
+      `,
+    },
+    {
+      id: 'persaingan-sempurna',
+      title: 'Pasar Sempurna',
+      icon: '💎',
+      content: `
+# 4. Struktur Pasar: Persaingan Sempurna
+
+Pasar Persaingan Sempurna dianggap sebagai struktur pasar yang paling **ideal** karena menjamin efisiensi optimal.
+
+### ✨ Ciri-Ciri Utama
+*   Jumlah penjual dan pembeli sangat banyak.
+*   Barang bersifat **Homogen** (serupa/identik).
+*   Produsen bebas keluar-masuk pasar.
+*   Pembeli memiliki informasi lengkap tentang pasar.
+*   Harga ditentukan oleh mekanisme pasar (produsen adalah *price taker*).
+
+### ✅ Kelebihan
+*   Tidak memerlukan iklan.
+*   Harga stabil dan adil.
+*   Kepuasan konsumen maksimal karena bebas memilih.
+
+### ❌ Kekurangan
+*   Tidak ada variasi produk (semua barang sama).
+*   Upah pekerja cenderung rendah.
+*   Keuntungan produsen hanya pada tingkat normal (sulit untuk riset/pengembangan).
+      `,
+    },
+    {
+      id: 'monopoli-oligopoli',
+      title: 'Monopoli & Oligopoli',
+      icon: '🏢',
+      content: `
+# 5. Struktur Pasar Tidak Sempurna (1)
+
+### 👤 A. Pasar Monopoli
+Kondisi di mana hanya ada **satu penjual** yang menguasai seluruh pasar.
+*   **Kelebihan:** Menghindari produk tiruan, mendorong teknologi tinggi, dan efisiensi skala ekonomi.
+*   **Kekurangan:** Penyalahgunaan kekuatan ekonomi, tidak ada pilihan bagi konsumen, dan kesenjangan pendapatan.
+
+### 🤝 B. Pasar Oligopoli
+Kondisi di mana hanya ada **beberapa penjual** besar yang melayani banyak pembeli.
+*   **Oligopoli Murni:** Produk bersifat homogen.
+*   **Oligopoli Diferensiasi:** Produk memiliki merek/model berbeda.
+*   **Ciri Khas:** Iklan sangat intensif dan adanya ketergantungan antar-perusahaan (perang harga).
+      `,
+    },
+    {
+      id: 'monopolistik',
+      title: 'Monopolistik',
+      icon: '🛍️',
+      content: `
+# 6. Struktur Pasar Tidak Sempurna (2)
+
+### 🏬 Pasar Monopolistik
+Bentuk pasar di mana banyak produsen menjual produk yang serupa, tetapi memiliki **variasi/diferensiasi** (beda merek, kemasan, atau rasa).
+
+*   **Ciri:** Banyak penjual, barang berbeda corak, aktif berpromosi.
+*   **Kelebihan:** Konsumen punya banyak pilihan, mendorong inovasi.
+*   **Kekurangan:** Persaingan sangat tinggi, butuh modal besar untuk iklan.
+
+### ⚖️ Pasar Oligopsoni & Monopsoni
+*   **Oligopsoni:** Pasar dengan beberapa pembeli besar yang bisa memengaruhi harga.
+*   **Monopsoni:** Hanya ada **satu pembeli tunggal** atas suatu komoditas.
+      `,
+    },
+    {
+      id: 'iptek-pasar',
+      title: 'Peran IPTEK',
+      icon: '🌐',
+      content: `
+# 7. Peran IPTEK terhadap Pasar
+
+Perkembangan Ilmu Pengetahuan dan Teknologi (IPTEK) telah mengubah wajah pasar secara drastis.
+
+### 📱 Digitalisasi Pasar
+Dahulu pasar identik dengan kerumunan fisik. Sekarang, **E-commerce** dan toko online memungkinkan transaksi tanpa batasan jarak dan waktu. 
+
+### 🔄 Perubahan Struktur
+*   **Dahulu:** Telepon rumah (monopoli perusahaan besar).
+*   **Sekarang:** Telepon genggam (persaingan banyak produsen).
+*   **Dampaknya:** Harga lebih bersahabat, layanan lebih praktis, dan perputaran uang lebih cepat melalui transaksi digital.
+      `,
+    },
+    {
+      id: 'pasar-input',
+      title: 'Pasar Input',
+      icon: '🏗️',
+      content: `
+# 8. Pasar Input (Faktor Produksi)
+
+Pasar yang memperjualbelikan faktor-faktor yang dibutuhkan dalam proses produksi.
+
+### 🔑 Jenis-Jenis Pasar Input
+1.  **SDA / Tanah:** Imbal jasanya berupa **Sewa**. Letak dan kesuburan memengaruhi harga.
+2.  **Tenaga Kerja:** Aktivitas mempertemukan pencari kerja dengan pengguna tenaga kerja (perusahaan).
+3.  **Modal:** Tempat jual beli dana investasi jangka panjang antara pemilik modal dan pengusaha.
+4.  **Kewirausahaan:** Inisiatif untuk mengelola faktor produksi secara efisien. Pelakunya disebut **Wirausahawan**.
+
+> **Ciri Khas:** Tidak berwujud fisik (berupa kegiatan), permintaan bersifat kolektif, dan jumlah transaksi biasanya besar.
       `,
     },
   ],
@@ -915,8 +1067,14 @@ export const ekonomiPasarModule: Module = {
   })),
   glossary: {
     'Pasar': 'Tempat bertemunya penjual dan pembeli untuk melakukan transaksi.',
+    'Barter': 'Pertukaran barang dengan barang tanpa perantara uang.',
+    'Harga Keseimbangan': 'Harga yang terbentuk dari kesepakatan antara permintaan dan penawaran.',
+    'Price Taker': 'Kondisi di mana penjual tidak bisa menentukan harga sendiri, melainkan mengikuti harga pasar.',
     'Monopoli': 'Struktur pasar di mana hanya ada satu penjual.',
     'Oligopoli': 'Struktur pasar dengan beberapa penjual yang mendominasi.',
+    'Monopolistik': 'Pasar dengan banyak penjual yang membedakan produknya melalui merek atau kualitas.',
+    'Monopsoni': 'Keadaan di mana hanya ada satu pembeli tunggal.',
+    'Pasar Input': 'Pasar yang menyediakan faktor produksi seperti tanah, modal, dan tenaga kerja.',
   },
 };
 
@@ -924,4 +1082,4 @@ export const ekonomiPasarModule: Module = {
 export const ekonomiModules: Module[] = [demandModule, supplyModule, ekonomiPasarModule];
 
 // All modules (untuk backwards compatibility)
-export const modules: Module[] = [demandModule, supplyModule];
+export const modules: Module[] = [demandModule, supplyModule, ekonomiPasarModule];

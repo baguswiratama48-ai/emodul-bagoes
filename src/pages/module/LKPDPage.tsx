@@ -101,6 +101,46 @@ const penawaranLkpdProblems = [
   },
 ];
 
+// LKPD for Ekonomi (Pasar)
+const pasarLkpdProblems = [
+  {
+    id: 1,
+    title: "Identifikasi Struktur Pasar",
+    story: "Di sebuah daerah, terdapat banyak penjual pulsa dan banyak pula pembelinya. Harga pulsa di semua toko hampir sama dan informasi harga sangat mudah diketahui oleh semua orang.",
+    question: "Termasuk ke dalam struktur pasar manakah ilustrasi di atas? Jelaskan karakteristik pasar tersebut!",
+    hint: "Pikirkan tentang ciri-ciri Pasar Persaingan Sempurna.",
+    rubrik: "Skor 50: Mampu mengidentifikasi jenis pasar dan menjelaskan minimal 3 ciri khasnya."
+  },
+  {
+    id: 2,
+    title: "Analisis Peran Pasar",
+    story: "Pasar digital (e-commerce) semakin berkembang pesat di Indonesia. Hal ini memudahkan produsen rumahan untuk menjual produknya tanpa harus menyewa toko fisik.",
+    question: "Jelaskan peran pasar bagi produsen berdasarkan ilustrasi tersebut!",
+    hint: "Pertimbangkan efisiensi biaya dan jangkauan pasar.",
+    rubrik: "Skor 50: Analisis logis mengenai efisiensi dan perluasan akses pasar."
+  }
+];
+
+const pasarLkpdMeta = {
+  title: "Lembar Kerja Peserta Didik (LKPD)",
+  subtitle: "Menganalisis Konsep dan Struktur Pasar",
+  mapel: "Ekonomi",
+  kelas: "X",
+  waktu: "45 menit",
+  tujuan: [
+    "Siswa mampu mengidentifikasi struktur pasar di lingkungan sekitar",
+    "Siswa mampu menganalisis peran pasar bagi pelaku ekonomi",
+  ],
+  kompetensi: "Menganalisis struktur pasar dan perannya dalam kegiatan ekonomi",
+  petunjuk: [
+    "Amati fenomena ekonomi di sekitarmu",
+    "Jawablah pertanyaan berdasarkan konsep yang telah dipelajari",
+  ],
+  rumus: [
+    { nama: "Struktur Pasar", formula: "Persaingan Sempurna vs Tidak Sempurna" }
+  ]
+};
+
 // LKPD for PKWU - Lembar Analisis Peluang Usaha
 const pkwuLkpdProblems = [
   {
