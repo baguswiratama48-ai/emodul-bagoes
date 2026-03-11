@@ -882,7 +882,10 @@ export default function LKPDPage() {
           <Card className={`${isPKWU ? 'border-green-500/30' : 'border-primary/30'}`}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Star className={`h-5 w-5 ${isPKWU ?               <CardDescription>
+                <Star className={`h-5 w-5 ${isPKWU ? 'text-green-600' : 'text-primary'}`} />
+                Rubrik Penilaian LKPD
+              </CardTitle>
+              <CardDescription>
                 Panduan penilaian untuk LKPD ini
               </CardDescription>
             </CardHeader>
@@ -1014,11 +1017,6 @@ export default function LKPDPage() {
                         <td className="p-3 border font-bold">Total Skor Maksimal</td>
                         <td className="p-3 text-center border font-bold">100</td>
                       </tr>
-                    </tfoot>
-                  </table>
-                )}
-              </div>
- </tr>
                     </tfoot>
                   </table>
                 )}
