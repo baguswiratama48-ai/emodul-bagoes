@@ -24,7 +24,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
-  Video
+  Video,
+  Sparkles
 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
@@ -145,6 +146,7 @@ export default function TeacherDashboard() {
   const [triggerAnswers, setTriggerAnswers] = useState<StudentTriggerAnswer[]>([]);
   const [videoAnswers, setVideoAnswers] = useState<StudentVideoAnswer[]>([]);
   const [reflectionAnswers, setReflectionAnswers] = useState<StudentTriggerAnswer[]>([]);
+  const [summaryAnswers, setSummaryAnswers] = useState<StudentTriggerAnswer[]>([]);
   const [studentNotes, setStudentNotes] = useState<StudentNote[]>([]);
   const [allStudents, setAllStudents] = useState<StudentProfile[]>([]);
   const [expandedAnswerKey, setExpandedAnswerKey] = useState<number | null>(null);
@@ -182,6 +184,7 @@ export default function TeacherDashboard() {
   const [currentPageTrigger, setCurrentPageTrigger] = useState(1);
   const [currentPageVideo, setCurrentPageVideo] = useState(1);
   const [currentPageReflection, setCurrentPageReflection] = useState(1);
+  const [currentPageSummary, setCurrentPageSummary] = useState(1);
   const [currentPageLkpd, setCurrentPageLkpd] = useState(1);
   const [currentPageQuiz, setCurrentPageQuiz] = useState(1);
 
@@ -235,6 +238,7 @@ export default function TeacherDashboard() {
     setSelectedKelas('all');
     setCurrentPageTrigger(1);
     setCurrentPageReflection(1);
+    setCurrentPageSummary(1);
     setCurrentPageLkpd(1);
     setCurrentPageQuiz(1);
   }, [selectedMapel]);
@@ -346,6 +350,7 @@ export default function TeacherDashboard() {
       .from('trigger_answers')
       .select('id, user_id, module_id, question_id, answer, submitted_at')
       .not('module_id', 'like', '%-refleksi')
+      .not('module_id', 'like', '%-summary')
       .order('submitted_at', { ascending: false });
 
     if (triggerData) {
@@ -379,6 +384,33 @@ export default function TeacherDashboard() {
       setReflectionAnswers(reflectionData.map((item: any) => {
         const profile = profilesMap[item.user_id];
         const fb = fbMap[`reflection-${item.id}`];
+        return {
+          id: item.id,
+          user_id: item.user_id,
+          full_name: profile?.full_name || 'Unknown',
+          kelas: profile?.kelas || '-',
+          question_id: item.question_id,
+          answer: item.answer,
+          submitted_at: item.submitted_at,
+          feedback: fb?.feedback,
+          student_reply: fb?.student_reply,
+          student_reply_at: fb?.student_reply_at,
+          module_id: item.module_id
+        };
+      }));
+    }
+
+    // Fetch summary reflections
+    const { data: summaryData } = await supabase
+      .from('trigger_answers')
+      .select('id, user_id, module_id, question_id, answer, submitted_at')
+      .like('module_id', '%-summary')
+      .order('submitted_at', { ascending: false });
+
+    if (summaryData) {
+      setSummaryAnswers(summaryData.map((item: any) => {
+        const profile = profilesMap[item.user_id];
+        const fb = fbMap[`summary-reflection-${item.id}`];
         return {
           id: item.id,
           user_id: item.user_id,
@@ -529,6 +561,17 @@ export default function TeacherDashboard() {
     return answers.sort(sortByName);
   }, [reflectionAnswers, mapelKelas, selectedKelas, selectedModuleId]);
 
+  const filteredSummaryAnswers = useMemo(() => {
+    let answers = summaryAnswers.filter(a => mapelKelas.includes(a.kelas));
+    if (selectedKelas !== 'all') {
+      answers = answers.filter(a => a.kelas === selectedKelas);
+    }
+    if (selectedModuleId) {
+      answers = answers.filter(a => a.module_id === `${selectedModuleId}-summary`);
+    }
+    return answers.sort(sortByName);
+  }, [summaryAnswers, mapelKelas, selectedKelas, selectedModuleId]);
+
   const filteredVideoAnswers = useMemo(() => {
     let answers = videoAnswers.filter(a => mapelKelas.includes(a.kelas));
     if (selectedKelas !== 'all') {
@@ -544,6 +587,10 @@ export default function TeacherDashboard() {
   const triggerQuestions = useMemo(() => {
     return getTriggerQuestionsByModuleId(selectedModuleId);
   }, [selectedModuleId]);
+
+  const summaryQuestionsFromModule = useMemo(() => {
+    return availableModules.find(m => m.id === selectedModuleId)?.summaryQuestions || [];
+  }, [availableModules, selectedModuleId]);
 
   const lkpdProblems = useMemo(() => {
     if (selectedModuleId === 'kerajinan-limbah') {
@@ -744,6 +791,17 @@ export default function TeacherDashboard() {
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center"><Sparkles className="h-6 w-6 text-indigo-500" /></div>
+                  <div>
+                    <p className="text-2xl font-bold">{new Set(filteredSummaryAnswers.map(a => a.user_id)).size}</p>
+                    <p className="text-sm text-muted-foreground">Ref. Rangkuman</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center"><CheckCircle2 className="h-6 w-6 text-success" /></div>
                   <div>
                     <p className="text-2xl font-bold">
@@ -762,12 +820,73 @@ export default function TeacherDashboard() {
                 <TabsTrigger value="trigger-answers" className="gap-2"><MessageCircle className="h-4 w-4" /> <span className="hidden sm:inline">Pemantik</span></TabsTrigger>
                 <TabsTrigger value="video-answers" className="gap-2"><Video className="h-4 w-4" /> <span className="hidden sm:inline">Tugas Video</span></TabsTrigger>
                 <TabsTrigger value="reflection-answers" className="gap-2"><Lightbulb className="h-4 w-4" /> <span className="hidden sm:inline">Refleksi</span></TabsTrigger>
+                <TabsTrigger value="summary-answers" className="gap-2"><Sparkles className="h-4 w-4" /> <span className="hidden sm:inline">Ref. Rangkuman</span></TabsTrigger>
                 <TabsTrigger value="lkpd-answers" className="gap-2"><ClipboardList className="h-4 w-4" /> <span className="hidden sm:inline">LKPD</span></TabsTrigger>
                 <TabsTrigger value="quiz-results" className="gap-2"><CheckCircle2 className="h-4 w-4" /> <span className="hidden sm:inline">Kuis</span></TabsTrigger>
                 <TabsTrigger value="student-notes" className="gap-2"><FileText className="h-4 w-4" /> <span className="hidden sm:inline">Catatan</span></TabsTrigger>
                 <TabsTrigger value="answer-keys" className="gap-2"><BookOpen className="h-4 w-4" /> <span className="hidden sm:inline">Kunci</span></TabsTrigger>
                 <TabsTrigger value="reset" className="gap-2"><RefreshCw className="h-4 w-4" /> <span className="hidden sm:inline">Reset</span></TabsTrigger>
               </TabsList>
+
+              <TabsContent value="summary-answers">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Refleksi Rangkuman</CardTitle>
+                    <CardDescription>Jawaban refleksi siswa pada akhir rangkuman materi</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {filteredSummaryAnswers.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground"><p>Belum ada data refleksi rangkuman.</p></div>
+                    ) : (
+                      <div className="space-y-6">
+                        {summaryQuestionsFromModule.map((q: any) => {
+                          const answersForQuestion = filteredSummaryAnswers.filter(a => a.question_id === q.id);
+                          const totalAnswers = answersForQuestion.length;
+                          const startIndex = (currentPageSummary - 1) * ITEMS_PER_PAGE;
+                          const paginated = answersForQuestion.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+                          return (
+                            <div key={q.id} className="border rounded-xl animated-border overflow-hidden shadow-sm">
+                              <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 border-b">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Badge variant="outline" className="bg-indigo-100 text-indigo-700">Pertanyaan {q.id}</Badge>
+                                  <Badge variant="secondary">{totalAnswers} jawaban</Badge>
+                                </div>
+                                <p className="font-medium text-lg text-indigo-900 dark:text-indigo-100">{q.question}</p>
+                              </div>
+                              <div className="divide-y bg-card">
+                                {paginated.map((answer, i) => (
+                                  <div key={i} className="p-4 hover:bg-accent/5 transition-colors">
+                                    <div className="flex items-start justify-between mb-2">
+                                      <div>
+                                        <p className="font-semibold text-primary">{answer.full_name}</p>
+                                        <div className="flex gap-2 text-xs text-muted-foreground mt-1">
+                                          <Badge variant="outline" className="text-[10px] h-5">Kelas {answer.kelas}</Badge>
+                                          <span>{new Date(answer.submitted_at).toLocaleDateString()}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <p className="text-sm bg-muted/30 p-3 rounded-lg font-mono whitespace-pre-wrap border border-border/50">{answer.answer}</p>
+                                    <FeedbackForm
+                                      studentId={answer.user_id}
+                                      answerId={answer.id}
+                                      answerType="summary-reflection"
+                                      existingFeedback={answer.feedback}
+                                      studentReply={answer.student_reply}
+                                      studentReplyAt={answer.student_reply_at}
+                                      onFeedbackSaved={fetchStudentData}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
               <TabsContent value="trigger-answers">
                 <Card>

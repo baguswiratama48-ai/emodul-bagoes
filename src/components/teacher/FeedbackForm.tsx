@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 interface FeedbackFormProps {
   studentId: string;
   answerId: string;
-  answerType: 'trigger' | 'lkpd' | 'reflection' | 'video';
+  answerType: 'trigger' | 'lkpd' | 'reflection' | 'video' | 'summary-reflection';
   existingFeedback?: string;
   studentReply?: string;
   studentReplyAt?: string;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -7,7 +7,9 @@ import {
   CheckCircle2,
   Home,
   Trophy,
-  Sparkles
+  Sparkles,
+  Save,
+  MessageSquare
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +17,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { ModuleLayout } from '@/components/layout/ModuleLayout';
 import { useProgress } from '@/hooks/useProgress';
 import { getModuleById, isPKWUModule } from '@/data/moduleUtils';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import confetti from 'canvas-confetti';
 
 // Summary for Ekonomi (Permintaan)
@@ -136,6 +141,15 @@ export default function SummaryPage() {
   const { moduleId } = useParams();
   const { markSectionComplete, markModuleComplete, getModuleProgress } = useProgress();
   const module = getModuleById(moduleId);
+  const { toast } = useToast();
+  const { user } = useAuth();
+
+  const [reflections, setReflections] = useState<Record<number, string>>({});
+  const [savedReflections, setSavedReflections] = useState<Record<number, string>>({});
+  const [feedbackMap, setFeedbackMap] = useState<Record<number, string>>({});
+  const [idsMap, setIdsMap] = useState<Record<number, string>>({});
+  const [saving, setSaving] = useState<Record<number, boolean>>({});
+  const [isLoading, setIsLoading] = useState(true);
 
   if (!module) {
     return <div className="flex items-center justify-center min-h-screen">Modul tidak ditemukan</div>;
@@ -143,6 +157,131 @@ export default function SummaryPage() {
 
   const progress = getModuleProgress(module.id);
   const isPKWU = isPKWUModule(moduleId);
+  const [isCompleted, setIsCompleted] = useState(progress.isCompleted);
+
+  const questionsToUse = module.summaryQuestions || ekonomiReflectionQuestions.map((q, i) => ({ id: i + 1, question: q, hint: 'Tuliskan refleksimu di sini.' }));
+
+  // Fetch existing answers
+  useEffect(() => {
+    const fetchAnswers = async () => {
+      if (!user || !moduleId) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('trigger_answers')
+          .select('id, question_id, answer')
+          .eq('user_id', user.id)
+          .eq('module_id', `${moduleId}-summary`);
+
+        if (error) throw error;
+
+        const answersMap: Record<number, string> = {};
+        const tempIdsMap: Record<number, string> = {};
+
+        data?.forEach((item) => {
+          answersMap[item.question_id] = item.answer;
+          tempIdsMap[item.question_id] = item.id;
+        });
+        setReflections(answersMap);
+        setSavedReflections(answersMap);
+        setIdsMap(tempIdsMap);
+
+        // Fetch Feedback
+        if (data && data.length > 0) {
+          const { data: feedbackData } = await supabase
+            .from('teacher_feedback')
+            .select('answer_id, feedback')
+            .eq('answer_type', 'summary-reflection') 
+            .in('answer_id', Object.values(tempIdsMap));
+
+          if (feedbackData) {
+            const fbMap: Record<number, string> = {};
+            feedbackData.forEach((fb: any) => {
+              const qId = Object.keys(tempIdsMap).find(key => tempIdsMap[Number(key)] === fb.answer_id);
+              if (qId) fbMap[Number(qId)] = fb.feedback;
+            });
+            setFeedbackMap(fbMap);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching summary reflections:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAnswers();
+  }, [user, moduleId]);
+
+  const handleReflectionChange = (id: number, value: string) => {
+    setReflections(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleSaveReflection = async (questionId: number) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "Kamu harus login untuk menyimpan jawaban",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSaving(prev => ({ ...prev, [questionId]: true }));
+
+    try {
+      const answer = reflections[questionId];
+      if (!answer?.trim()) return;
+
+      const { data, error } = await supabase
+        .from('trigger_answers')
+        .upsert({
+          user_id: user.id,
+          module_id: `${moduleId}-summary`,
+          question_id: questionId,
+          answer: answer.trim(),
+        }, {
+          onConflict: 'user_id,module_id,question_id',
+        })
+        .select('id')
+        .single();
+
+      if (error) throw error;
+      if (data) setIdsMap(prev => ({ ...prev, [questionId]: data.id }));
+
+      setSavedReflections(prev => ({ ...prev, [questionId]: answer }));
+
+      toast({
+        title: "Berhasil",
+        description: "Refleksi berhasil dikirim ke guru",
+      });
+
+    } catch (error) {
+      console.error('Error saving summary reflection:', error);
+      toast({
+        title: "Error",
+        description: "Gagal mengirim refleksi",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(prev => ({ ...prev, [questionId]: false }));
+    }
+  };
+
+  const handleCompleteModule = () => {
+    markSectionComplete(module.id, 'rangkuman');
+    markModuleComplete(module.id);
+    setIsCompleted(true);
+
+    confetti({
+      particleCount: 150,
+      spread: 100,
+      origin: { y: 0.6 }
+    });
+  };
 
   let summaryPoints = permintaanSummaryPoints;
   let keyFormulaTitle = "Fungsi Permintaan";
@@ -159,27 +298,6 @@ export default function SummaryPage() {
   } else if (moduleId === 'pasar') {
     summaryPoints = pasarSummaryPoints;
   }
-
-  const reflectionQuestions = ekonomiReflectionQuestions;
-
-  const [reflections, setReflections] = useState<Record<number, string>>({});
-  const [isCompleted, setIsCompleted] = useState(progress.isCompleted);
-
-  const handleReflectionChange = (index: number, value: string) => {
-    setReflections(prev => ({ ...prev, [index]: value }));
-  };
-
-  const handleCompleteModule = () => {
-    markSectionComplete(module.id, 'rangkuman');
-    markModuleComplete(module.id);
-    setIsCompleted(true);
-
-    confetti({
-      particleCount: 150,
-      spread: 100,
-      origin: { y: 0.6 }
-    });
-  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -304,20 +422,59 @@ export default function SummaryPage() {
           <motion.div variants={itemVariants}>
             <Card>
               <CardHeader>
-                <CardTitle>Refleksi Pembelajaran</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5 text-amber-500" />
+                  Refleksi Pembelajaran
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {reflectionQuestions.map((question, index) => (
-                  <div key={index}>
-                    <label className="block text-foreground font-medium mb-2">
-                      {index + 1}. {question}
+                {questionsToUse.map((q: any) => (
+                  <div key={q.id} className="space-y-3">
+                    <label className="block text-foreground font-medium">
+                      {q.id}. {q.question}
                     </label>
+                    <p className="text-xs text-muted-foreground italic mb-2">
+                      💡 {q.hint}
+                    </p>
                     <Textarea
                       placeholder="Tuliskan jawabanmu..."
-                      className="resize-none"
-                      value={reflections[index] || ''}
-                      onChange={(e) => handleReflectionChange(index, e.target.value)}
+                      className="resize-none min-h-[100px]"
+                      value={reflections[q.id] || ''}
+                      onChange={(e) => handleReflectionChange(q.id, e.target.value)}
+                      disabled={isLoading}
                     />
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {savedReflections[q.id] && (
+                          <div className="flex items-center gap-1 text-xs text-success font-medium">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Sudah dikirim
+                          </div>
+                        )}
+                      </div>
+                      <Button
+                        size="sm"
+                        variant={savedReflections[q.id] === reflections[q.id] ? "outline" : "default"}
+                        onClick={() => handleSaveReflection(q.id)}
+                        disabled={!reflections[q.id]?.trim() || saving[q.id] || savedReflections[q.id] === reflections[q.id]}
+                        className="gap-2"
+                      >
+                        <Save className="h-4 w-4" />
+                        {saving[q.id] ? 'Mengirim...' : 'Kirim ke Guru'}
+                      </Button>
+                    </div>
+
+                    {feedbackMap[q.id] && (
+                      <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <div className="flex items-center gap-2 mb-1 text-blue-700 dark:text-blue-400">
+                          <MessageSquare className="h-4 w-4" />
+                          <span className="font-medium text-xs">Feedback Guru</span>
+                        </div>
+                        <p className="text-sm text-blue-800 dark:text-blue-300">
+                          {feedbackMap[q.id]}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </CardContent>

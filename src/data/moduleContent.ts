@@ -49,6 +49,7 @@ export interface Module {
   product?: string;
   meaningfulUnderstanding?: string;
   reflectionQuestions?: { id: number; question: string; hint: string }[];
+  summaryQuestions?: { id: number; question: string; hint: string }[];
 }
 
 export const demandModule: Module = {
@@ -1532,7 +1533,7 @@ d. Penawaran faktor produksi kadang merupakan monopoli, sementara permintaan fak
     'Pasar Barang Konsumsi': 'Pasar yang memperjualbelikan barang untuk keperluan hidup sehari-hari.',
     'Bursa Efek': 'Lembaga yang menyelenggarakan sistem perdagangan efek (saham/obligasi).',
   },
-  reflectionQuestions: [
+  summaryQuestions: [
     {
       id: 1,
       question: 'Sejauh mana pemahaman Anda mengenai perbedaan antara pasar persaingan sempurna dan tidak sempurna setelah mempelajari modul ini?',
