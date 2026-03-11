@@ -38,16 +38,35 @@ export default function QuizPage() {
   const progress = getModuleProgress(module.id);
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
+  const [shuffledQuestions, setShuffledQuestions] = useState<any[]>([]);
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
   const [showResults, setShowResults] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [loadingCheck, setLoadingCheck] = useState(true);
 
-
-
   const questions = module.quizQuestions;
   const totalQuestions = questions.length;
+
+  // Shuffle function
+  const shuffleArray = (array: any[]) => {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+  };
+
+  // Initialize shuffled questions
+  useEffect(() => {
+    if (!loadingCheck && !hasSubmitted && shuffledQuestions.length === 0) {
+      setShuffledQuestions(shuffleArray(questions));
+    } else if (hasSubmitted && shuffledQuestions.length === 0) {
+      // If already submitted, just show original order for review
+      setShuffledQuestions(questions);
+    }
+  }, [loadingCheck, hasSubmitted, questions]);
 
   // Check if already submitted
   useEffect(() => {
@@ -67,10 +86,9 @@ export default function QuizPage() {
       .eq('module_id', module.id);
 
     if (data && data.length > 0) {
-      const loadedAnswers: Record<number, number> = {};
-      data.forEach((item, index) => {
-        const qIndex = questions.findIndex(q => q.id === item.question_id);
-        if (qIndex >= 0) loadedAnswers[qIndex] = item.selected_answer;
+      const loadedAnswers: Record<string, number> = {};
+      data.forEach((item) => {
+        loadedAnswers[item.question_id] = item.selected_answer;
       });
       setSelectedAnswers(loadedAnswers);
       setHasSubmitted(true);
@@ -79,9 +97,9 @@ export default function QuizPage() {
     setLoadingCheck(false);
   };
 
-  const handleAnswerSelect = (questionIndex: number, answerIndex: number) => {
+  const handleAnswerSelect = (questionId: string, answerIndex: number) => {
     if (hasSubmitted) return;
-    setSelectedAnswers(prev => ({ ...prev, [questionIndex]: answerIndex }));
+    setSelectedAnswers(prev => ({ ...prev, [questionId]: answerIndex }));
     setShowExplanation(false);
   };
 
@@ -102,12 +120,13 @@ export default function QuizPage() {
   const saveAnswersToDatabase = async () => {
     if (!user) return;
 
-    const answers = questions.map((q, index) => ({
+    // Use original questions for mapping to DB correctly
+    const answers = questions.map((q) => ({
       user_id: user.id,
       module_id: module.id,
       question_id: q.id,
-      selected_answer: selectedAnswers[index] ?? -1,
-      is_correct: selectedAnswers[index] === q.correctAnswer
+      selected_answer: selectedAnswers[q.id] ?? -1,
+      is_correct: selectedAnswers[q.id] === q.correctAnswer
     }));
 
     for (const answer of answers) {
@@ -144,12 +163,13 @@ export default function QuizPage() {
     setCurrentQuestion(0);
     setShowResults(false);
     setShowExplanation(false);
+    setShuffledQuestions(shuffleArray(questions)); // Reshuffle for retry
   };
 
   const calculateScore = () => {
     let correct = 0;
-    questions.forEach((q, index) => {
-      if (selectedAnswers[index] === q.correctAnswer) {
+    questions.forEach((q) => {
+      if (selectedAnswers[q.id] === q.correctAnswer) {
         correct++;
       }
     });
@@ -160,7 +180,7 @@ export default function QuizPage() {
     markSectionComplete(module.id, 'kuis');
   };
 
-  const currentQ = questions[currentQuestion];
+  const currentQ = shuffledQuestions[currentQuestion];
   const answeredCount = Object.keys(selectedAnswers).length;
   const score = calculateScore();
   const previousScore = progress.quizScores['main-quiz'];
@@ -263,7 +283,7 @@ export default function QuizPage() {
             <h3 className="text-lg font-semibold mb-4">Review Jawaban</h3>
             <div className="space-y-4">
               {questions.map((q, index) => {
-                const isCorrect = selectedAnswers[index] === q.correctAnswer;
+                const isCorrect = selectedAnswers[q.id] === q.correctAnswer;
                 return (
                   <Card key={q.id} className={isCorrect ? 'border-success/50' : 'border-destructive/50'}>
                     <CardContent className="pt-6">
@@ -278,8 +298,8 @@ export default function QuizPage() {
                             {index + 1}. {q.question}
                           </p>
                           <p className="text-sm text-muted-foreground mb-2">
-                            Jawabanmu: <span className={isCorrect ? 'text-success' : 'text-destructive'}>
-                              {q.options[selectedAnswers[index]]}
+                            Jawabanmu: <span className={selectedAnswers[q.id] !== undefined ? (isCorrect ? 'text-success' : 'text-destructive') : 'text-muted-foreground'}>
+                              {selectedAnswers[q.id] !== undefined ? q.options[selectedAnswers[q.id]] : 'Tidak dijawab'}
                             </span>
                           </p>
                           {!isCorrect && (
@@ -299,6 +319,17 @@ export default function QuizPage() {
             </div>
           </motion.div>
         </motion.div>
+      </ModuleLayout>
+    );
+  }
+
+  if (loadingCheck || shuffledQuestions.length === 0) {
+    return (
+      <ModuleLayout module={module} currentSection="kuis">
+        <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+          <RotateCcw className="h-8 w-8 text-primary animate-spin" />
+          <p className="text-muted-foreground font-medium">Memuat Kuis...</p>
+        </div>
       </ModuleLayout>
     );
   }
@@ -324,7 +355,7 @@ export default function QuizPage() {
             Uji Pemahamanmu!
           </h1>
           <p className="text-muted-foreground">
-            Jawab semua pertanyaan untuk menguji pemahaman tentang konsep permintaan.
+            Jawab semua pertanyaan untuk menguji pemahaman tentang materi {module.title}. Soal ditampilkan secara acak untuk setiap sesi.
           </p>
         </motion.div>
 
@@ -337,7 +368,7 @@ export default function QuizPage() {
                   Soal {currentQuestion + 1} dari {totalQuestions}
                 </span>
                 <span className="text-sm text-muted-foreground">
-                  {answeredCount} terjawab
+                   {answeredCount} terjawab
                 </span>
               </div>
               <Progress value={((currentQuestion + 1) / totalQuestions) * 100} className="h-2" />
@@ -361,18 +392,18 @@ export default function QuizPage() {
             </CardHeader>
             <CardContent>
               <RadioGroup
-                value={selectedAnswers[currentQuestion]?.toString()}
-                onValueChange={(value) => handleAnswerSelect(currentQuestion, parseInt(value))}
+                value={selectedAnswers[currentQ.id]?.toString()}
+                onValueChange={(value) => handleAnswerSelect(currentQ.id, parseInt(value))}
                 className="space-y-3"
               >
                 {currentQ.options.map((option, index) => (
                   <div
                     key={index}
-                    className={`flex items-center space-x-3 p-4 rounded-lg border transition-all cursor-pointer ${selectedAnswers[currentQuestion] === index
+                    className={`flex items-center space-x-3 p-4 rounded-lg border transition-all cursor-pointer ${selectedAnswers[currentQ.id] === index
                       ? 'border-primary bg-primary/5'
                       : 'border-border hover:border-primary/50 hover:bg-muted/50'
                       }`}
-                    onClick={() => handleAnswerSelect(currentQuestion, index)}
+                    onClick={() => handleAnswerSelect(currentQ.id, index)}
                   >
                     <RadioGroupItem value={index.toString()} id={`option-${index}`} />
                     <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer text-foreground">
@@ -382,7 +413,7 @@ export default function QuizPage() {
                 ))}
               </RadioGroup>
 
-              {selectedAnswers[currentQuestion] !== undefined && (
+              {selectedAnswers[currentQ.id] !== undefined && (
                 <div className="mt-6">
                   <Button
                     variant="ghost"
@@ -401,8 +432,8 @@ export default function QuizPage() {
                       className="mt-3 p-4 rounded-lg bg-muted"
                     >
                       <p className="text-sm text-foreground">
-                        <strong className={selectedAnswers[currentQuestion] === currentQ.correctAnswer ? 'text-success' : 'text-destructive'}>
-                          {selectedAnswers[currentQuestion] === currentQ.correctAnswer ? '✓ Benar!' : '✗ Kurang tepat.'}
+                        <strong className={selectedAnswers[currentQ.id] === currentQ.correctAnswer ? 'text-success' : 'text-destructive'}>
+                          {selectedAnswers[currentQ.id] === currentQ.correctAnswer ? '✓ Benar!' : '✗ Kurang tepat.'}
                         </strong>
                         {' '}{currentQ.explanation}
                       </p>
@@ -417,13 +448,13 @@ export default function QuizPage() {
         {/* Question Navigation */}
         <motion.div variants={itemVariants}>
           <div className="flex flex-wrap gap-2 justify-center">
-            {questions.map((_, index) => (
+            {shuffledQuestions.map((q, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentQuestion(index)}
                 className={`w-10 h-10 rounded-lg font-medium transition-all ${currentQuestion === index
                   ? 'bg-primary text-primary-foreground'
-                  : selectedAnswers[index] !== undefined
+                  : selectedAnswers[q.id] !== undefined
                     ? 'bg-success/10 text-success border border-success/30'
                     : 'bg-muted text-muted-foreground hover:bg-muted/80'
                   }`}
