@@ -883,170 +883,183 @@ export const ekonomiPasarModule: Module = {
   sections: [
     {
       id: 'pengertian-syarat',
-      title: 'Pengertian & Syarat',
+      title: '1. Pengertian & Syarat',
       icon: '🏪',
       content: `
 # 1. Pengertian dan Syarat Pasar
 
-Pasar telah dikenal sejak zaman dahulu sebagai pusat pertemuan penjual (produsen) dan pembeli (konsumen). 
+Pasar sebagai pusat pertemuan penjual dan pembeli (produsen dan konsumen), telah dikenal sejak zaman dahulu. Ketika pertama kali muncul, perdagangan masih berupa pertukaran barang dengan barang (barter) yang awalnya berada di persimpangan jalur lalu lintas yang penting, seperti di pelabuhan. Pasar kemudian meluas, baik bentuk dan jenis komoditas yang dijual maupun proses transaksinya.
 
-> **Sejarah Singkat:** 
-> Dahulu, perdagangan dilakukan dengan cara **barter** (tukar barang). Pasar awalnya terbentuk di lokasi strategis seperti persimpangan jalan atau pelabuhan, lalu meluas seiring perkembangan zaman.
+**Pengertian dan Syarat Pasar**
 
-### A. Pengertian Pasar
-*   **Arti Sempit:** Tempat bertemunya penjual dan pembeli untuk bertransaksi barang dan jasa.
-*   **Arti Luas:** Proses interaksi penjual dan pembeli untuk menetapkan **harga keseimbangan**.
-*   **Secara Umum:** Tempat bertemunya Permintaan dan Penawaran.
+Pasar dalam arti sempit diartikan sebagai tempat bertemunya penjual dan pembeli untuk bertransaksi barang dan jasa. Dalam arti luas, pasar merupakan suatu proses di mana penjual dan pembeli saling berinteraksi untuk menetapkan harga keseimbangan. Secara umum, pasar adalah tempat bertemunya permintaan dan penawaran sehingga dapat menetapkan harga.
 
-### B. Syarat Terjadinya Pasar
-Agar sebuah pasar dapat terbentuk, diperlukan syarat-syarat berikut:
-1.  Terdapat **Penjual dan Pembeli**.
-2.  Tersedia **Barang dan Jasa** yang diperjualbelikan.
-3.  Terjadi **Transaksi** melalui proses tawar-menawar.
-4.  Tersedia **Media Interaksi** (fisik maupun digital).
+Terjadinya sebuah pasar diperlukan syarat-syarat, antara lain terdapat penjual dan pembeli, tersedia barang dan jasa yang diperjualbelikan, terjadinya transaksi antara penjual dan pembeli melalui proses tawar-menawar, serta tersedia media untuk interaksi antara penjual dan pembeli.
       `,
     },
     {
       id: 'fungsi-peran',
-      title: 'Fungsi & Peranan',
+      title: '2. Fungsi & Peranan',
       icon: '⚙️',
       content: `
 # 2. Fungsi dan Peranan Pasar
 
-Pasar menjalankan peran vital dalam perekonomian melalui tiga fungsi utama.
+Dalam kenyataannya pasar mempunyai tiga fungsi utama yaitu sebagai berikut.
 
-### 🌟 Tiga Fungsi Utama Pasar
-1.  **Fungsi Distribusi:** Memperpendek jarak antara produsen dan konsumen sehingga barang tersalurkan dengan efisien.
-2.  **Fungsi Pembentukan Harga:** Melalui kesepakatan tawar-menawar antara penjual dan pembeli.
-3.  **Fungsi Promosi:** Tempat strategis bagi produsen untuk memperkenalkan produk baru kepada masyarakat.
+a. Fungsi distribusi, pasar memungkinkan produsen berhubungan dengan konsumen, baik secara langsung maupun tidak langsung dengan perantara dalam perdagangan.
 
----
+b. Fungsi pembentukan harga, harga pasar akan terbentuk dengan adanya kesepakatan antara pembeli dan penjual.
 
-### 👥 Peranan Pasar bagi Berbagai Pihak
-*   **Bagi Produsen:** Memperlancar penjualan, tempat promosi, dan memperoleh bahan baku produksi.
-*   **Bagi Konsumen:** Memudahkan memperoleh barang/jasa kebutuhan sehari-hari.
-*   **Bagi Pembangunan:** Menyediakan material pembangunan dan menjadi sumber pendapatan negara (Pajak & Retribusi).
-*   **Bagi Sumber Daya Manusia:** Membantu mengurangi pengangguran dan membuka lapangan kerja baru.
+c. Fungsi promosi, pasar dapat digunakan oleh produsen untuk memperkenalkan barang yang diproduksinya. Hal ini terutama untuk barang-barang baru.
+
+Adapun peran pasar yaitu sebagai berikut.
+
+a. Peranan pasar bagi produsen, pasar dapat membantu memperlancar penjualan hasil produksi, sebagai tempat untuk mempromosikan barang dan hasil produksi, serta produsen juga dapat memperoleh barang atau jasa yang akan digunakan untuk keperluan proses produksi.
+
+b. Peranan pasar bagi konsumen, memudahkan memperoleh barang atau jasa yang dibutuhkan.
+
+c. Peranan pasar bagi pembangunan, pasar juga menyediakan segala macam barang dan jasa yang bermanfaat bagi pembangunan. Pasar juga dapat dijadikan sebagai sumber pendapatan pemerintah untuk membiayai pembangunan melalui pajak dan retribusi.
+
+d. Peranan pasar bagi sumber daya manusia, pasar turut membantu mengurangi pengangguran, memanfaatkan sumber daya manusia, serta membuka lapangan kerja.
       `,
     },
     {
       id: 'macam-pasar',
-      title: 'Klasifikasi Pasar',
+      title: '3. Macam-Macam Pasar',
       icon: '📦',
       content: `
 # 3. Macam-Macam Pasar
 
-Pasar dapat dikelompokkan berdasarkan berbagai kriteria:
-
-| Kriteria | Jenis Pasar | Contoh |
-|----------|-------------|--------|
-| **Jenisnya** | Pasar Barang Konsumsi & Faktor Produksi | Pasar beras vs Pasar tenaga kerja |
-| **Wujudnya** | Pasar Konkret (Nyata) & Abstrak (Digital) | Pasar Tradisional vs Tokopedia |
-| **Jangkauan** | Lokal, Daerah, Nasional, Internasional | Pasar desa vs Bursa efek |
-| **Waktu** | Harian, Mingguan, Bulanan, Tahunan | Pasar sayur vs Pekan Raya Jakarta |
-| **Nama Tempat** | Berdasarkan lokasi | Pasar Cikini, Pasar Kramat Jati |
-| **Barang Dijual** | Berdasarkan komoditas | Pasar Buah, Pasar Sayur, Pasar Ikan |
+a. Menurut jenisnya, pasar terdiri atas pasar barang konsumsi dan pasar faktor produksi.
+b. Menurut wujudnya, pasar dibedakan atas pasar konkret dan pasar abstrak.
+c. Menurut luas jangkauan distribusi, pasar terdiri atas pasar lokal, daerah, nasional, dan internasional.
+d. Menurut waktu jual beli, pasar terdiri atas pasar harian, mingguan, bulanan, dan tahunan.
+e. Menurut nama tempat atau daerah, yang termasuk jenis pasar ini antara lain Pasar Cikini, Pasar Kramat Jati, dan sebagainya.
+f. Menurut barang yang dijual, yang termasuk jenis pasar ini antara lain pasar buah, pasar sayur, pasar ikan, dan sebagainya.
       `,
     },
     {
-      id: 'persaingan-sempurna',
-      title: 'Pasar Sempurna',
+      id: 'struktur-pasar',
+      title: '4. Struktur Pasar',
       icon: '💎',
       content: `
-# 4. Struktur Pasar: Persaingan Sempurna
+# 4. Struktur Pasar
 
-Pasar Persaingan Sempurna dianggap sebagai struktur pasar yang paling **ideal** karena menjamin efisiensi optimal.
+Jenis-jenis pasar dalam pasar barang terdiri atas pasar persaingan sempurna dan pasar persaingan tidak sempurna.
 
-### ✨ Ciri-Ciri Utama
-*   Jumlah penjual dan pembeli sangat banyak.
-*   Barang bersifat **Homogen** (serupa/identik).
-*   Produsen bebas keluar-masuk pasar.
-*   Pembeli memiliki informasi lengkap tentang pasar.
-*   Harga ditentukan oleh mekanisme pasar (produsen adalah *price taker*).
+**a. Pasar Persaingan Sempurna**
 
-### ✅ Kelebihan
-*   Tidak memerlukan iklan.
-*   Harga stabil dan adil.
-*   Kepuasan konsumen maksimal karena bebas memilih.
+Pasar persaingan sempurna adalah suatu bentuk interaksi antara permintaan dan penawaran yang ditandai oleh jumlah produsen dan konsumen yang sangat banyak serta hampir tidak terbatas. Pasar persaingan sempurna merupakan struktur pasar yang paling ideal karena dianggap struktur pasar yang dapat menjamin terwujudnya kegiatan memproduksi barang atau jasa yang memiliki efisiensi optimal.
 
-### ❌ Kekurangan
-*   Tidak ada variasi produk (semua barang sama).
-*   Upah pekerja cenderung rendah.
-*   Keuntungan produsen hanya pada tingkat normal (sulit untuk riset/pengembangan).
-      `,
-    },
-    {
-      id: 'monopoli-oligopoli',
-      title: 'Monopoli & Oligopoli',
-      icon: '🏢',
-      content: `
-# 5. Struktur Pasar Tidak Sempurna (1)
+Ciri-ciri pasar persaingan sempurna antara lain terdapat banyak penjual dan pembeli, barang yang diperdagangkan homogen (serupa), setiap perusahaan bebas keluar atau masuk, pembeli mengetahui kondisi pasar, faktor-faktor produksi bergerak bebas, perusahaan menerima harga yang ditentukan pasar, serta tidak ada campur tangan pemerintah.
 
-### 👤 A. Pasar Monopoli
-Kondisi di mana hanya ada **satu penjual** yang menguasai seluruh pasar.
-*   **Kelebihan:** Menghindari produk tiruan, mendorong teknologi tinggi, dan efisiensi skala ekonomi.
-*   **Kekurangan:** Penyalahgunaan kekuatan ekonomi, tidak ada pilihan bagi konsumen, dan kesenjangan pendapatan.
+Kelebihan
+- Tidak memerlukan adanya iklan.
+- Tidak tampak kegiatan saling menyaingi antarpelaku.
+- Adanya satu harga.
+- Kepuasan konsumen maksimal karena bebas memilih.
+- Keuntungan produsen maksimal karena dapat menjual barang sebanyak-banyaknya.
+- Produksi barang yang diperlukan konsumen dengan biaya minimal.
 
-### 🤝 B. Pasar Oligopoli
-Kondisi di mana hanya ada **beberapa penjual** besar yang melayani banyak pembeli.
-*   **Oligopoli Murni:** Produk bersifat homogen.
-*   **Oligopoli Diferensiasi:** Produk memiliki merek/model berbeda.
-*   **Ciri Khas:** Iklan sangat intensif dan adanya ketergantungan antar-perusahaan (perang harga).
-      `,
-    },
-    {
-      id: 'monopolistik',
-      title: 'Monopolistik',
-      icon: '🛍️',
-      content: `
-# 6. Struktur Pasar Tidak Sempurna (2)
+Kekurangan
+- Tidak ada pilihan bagi konsumen untuk memilih barang karena semua barang sama dan sejenis.
+- Pekerja menerima gaji atau upah yang rendah.
+- Perusahaan tidak mempunyai anggaran untuk mengadakan penelitian karena keuntungan hanya memperoleh keuntungan normal.
 
-### 🏬 Pasar Monopolistik
-Bentuk pasar di mana banyak produsen menjual produk yang serupa, tetapi memiliki **variasi/diferensiasi** (beda merek, kemasan, atau rasa).
+**b. Pasar Persaingan Tidak Sempurna**
 
-*   **Ciri:** Banyak penjual, barang berbeda corak, aktif berpromosi.
-*   **Kelebihan:** Konsumen punya banyak pilihan, mendorong inovasi.
-*   **Kekurangan:** Persaingan sangat tinggi, butuh modal besar untuk iklan.
+**1) Pasar Monopoli**
+Pasar monopoli adalah suatu bentuk pasar yang hanya ada satu penjual yang menguasai perdagangan barang atau jasa sehingga pembeli tidak bisa mendapatkan barang pengganti (substitusi). Oleh karena hanya ada satu penjual, penjual dapat menentukan harga dan memperoleh keuntungan yang tinggi.
 
-### ⚖️ Pasar Oligopsoni & Monopsoni
-*   **Oligopsoni:** Pasar dengan beberapa pembeli besar yang bisa memengaruhi harga.
-*   **Monopsoni:** Hanya ada **satu pembeli tunggal** atas suatu komoditas.
+Kelebihan
+a. Menghindari produk-produk tiruan dan persaingan yang tidak bermanfaat.
+b. Menimbulkan skala ekonomi yang menurunkan biaya produksi.
+c. Terciptanya kesinambungan stabilitas perusahaan.
+d. Mendorong penggunaan mesin-mesin generasi terbaru dengan tingkat teknologi tinggi.
+e. Mendorong peningkatan kinerja departemen penelitian dan pengembangan.
+
+Kekurangan
+a. Penyalahgunaan kekuatan ekonomi.
+b. Pembeli tidak memiliki alternatif hasil pilihan barang yang dibeli.
+c. Adanya kesenjangan dalam pembagian pendapatan.
+d. Tidak ada persaingan.
+e. Mengurangi kesejahteraan konsumen.
+
+**2) Pasar Oligopoli**
+Pasar oligopoli adalah suatu bentuk pasar di mana hanya terdapat beberapa produsen atau sedikit perusahaan yang menjual produk-produk yang identik atau hampir sama dengan jumlah pembeli yang banyak.
+Oligopoli dapat dibedakan menjadi dua, yaitu oligopoli murni (pure oligopoly) yang ditandai beberapa perusahaan menjual produk homogen dan oligopoli dengan pembedaan (differentiated oligopoly) yang ditandai beberapa perusahaan menjual produk yang dapat dibedakan baik atas merek, model, dan sebagainya.
+Adakalanya pasar oligopoli terdiri atas dua perusahaan saja yang disebut duopoli.
+
+Ciri-ciri pasar oligopoli antara lain terdapat banyak pembeli di pasar, hanya ada beberapa penjual, produk yang dijual bisa bersifat homogen dan bisa juga berbeda tetapi memenuhi standar tertentu, terdapat hambatan untuk memasuki pasar bagi perusahaan baru, serta penggunaan iklan sangat intensif.
+
+Kelebihan
+a. Terdapat sedikit penjual karena dibutuhkan investasi besar untuk masuk ke pasar.
+b. Jumlah penjual yang sedikit membuat penjual dapat mengendalikan harga dalam tingkat tertentu.
+c. Bila terjadi perang harga, konsumen akan diuntungkan.
+
+Kekurangan
+a. Terdapat rintangan yang kuat untuk masuk ke pasar.
+b. Akan terjadi perang harga.
+c. Produsen bisa melakukan kerja sama (kartel) yang pada akhirnya merugikan konsumen.
+
+**3) Pasar Monopolistik**
+Pasar monopolistik adalah bentuk pasar yang terdapat banyak produsen menjual produk yang kurang lebih sama, tetapi dengan berbagai macam variasi.
+Ciri-ciri pasar monopolistik antara lain terdapat banyak produsen atau penjual, jenis barang yang dipasarkan berbeda, produsen mampu mempengaruhi harga, produsen mudah masuk ke dalam pasar, dan promosi penjualan sangat aktif.
+
+Kelebihan
+a. Terdapat banyak penjual sehingga konsumen memiliki pilihan.
+b. Bebas keluar masuk pasar akan mendorong produsen untuk berkompetisi secara sehat.
+c. Diferensiasi produk mendorong konsumen untuk selektif dalam menentukan produk yang diinginkan.
+d. Pasar persaingan monopolistik merupakan pasar yang mudah dijumpai.
+
+Kekurangan
+a. Memiliki tingkat persaingan yang tinggi.
+b. Meskipun terdapat kebebasan untuk keluar masuk, untuk memasuki pasar tetap membutuhkan modal yang besar karena pemain di dalam pasar telah memiliki skala ekonomi yang cukup tinggi.
+c. Pasar monopolistik mendorong produsen mengadakan inovasi produk sehingga meningkatkan biaya perusahaan yang akhirnya berimbas pada harga produk yang dibayar konsumen.
+
+**4) Pasar Oligopsoni dan Monopsoni**
+a. Pasar oligopsoni adalah kondisi pasar yang terdapat beberapa pembeli yang masing-masing pembeli memiliki peran cukup besar untuk memengaruhi harga.
+b. Pasar monopsoni adalah keadaan satu pelaku usaha menguasai penerimaan pasokan atau menjadi pembeli tunggal atas barang atau jasa dalam suatu pasar komoditas.
       `,
     },
     {
       id: 'iptek-pasar',
-      title: 'Peran IPTEK',
+      title: '5. IPTEK & Pasar',
       icon: '🌐',
       content: `
-# 7. Peran IPTEK terhadap Pasar
+# 5. Peran Iptek terhadap Perubahan Jenis dan Struktur Pasar
 
-Perkembangan Ilmu Pengetahuan dan Teknologi (IPTEK) telah mengubah wajah pasar secara drastis.
+Teknologi dewasa ini berkembang sangat pesat. Hal ini terbukti dengan banyaknya jaringan internet yang dapat diakses di mana pun berada. Kebergantungan pada internet sangat besar. Hal ini dimanfaatkan oleh wirausaha dalam memasarkan produk-produknya.
 
-### 📱 Digitalisasi Pasar
-Dahulu pasar identik dengan kerumunan fisik. Sekarang, **E-commerce** dan toko online memungkinkan transaksi tanpa batasan jarak dan waktu. 
+Banyak toko online yang dipasarkan melalui internet, tidak hanya itu, transaksi online melibatkan banyak pihak sehingga memengaruhi perputaran uang. Hal ini sangat berpengaruh terhadap perekonomian.
 
-### 🔄 Perubahan Struktur
-*   **Dahulu:** Telepon rumah (monopoli perusahaan besar).
-*   **Sekarang:** Telepon genggam (persaingan banyak produsen).
-*   **Dampaknya:** Harga lebih bersahabat, layanan lebih praktis, dan perputaran uang lebih cepat melalui transaksi digital.
+Teknologi juga dapat memengaruhi struktur pasar. Dahulu telepon merupakan bentuk pasar monopoli karena hanya dimiliki oleh perusahaan besar saja. Dahulu telepon berbentuk telepon rumah yang hanya dimiliki oleh sekelompok orang tertentu saja. Oleh karena perkembangan teknologi, sekarang orang dapat memiliki telepon genggam yang lebih murah dan praktis. Dengan munculnya telepon genggam, perusahaan telepon berbentuk fixed line (telepon rumah) mulai ditinggalkan dan beralih ke telepon genggam.
       `,
     },
     {
       id: 'pasar-input',
-      title: 'Pasar Input',
+      title: '6. Pasar Input',
       icon: '🏗️',
       content: `
-# 8. Pasar Input (Faktor Produksi)
+# 6. Pasar Input
 
-Pasar yang memperjualbelikan faktor-faktor yang dibutuhkan dalam proses produksi.
+Pasar input adalah pasar yang menyediakan berbagai faktor produksi.
 
-### 🔑 Jenis-Jenis Pasar Input
-1.  **SDA / Tanah:** Imbal jasanya berupa **Sewa**. Letak dan kesuburan memengaruhi harga.
-2.  **Tenaga Kerja:** Aktivitas mempertemukan pencari kerja dengan pengguna tenaga kerja (perusahaan).
-3.  **Modal:** Tempat jual beli dana investasi jangka panjang antara pemilik modal dan pengusaha.
-4.  **Kewirausahaan:** Inisiatif untuk mengelola faktor produksi secara efisien. Pelakunya disebut **Wirausahawan**.
+Ciri-ciri pasar input antara lain sebagai berikut.
+a. Tidak berwujud fisik, tetapi berwujud kegiatan.
+b. Permintaan dan penawaran faktor produksi dilakukan dalam jumlah besar.
+c. Jenis penawaran dan permintaan faktor produksi sesuai dengan produksi yang dihasilkan.
+d. Penawaran faktor produksi kadang merupakan monopoli, sementara permintaan faktor produksi bersifat kolektif.
 
-> **Ciri Khas:** Tidak berwujud fisik (berupa kegiatan), permintaan bersifat kolektif, dan jumlah transaksi biasanya besar.
+Pasar input terdiri atas sebagai berikut.
+
+a. **Pasar sumber daya alam/tanah.** Faktor produksi tanah meliputi permukaan dan semua yang terkandung di dalamnya. Balas jasa yang diterima dari pengguna faktor produksi tanah adalah sewa. Tanah sebagai faktor produksi asli sangat penting bagi kegiatan produksi. Harga dan jumlah permintaan tanah berbeda-beda. Hal ini karena perbedaan sifat tanah yang meliputi kesuburan, letak, serta banyaknya tanah yang digunakan untuk produksi dan tempat tinggal.
+
+b. **Pasar tenaga kerja.** Pasar tenaga kerja merupakan seluruh aktivitas dari pelaku yang tujuannya mempertemukan para pencari kerja dengan pengguna tenaga kerja. Permintaan tenaga kerja datang dari rumah tangga produksi. Adapun penawaran tenaga kerja datang dari masyarakat.
+
+c. **Pasar modal.** Pasar modal adalah tempat jual beli dana dan investasi jangka panjang. Permintaan modal berasal dari pengusaha dan penawaran berasal dari pemilik modal.
+
+d. **Pasar kewirausahaan.** Kewirausahaan merupakan inisiatif untuk mengoordinasi faktor produksi guna mencapai efisiensi yang maksimal. Orang yang melakukan koordinasi disebut wirausahawan.
       `,
     },
   ],
