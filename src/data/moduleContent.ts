@@ -1085,9 +1085,17 @@ d. Penawaran faktor produksi kadang merupakan monopoli, sementara permintaan fak
   videos: [
     {
       id: 'video-pasar-1',
-      title: 'Video Pembelajaran: Konsep Pasar',
-      url: 'https://www.youtube.com/embed/placeholder',
-      description: 'Video pengantar mengenai konsep dan jenis-jenis pasar.',
+      title: 'Konsep Dasar Pasar',
+      url: 'https://www.youtube.com/embed/EO_9e2kcZm8',
+      description: 'Penjelasan mendalam mengenai pengertian, syarat, dan fungsi pasar dalam ekonomi.',
+      task: 'Buatlah ringkasan dari video pembelajaran di atas minimal 100 kata.'
+    },
+    {
+      id: 'video-pasar-2',
+      title: 'Struktur dan Macam Pasar',
+      url: 'https://www.youtube.com/embed/VbBHbXjbECU',
+      description: 'Membahas berbagai macam struktur pasar mulai dari persaingan sempurna hingga monopoli.',
+      task: 'Buatlah ringkasan dari video pembelajaran di atas minimal 100 kata.'
     },
   ],
   quizQuestions: Array.from({ length: 10 }, (_, i) => ({

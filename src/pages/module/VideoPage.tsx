@@ -10,7 +10,9 @@ import {
   ArrowLeft,
   Play,
   CheckCircle2,
-  Clock
+  Clock,
+  MessageSquare,
+  Star
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -156,7 +158,7 @@ export default function VideoPage() {
             Tonton Video Penjelasan
           </h1>
           <p className="text-muted-foreground">
-            Simak video-video berikut untuk pemahaman yang lebih mendalam tentang {isPKWU ? 'kerajinan dari bahan limbah' : 'konsep permintaan'}.
+            Simak video-video berikut untuk pemahaman yang lebih mendalam tentang {module.title.toLowerCase()}.
           </p>
         </motion.div>
 
@@ -234,32 +236,77 @@ export default function VideoPage() {
               <CardContent className="space-y-4">
                 {feedback ? (
                   <div className="p-4 bg-background rounded-lg border">
-                    <p className="font-medium mb-2 text-sm text-muted-foreground">Jawaban Kamu:</p>
-                    <p className="mb-4 text-sm">{answer}</p>
-                    <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                      <p className="font-bold text-yellow-800 dark:text-yellow-400 text-sm mb-1">Feedback Guru:</p>
-                      <p className="text-yellow-700 dark:text-yellow-300 whitespace-pre-line">{feedback}</p>
+                    <p className="font-medium mb-2 text-sm text-muted-foreground">Ringkasan Kamu:</p>
+                    <p className="mb-4 text-sm whitespace-pre-wrap">{answer}</p>
+                    <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                      <div className="flex items-center gap-2 mb-1 text-blue-700 dark:text-blue-400">
+                        <MessageSquare className="h-4 w-4" />
+                        <span className="font-medium text-sm">Feedback Guru</span>
+                      </div>
+                      <p className="text-sm text-blue-800 dark:text-blue-300">
+                        {feedback}
+                      </p>
+                      
+                      {/* Visual Stars Display */}
+                      {(() => {
+                        let stars = 0;
+                        if (feedback.includes('⭐⭐⭐⭐⭐')) stars = 5;
+                        else if (feedback.includes('⭐⭐⭐⭐')) stars = 4;
+                        else if (feedback.includes('⭐⭐⭐')) stars = 3;
+                        else if (feedback.includes('⭐⭐')) stars = 2;
+                        else if (feedback.includes('⭐')) stars = 1;
+                        
+                        if (stars > 0) {
+                          return (
+                            <div className="mt-2 flex items-center gap-1">
+                              {[1, 2, 3, 4, 5].map((s) => (
+                                <Star 
+                                  key={s} 
+                                  className={`h-4 w-4 ${s <= stars ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} 
+                                />
+                              ))}
+                              <span className="ml-1 text-xs font-bold text-yellow-600 dark:text-yellow-400">
+                                {stars}/5 Bintang
+                              </span>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
                     </div>
                   </div>
                 ) : (
                   <>
-                    <textarea
-                      className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      placeholder="Tulis jawabanmu di sini..."
-                      value={answer}
-                      onChange={(e) => {
-                        setAnswer(e.target.value);
-                        setSaved(false);
-                      }}
-                    />
-                    <div className="flex justify-end">
-                      <Button
-                        onClick={saveAnswer}
-                        disabled={!answer.trim() || saving}
-                      >
-                        {saving ? 'Menyimpan...' : (saved ? 'Tersimpan' : 'Kirim Jawaban')}
-                      </Button>
+                    <div className="space-y-2">
+                      <textarea
+                        className="flex min-h-[150px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        placeholder="Tulis ringkasanmu di sini (minimal 100 kata)..."
+                        value={answer}
+                        onChange={(e) => {
+                          setAnswer(e.target.value);
+                          setSaved(false);
+                        }}
+                      />
+                      <div className="flex justify-between items-center text-xs">
+                        <span className={answer.trim().split(/\s+/).filter(w => w.length > 0).length >= 100 ? "text-green-600 font-bold" : "text-muted-foreground"}>
+                          Jumlah kata: {answer.trim() === '' ? 0 : answer.trim().split(/\s+/).filter(w => w.length > 0).length} / 100
+                        </span>
+                        {answer.trim().split(/\s+/).filter(w => w.length > 0).length < 100 && (
+                          <span className="text-red-500 italic">Minimal 100 kata untuk dapat menyimpan.</span>
+                        )}
+                      </div>
                     </div>
+                    {answer.trim().split(/\s+/).filter(w => w.length > 0).length >= 100 && (
+                      <div className="flex justify-end">
+                        <Button
+                          onClick={saveAnswer}
+                          disabled={saving}
+                          className="bg-gradient-primary"
+                        >
+                          {saving ? 'Menyimpan...' : (saved ? 'Tersimpan' : 'Kirim Ringkasan')}
+                        </Button>
+                      </div>
+                    )}
                   </>
                 )}
               </CardContent>
