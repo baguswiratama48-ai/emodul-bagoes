@@ -39,7 +39,16 @@ export default function VideoPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const { user } = useAuth();
-  const { toast } = useToast(); // Fix import logic, assumed useToast hook is available
+  const { toast } = useToast();
+
+  const storageKey = user ? `video-answer-${user.id}-${module.id}-${selectedVideo.id}` : null;
+
+  // Auto-save to localStorage
+  useEffect(() => {
+    if (storageKey && answer && !saved && !saving) {
+      localStorage.setItem(storageKey, answer);
+    }
+  }, [answer, storageKey, saved, saving]);
 
   // Load existing answer and feedback
   useEffect(() => {
@@ -68,6 +77,9 @@ export default function VideoPage() {
         setAnswerId(data.id);
         setSaved(true);
 
+        // Clear local storage if server has the data
+        if (storageKey) localStorage.removeItem(storageKey);
+
         // Fetch feedback
         const { data: fbData } = await supabase
           .from('teacher_feedback')
@@ -78,6 +90,18 @@ export default function VideoPage() {
 
         if (fbData) {
           setFeedback(fbData.feedback);
+        }
+      } else {
+        // If no server data, check local storage for draft
+        if (storageKey) {
+          const localDraft = localStorage.getItem(storageKey);
+          if (localDraft) {
+            setAnswer(localDraft);
+            toast({
+              title: "Draft Ditemukan",
+              description: "Memulihkan jawaban yang belum sempat tersimpan.",
+            });
+          }
         }
       }
     } catch (error) {
@@ -108,9 +132,21 @@ export default function VideoPage() {
 
       setAnswerId(data.id);
       setSaved(true);
-      // toast({ title: 'Tersimpan', description: 'Jawaban berhasil disimpan' }); // importing toast context is tricky here without modifying imports
+
+      // Clear local storage on success
+      if (storageKey) localStorage.removeItem(storageKey);
+
+      toast({
+        title: 'Berhasil Disimpan',
+        description: 'Ringkasan video Anda telah berhasil disimpan ke server.'
+      });
     } catch (error) {
       console.error('Error saving answer:', error);
+      toast({
+        title: 'Gagal Menyimpan',
+        description: 'Terjadi gangguan koneksi. Jawaban Anda tetap tersimpan aman di browser ini dan akan dicoba kembali nanti.',
+        variant: 'destructive'
+      });
     } finally {
       setSaving(false);
     }
