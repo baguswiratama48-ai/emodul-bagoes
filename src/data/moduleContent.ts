@@ -496,12 +496,14 @@ Perubahan jumlah barang yang diminta pada **setiap tingkat harga** akibat peruba
       title: 'Membuat Kurva Permintaan',
       url: 'https://www.youtube.com/embed/ifzlTBn1xgU',
       description: 'Tutorial cara membuat tabel dan kurva permintaan',
+      task: 'Buatlah ringkasan dari video pembelajaran di atas minimal 100 kata.'
     },
     {
       id: 'video-4',
       title: 'Fungsi dan Pergeseran Kurva Permintaan',
       url: 'https://www.youtube.com/embed/AUfiSTR9G5Y',
       description: 'Penjelasan fungsi permintaan dan pergeseran kurva',
+      task: 'Buatlah ringkasan dari video pembelajaran di atas minimal 100 kata.'
     },
   ],
   quizQuestions: [

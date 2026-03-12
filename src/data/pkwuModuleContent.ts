@@ -1408,7 +1408,8 @@ Merupakan aplikasi dalam mempromosikan produk atau merek yang berasosiasi dengan
       id: 'video-sumber-daya',
       title: 'Sumber Daya Usaha',
       url: 'https://www.youtube.com/embed/sdgyMRNqB7g?si=ADbDbyS8dLK0U52Y',
-      description: 'Video pembelajaran tentang Sumber Daya Usaha, Administrasi, dan Pemasaran Kerajinan.',
+      description: 'Video pembelajaran tentang Sumber Daya Usaha, Administrasi, and Pemasaran Kerajinan.',
+      task: 'Buatlah ringkasan dari video pembelajaran di atas minimal 100 kata.'
     }
   ],
   quizQuestions: [],
