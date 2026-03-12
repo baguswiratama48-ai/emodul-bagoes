@@ -52,48 +52,43 @@ export default function VideoPage() {
 
   // Load existing answer and feedback
   useEffect(() => {
-    if (user && selectedVideo) {
-      loadAnswer();
-      setAnswer(''); // Reset when video changes
+    let isMounted = true;
+    
+    const fetchData = async () => {
+      if (!user || !selectedVideo) return;
+      
+      setAnswer(''); // Reset
+      setAnswerId(null);
       setSaved(false);
       setFeedback('');
-    }
-  }, [user, selectedVideo, module.id]); // Add dependencies
-
-  const loadAnswer = async () => {
-    if (!user) return;
-
-    try {
-      const { data }: { data: any } = await supabase
-        .from('video_answers' as any)
-        .select('id, answer')
-        .eq('user_id', user.id)
-        .eq('module_id', module.id)
-        .eq('video_id', selectedVideo.id)
-        .maybeSingle();
-
-      if (data) {
-        setAnswer(data.answer || '');
-        setAnswerId(data.id);
-        setSaved(true);
-
-        // Clear local storage if server has the data
-        if (storageKey) localStorage.removeItem(storageKey);
-
-        // Fetch feedback
-        const { data: fbData } = await supabase
-          .from('teacher_feedback')
-          .select('feedback')
-          .eq('answer_id', data.id)
-          .eq('answer_type', 'video')
+      
+      try {
+        const { data }: { data: any } = await supabase
+          .from('video_answers' as any)
+          .select('id, answer')
+          .eq('user_id', user.id)
+          .eq('module_id', module.id)
+          .eq('video_id', selectedVideo.id)
           .maybeSingle();
 
-        if (fbData) {
-          setFeedback(fbData.feedback);
-        }
-      } else {
-        // If no server data, check local storage for draft
-        if (storageKey) {
+        if (isMounted && data) {
+          setAnswer(data.answer || '');
+          setAnswerId(data.id);
+          setSaved(true);
+
+          if (storageKey) localStorage.removeItem(storageKey);
+
+          const { data: fbData } = await supabase
+            .from('teacher_feedback')
+            .select('feedback')
+            .eq('answer_id', data.id)
+            .eq('answer_type', 'video')
+            .maybeSingle();
+
+          if (isMounted && fbData) {
+            setFeedback(fbData.feedback);
+          }
+        } else if (isMounted && storageKey) {
           const localDraft = localStorage.getItem(storageKey);
           if (localDraft) {
             setAnswer(localDraft);
@@ -103,48 +98,64 @@ export default function VideoPage() {
             });
           }
         }
+      } catch (err) {
+        console.error('Error in fetching data:', err);
       }
-    } catch (error) {
-      console.error('Error loading video answer:', error);
-    }
-  };
+    };
+
+    fetchData();
+    return () => { isMounted = false; };
+  }, [user?.id, selectedVideo.id, module.id]);
 
   const saveAnswer = async () => {
     if (!user || !answer.trim()) return;
     setSaving(true);
 
     try {
-      const { data, error }: { data: any, error: any } = await supabase
+      console.log('Saving video answer for:', {
+        user_id: user.id,
+        module_id: module.id,
+        video_id: selectedVideo.id
+      });
+
+      const payload: any = {
+        user_id: user.id,
+        module_id: module.id,
+        video_id: selectedVideo.id,
+        answer: answer.trim(),
+        updated_at: new Date().toISOString()
+      };
+
+      if (answerId) payload.id = answerId;
+
+      const { data, error } = await supabase
         .from('video_answers' as any)
-        .upsert({
-          user_id: user.id,
-          module_id: module.id,
-          video_id: selectedVideo.id,
-          answer: answer.trim(),
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_id,module_id,video_id'
+        .upsert(payload, { 
+          onConflict: 'user_id,module_id,video_id' 
         })
         .select()
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error details:', error);
+        throw error;
+      }
 
-      setAnswerId(data.id);
-      setSaved(true);
-
-      // Clear local storage on success
-      if (storageKey) localStorage.removeItem(storageKey);
-
-      toast({
-        title: 'Berhasil Disimpan',
-        description: 'Ringkasan video Anda telah berhasil disimpan ke server.'
-      });
-    } catch (error) {
-      console.error('Error saving answer:', error);
+      if (data) {
+        setAnswerId((data as any).id);
+        setSaved(true);
+        if (storageKey) localStorage.removeItem(storageKey);
+        
+        toast({
+          title: 'Berhasil Disimpan',
+          description: 'Ringkasan video Anda telah berhasil disimpan.'
+        });
+      }
+    } catch (error: any) {
+      console.error('Error detail saat simpan video:', error);
       toast({
         title: 'Gagal Menyimpan',
-        description: 'Terjadi gangguan koneksi. Jawaban Anda tetap tersimpan aman di browser ini dan akan dicoba kembali nanti.',
+        description: `Terjadi gangguan: ${error.message || 'Koneksi bermasalah'}. Jawaban Anda tetap aman di browser ini.`,
         variant: 'destructive'
       });
     } finally {
@@ -162,6 +173,9 @@ export default function VideoPage() {
 
   const isVideoWatched = (videoId: string) => progress.watchedVideos.includes(videoId);
   const watchedCount = module.videos.filter(v => isVideoWatched(v.id)).length;
+
+  const wordCount = answer.trim() === '' ? 0 : answer.trim().split(/\s+/).filter(w => w.length > 0).length;
+  const isSatisfied = wordCount >= 100;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -324,15 +338,15 @@ export default function VideoPage() {
                         }}
                       />
                       <div className="flex justify-between items-center text-xs">
-                        <span className={answer.trim().split(/\s+/).filter(w => w.length > 0).length >= 100 ? "text-green-600 font-bold" : "text-muted-foreground"}>
-                          Jumlah kata: {answer.trim() === '' ? 0 : answer.trim().split(/\s+/).filter(w => w.length > 0).length} / 100
+                        <span className={isSatisfied ? "text-green-600 font-bold" : "text-muted-foreground"}>
+                          Jumlah kata: {wordCount} / 100
                         </span>
-                        {answer.trim().split(/\s+/).filter(w => w.length > 0).length < 100 && (
+                        {!isSatisfied && (
                           <span className="text-red-500 italic">Minimal 100 kata untuk dapat menyimpan.</span>
                         )}
                       </div>
                     </div>
-                    {answer.trim().split(/\s+/).filter(w => w.length > 0).length >= 100 && (
+                    {isSatisfied && (
                       <div className="flex justify-end">
                         <Button
                           onClick={saveAnswer}

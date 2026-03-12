@@ -482,12 +482,14 @@ Perubahan jumlah barang yang diminta pada **setiap tingkat harga** akibat peruba
       title: 'Pengantar Konsep Permintaan',
       url: 'https://www.youtube.com/embed/OSDYAzU5v-I',
       description: 'Video pengenalan tentang konsep dasar permintaan dalam ekonomi',
+      task: 'Buatlah ringkasan dari video pembelajaran di atas minimal 100 kata.'
     },
     {
       id: 'video-2',
       title: 'Hukum Permintaan dan Ceteris Paribus',
       url: 'https://www.youtube.com/embed/dq1KMVUt570',
       description: 'Penjelasan tentang hukum permintaan dan asumsi ceteris paribus',
+      task: 'Buatlah ringkasan dari video pembelajaran di atas minimal 100 kata.'
     },
     {
       id: 'video-3',
@@ -767,12 +769,14 @@ Perubahan **faktor-faktor lain selain harga**, misalnya adanya **pajak** atau **
       title: 'Konsep Dasar Penawaran',
       url: 'https://www.youtube.com/embed/oBY7ST6GdpQ',
       description: 'Penjelasan tentang pengertian dan konsep dasar penawaran.',
+      task: 'Buatlah ringkasan dari video pembelajaran di atas minimal 100 kata.'
     },
     {
       id: 'video-s2',
       title: 'Faktor Penawaran',
       url: 'https://www.youtube.com/embed/TC5Bko5SvWg',
       description: 'Video penjelasan faktor-faktor yang memengaruhi penawaran.',
+      task: 'Buatlah ringkasan dari video pembelajaran di atas minimal 100 kata.'
     }
   ],
   quizQuestions: Array.from({ length: 50 }, (_, i) => {

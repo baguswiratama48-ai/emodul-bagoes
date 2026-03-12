@@ -158,6 +158,44 @@ export type Database = {
           }
         ]
       }
+      video_answers: {
+        Row: {
+          answer: string | null
+          id: string
+          module_id: string
+          submitted_at: string
+          updated_at: string
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          answer?: string | null
+          id?: string
+          module_id: string
+          submitted_at?: string
+          updated_at?: string
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          answer?: string | null
+          id?: string
+          module_id?: string
+          submitted_at?: string
+          updated_at?: string
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_answers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       teacher_feedback: {
         Row: {
           answer_id: string
