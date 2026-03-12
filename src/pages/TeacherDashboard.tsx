@@ -193,58 +193,11 @@ export default function TeacherDashboard() {
     return a.full_name.localeCompare(b.full_name);
   };
 
-  useEffect(() => {
-    if (isGuru) {
-      fetchStudentData();
+  // Debounce helper for background updates
+  const [lastUpdate, setLastUpdate] = useState<number>(0);
 
-      // Subscribe to real-time updates for all relevant tables
-      const feedbackParams = { event: '*', schema: 'public', table: 'teacher_feedback' } as const;
-      const lkpdParams = { event: '*', schema: 'public', table: 'lkpd_answers' } as const;
-      const triggerParams = { event: '*', schema: 'public', table: 'trigger_answers' } as const;
-      const quizParams = { event: '*', schema: 'public', table: 'quiz_answers' } as const;
-      const notesParams = { event: '*', schema: 'public', table: 'student_notes' } as const;
-
-      const channel = supabase.channel('teacher-dashboard-changes')
-        .on('postgres_changes', feedbackParams, () => {
-          console.log('Realtime update: teacher_feedback');
-          fetchStudentData();
-        })
-        .on('postgres_changes', lkpdParams, () => {
-          console.log('Realtime update: lkpd_answers');
-          fetchStudentData();
-        })
-        .on('postgres_changes', triggerParams, () => {
-          console.log('Realtime update: trigger_answers');
-          fetchStudentData();
-        })
-        .on('postgres_changes', quizParams, () => {
-          console.log('Realtime update: quiz_answers');
-          fetchStudentData();
-        })
-        .on('postgres_changes', notesParams, () => {
-          console.log('Realtime update: student_notes');
-          fetchStudentData();
-        })
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
-  }, [isGuru]);
-
-  // Reset kelas filter & pagination when mapel changes
-  useEffect(() => {
-    setSelectedKelas('all');
-    setCurrentPageTrigger(1);
-    setCurrentPageReflection(1);
-    setCurrentPageSummary(1);
-    setCurrentPageLkpd(1);
-    setCurrentPageQuiz(1);
-  }, [selectedMapel]);
-
-  const fetchStudentData = async () => {
-    setLoading(true);
+  const fetchStudentData = async (isBackground = false) => {
+    if (!isBackground) setLoading(true);
 
     // Fetch all profiles with NIS and kelas
     const { data: profilesData } = await supabase
@@ -478,8 +431,37 @@ export default function TeacherDashboard() {
       }));
     }
 
-    setLoading(false);
+    if (!isBackground) setLoading(false);
   };
+
+  useEffect(() => {
+    if (isGuru) {
+      fetchStudentData();
+
+      // Debounced fetch function for realtime updates
+      const debouncedFetch = () => {
+        const now = Date.now();
+        if (now - lastUpdate > 2000) { // Max once every 2 seconds
+          setLastUpdate(now);
+          fetchStudentData(true);
+        }
+      };
+
+      // Subscribe to real-time updates for all relevant tables
+      const channel = supabase.channel('teacher-dashboard-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'quiz_answers' }, debouncedFetch)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'lkpd_answers' }, debouncedFetch)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'trigger_answers' }, debouncedFetch)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'video_answers' }, debouncedFetch)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'student_notes' }, debouncedFetch)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'teacher_feedback' }, debouncedFetch)
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [isGuru]);
 
   const handleUpdateNote = async (noteId: string, score: string, feedback: string) => {
     try {
@@ -499,20 +481,15 @@ export default function TeacherDashboard() {
     }
   };
 
-  // Realtime Subscription
+  // Reset kelas filter & pagination when mapel changes
   useEffect(() => {
-    const channels = supabase.channel('custom-all-channel')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'quiz_answers' }, () => fetchStudentData())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'lkpd_answers' }, () => fetchStudentData())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'trigger_answers' }, () => fetchStudentData())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'video_answers' }, () => fetchStudentData())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'teacher_feedback' }, () => fetchStudentData())
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channels);
-    };
-  }, []);
+    setSelectedKelas('all');
+    setCurrentPageTrigger(1);
+    setCurrentPageReflection(1);
+    setCurrentPageSummary(1);
+    setCurrentPageLkpd(1);
+    setCurrentPageQuiz(1);
+  }, [selectedMapel]);
 
   // Filter functions based on mapel and kelas
   // Filter functions based on mapel and kelas
